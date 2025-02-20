@@ -2,6 +2,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
+import MainCard from "@/components/Home/MainCard";
 //import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
@@ -23,7 +24,8 @@ export default function RootLayout() {
   return (
     <html lang="en">
       <body>
-        
+        <NavBar/>
+        <MainCard/>
       </body>
     </html>
   );
