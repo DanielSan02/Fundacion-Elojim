@@ -3,13 +3,13 @@ import React, { useState } from 'react'
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaWheelchair } from "react-icons/fa6";
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';  // Importamos useSession
-import {signOut} from 'next-auth/react'
+//import { useSession } from 'next-auth/react';  // Importamos useSession
+//import {signOut} from 'next-auth/react'
 
 function NavBar() {
-    const { data: session } = useSession();  // Usamos useSession para obtener la sesión
+    //const { data: session } = useSession();  // Usamos useSession para obtener la sesión
     const [menuOpen, setMenuOpen] = useState(false);
-
+    let session = 1
     return (
         <header className="w-full">
 
@@ -83,7 +83,7 @@ function NavBar() {
 
                     {/* Session Buttons */}
                     <div className="hidden md:flex justify-center items-center px-12 py-6 bg-[#F8E81F]">
-                        {!session ? (
+                        {session=1 ? (
                             <Link href={'/auth/login'}>
                                 <button className="text-black font-semibold">Iniciar sesión</button>
                             </Link>
@@ -112,7 +112,7 @@ function NavBar() {
     </ul>
     {session ? (
       <>
-        <p className="text-black font-semibold py-2">Bienvenido, {session.user.name}</p>
+        <p className="text-black font-semibold py-2">Bienvenido</p>
         <button className="text-black font-semibold py-2 px-4 bg-[#F8E81F]" onClick={() => signOut()}>Cerrar sesión</button>
       </>
     ) : (

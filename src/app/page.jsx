@@ -3,12 +3,12 @@
 import NavBar from "@/components/NavBar";
 
 
-export default function Home({ session }) {
+export default function Home() {
   return (
-    <SessionProvider session={session}>
+    
       <div className="">
         <NavBar />
       </div>
-    </SessionProvider>
+    
   );
 }
