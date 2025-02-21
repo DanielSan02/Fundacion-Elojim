@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(20)
+  lastName String  @db.VarChar(20)
+  email    String  @unique
+  password String  @db.VarChar(100)  // Aumenté a 100 caracteres para seguridad
+  posts    Post[]
+  rolId    Int
+  role     Role    @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("users")  // Mapea a la tabla "users" en la DB
+}
+
+model Role {
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(50)
+  users   Users[]
+
+  @@map("roles")  // Mapea a la tabla "roles" en la DB
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  authorId  Int
+  author    Users     @relation(fields: [authorId], references: [id])
+
+  @@map("posts")  // Mapea a la tabla "posts" en la DB
+}
