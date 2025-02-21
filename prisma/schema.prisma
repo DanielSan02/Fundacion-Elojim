@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,19 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id    Int     @id @default(autoincrement())
-  name  String  @db.VarChar(20)
-  lastname String  @db.VarChar(20)
-  email String  @unique
-  password String    @db.VarChar(20)
-  posts post[]
+model Users {
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(20)
+  lastName String  @db.VarChar(20)
+  email    String  @unique
+  password String  @db.VarChar(100)  // Aumenté a 100 caracteres para seguridad
+  posts    Post[]
+  rolId    Int
+  role     Role    @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("users")  // Mapea a la tabla "users" en la DB
 }
 
-model post {
+model Role {
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(50)
+  users   Users[]
+
+  @@map("roles")  // Mapea a la tabla "roles" en la DB
+}
+
+model Post {
   id        Int      @id @default(autoincrement())
   title     String
   content   String?
-  author    users     @relation(fields: [authorId], references: [id])
   authorId  Int
+  author    Users     @relation(fields: [authorId], references: [id])
+
+  @@map("posts")  // Mapea a la tabla "posts" en la DB
 }
