@@ -16,7 +16,7 @@ function NavBar() {
             <nav className="bg-[#1B3C8C] text-black px-12 py-1 sm:px-12  md:px-12 md:py-0">
                 <div className=" flex justify-between items-center">
                         <Link href='' className='flex'>
-                            <img src="/images/logoFundación.jpg" className="object-left w-24 sm:w-32 h-12 rounded" alt="Fundación Elojim" />
+                            <img src="/images/logoFundación_circular.png" className="w-16 h-16 object-cover border-solid" alt="Fundación Elojim" />
                         </Link>
                         
                         
@@ -27,7 +27,7 @@ function NavBar() {
                     {/* Hamburger Menu */}
                     <button
                         aria-label='hamburgerMenu'
-                        className="md:hidden text-black focus:outline-none"
+                        className="md:hidden text-white focus:outline-none"
                         onClick={() => setMenuOpen(!menuOpen)}
                     >
                         <GiHamburgerMenu />
@@ -80,9 +80,9 @@ function NavBar() {
         <li className="py-2 px-4 hover:text-gray-500 text-white">Contacto</li>
       </Link>
     </ul>
-    {session ? (
+    {session=2 ? (
       <>
-        <p className="text-black font-semibold py-2">Bienvenido</p>
+        <p className="text-white font-semibold py-2">Bienvenido</p>
         <button className="text-white font-semibold py-2 px-4 bg-[#3B82F6]" onClick={() => signOut()}>Cerrar sesión</button>
       </>
     ) : (
