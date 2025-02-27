@@ -1,100 +1,101 @@
-'use client'
-import React, { useState } from 'react'
-import { GiHamburgerMenu } from "react-icons/gi";
-import { FaWheelchair } from "react-icons/fa6";
-import Link from 'next/link';
-import { useSession } from 'next-auth/react';  // Importamos useSession
-//import {signOut} from 'next-auth/react'
+"use client";
 
-function NavBar() {
-    const { data: session } = useSession();  // Usamos useSession para obtener la sesión
-    const [menuOpen, setMenuOpen] = useState(false);
-    
-    return (
-        <header className="w-full">
-            {/* Main Navbar */}
-            <nav className="bg-[#1B3C8C] text-black px-12 py-1 sm:px-12  md:px-12 md:py-0">
-                <div className=" flex justify-between items-center">
-                        <Link href='' className='flex'>
-                            <img src="/images/logoFundación_circular2.png" className="w-16 h-16 object-cover border-solid rounded-full" alt="Fundación Elojim" />
-                        </Link>
-                        
-                        
-                    <div className="flex items-center">
-                        
-                    </div>
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
-                    {/* Hamburger Menu */}
-                    <button
-                        aria-label='hamburgerMenu'
-                        className="md:hidden text-white focus:outline-none"
-                        onClick={() => setMenuOpen(!menuOpen)}
-                    >
-                        <GiHamburgerMenu />
-                    </button>
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-                    {/* Menu */}
-                    <ul
-                        className={`${menuOpen ? 'block' : 'hidden'} md:flex gap-2 md:gap-0 text-center items-center md:text-sm lg:text-base absolute md:static bg-white w-full md:w-auto top-full left-0 md:top-auto md:left-auto md:bg-transparent shadow md:shadow-none`}
-                    >
-                        <Link href={'/'} >
-                            <li className="py-2 px-4 md:px-2 hover:text-[#3B82F6] text-white lg:py-0">Inicio</li>
-                        </Link>
-                        <Link href={'/'} >
-                            <li className="py-2 px-4 md:px-2 hover:text-[#3B82F6] lg:py-0 text-white">Nosotros</li>
-                        </Link>
-                        <Link href={'/'} >
-                            <li className="py-2 px-4 md:px-2 hover:text-[#3B82F6] lg:py-0 text-white">Programas</li>
-                        </Link>
-                        <Link href={'/'} >
-                            <li className="py-2 px-4 md:px-2  hover:text-[#3B82F6] lg:py-0 text-white">Contacto</li>
-                        </Link>
-                    </ul>
+  const navItems = [
+    { href: "#inicio", label: "Inicio" },
+    { href: "#nosotros", label: "Nosotros" },
+    { href: "#noticias", label: "Noticias" },
+    { href: "#contacto", label: "Contáctanos" },
+  ];
 
-                    {/* Session Buttons */}
-                    <div className="hidden md:flex justify-center items-center px-12 py-6 bg-[#3B82F6]">
-                        {session ? (
-                            <Link href={'/auth/login'}>
-                                <button className="text-white font-semibold">Iniciar sesión</button>
-                            </Link>
-                        ):(
-                            <button className="text-white text-center font-semibold" onClick={() => signOut()}>Cerrar sesión</button>
-                        )}
-                    </div>
-                </div>
+  return (
+    <header className="fixed w-full z-50 bg-[#1B3C8C] bg-opacity-95 text-white">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-20">
+          <Link href="/" className="flex items-center space-x-2">
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-02-13%20at%2017.34.06_40b979a6.jpg-DJAWfRDBGD3mQ8bzUFl012SW2IPPFV.jpeg"
+              alt="Fundación Elojim"
+              width={50}
+              height={50}
+              className="rounded-full"
+            />
+            <span className="text-2xl font-semibold">Fundación Elojim</span>
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="hover:text-[#3B82F6] transition-colors">
+                {item.label}
+              </a>
+            ))}
+            <Link href="/auth/login">
+              <Button
+                variant="outline"
+                className="text-[#3B82F6] border-white hover:bg-[#3B82F6] hover:text-white transition-colors">
+                Iniciar Sesión
+              </Button>
+            </Link>
+          </nav>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" className="p-0">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
 
-                {/* Menu Responsive */}
-                {menuOpen && (
-  <div className="flex flex-col text-center md:hidden pb-2" data-testid="responsive-menu">
-    <ul>
-      <Link href={'/'}>
-        <li className="py-2 px-4 hover:text-[#3B82F6] text-white">Inicio</li>
-      </Link>
-      <Link href={'/requestEscenary'}>
-        <li className="py-2 px-4 hover:text-[#3B82F6] text-white">Nosotros</li>
-      </Link>
-      <Link href={'/'}>
-        <li className="py-2 px-4 hover:text-[#3B82F6] text-white">Programas</li>
-      </Link>
-      <Link href={''}>
-        <li className="py-2 px-4 hover:text-[#3B82F6] text-white">Contacto</li>
-      </Link>
-    </ul>
-    {session ? (
-      <>
-        <p className="text-white font-semibold py-2">Bienvenido</p>
-        <button className="text-white font-semibold py-2 px-4 bg-[#3B82F6]" onClick={() => signOut()}>Cerrar sesión</button>
-      </>
-    ) : (
-      <Link href={'/auth/login'}>
-        <button className="text-white font-semibold py-2 px-4 bg-[#3B82F6]">Iniciar sesión</button>
-      </Link>
-    )}
-  </div>
-)}
-            </nav>
-        </header>
-    );
-}
+            <SheetContent
+              side="right"
+              className="w-[300px] sm:w-[400px] bg-[#1B3C8C] text-white">
+              {/* 🔹 Agregar SheetTitle para accesibilidad */}
+              <SheetHeader>
+                <SheetTitle className="text-white text-xl font-bold tracking-wide">
+                  Menú
+                </SheetTitle>
+              </SheetHeader>
 
-export default NavBar;
+              <nav className="flex flex-col space-y-4 mt-6">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-lg hover:text-[#3B82F6] transition-colors"
+                    onClick={() => setIsOpen(false)}>
+                    {item.label}
+                  </Link>
+                ))}
+                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="text-[#3B82F6] border-white hover:bg-[#3B82F6] hover:text-white transition-colors">
+                    Iniciar Sesión
+                  </Button>
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;
