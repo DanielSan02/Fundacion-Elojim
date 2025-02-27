@@ -75,6 +75,9 @@ module.exports = {
 	  },
 	},
 	plugins: [require("tailwindcss-animate")],
+	variants: {
+		scrollBehavior: ["responsive", "motion-safe", "motion-reduce"],
+	  },
   }
   
   
