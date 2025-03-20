@@ -21,6 +21,7 @@ const Navbar = () => {
     { href: "#nosotros", label: "Nosotros" },
     { href: "#noticias", label: "Noticias" },
     { href: "#contacto", label: "Contáctanos" },
+    { href: "/programas", label: "Programas" },
   ];
 
   return (
