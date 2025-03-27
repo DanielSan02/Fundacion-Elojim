@@ -28,34 +28,47 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export default function SoftwareFactoryForm({ program, onClose }) {
+export default function SemilleroForm({ program, onClose }) {
   const { registerProgram } = usePrograms();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState();
 
   const [formData, setFormData] = useState({
+    // Datos Personales
     nombreCompleto: "",
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    telefono: "",
+    telefonoContacto: "",
     correoElectronico: "",
     direccion: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
     grupoEtnico: "",
-    institucionEducativa: "",
-    programaAcademico: "",
-    semestreNivel: "",
-    modalidadVinculacion: "pasantia",
-    tiempoDisponible: "",
-    tecnologias: [],
-    proyectosRealizados: "",
-    motivacion: "",
+
+    // Información de Vinculación
+    tipoVinculacion: "institucion",
+    nombreInstitucion: "",
+    nivelEducativo: "",
+
+    // Intereses y Experiencia
+    participacionPrevia: "no",
     areasInteres: [],
-    experienciaAgile: "",
+    otrasAreas: "",
+    tieneProyecto: "no",
+    descripcionProyecto: "",
+
+    // Habilidades y Disponibilidad
+    habilidades: "",
+    disponibilidad: "",
+
+    // Motivación
+    motivacion: "",
+    expectativas: "",
+
+    // Autorización
     aceptaTerminos: false,
   });
 
@@ -85,24 +98,6 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         [name]: value,
       });
     }
-  };
-
-  const handleTecnologiaChange = (tecnologia) => {
-    setFormData((prev) => {
-      const currentTecnologias = [...prev.tecnologias];
-
-      if (currentTecnologias.includes(tecnologia)) {
-        return {
-          ...prev,
-          tecnologias: currentTecnologias.filter((t) => t !== tecnologia),
-        };
-      } else {
-        return {
-          ...prev,
-          tecnologias: [...currentTecnologias, tecnologia],
-        };
-      }
-    });
   };
 
   const handleAreaInteresChange = (area) => {
@@ -143,13 +138,14 @@ export default function SoftwareFactoryForm({ program, onClose }) {
       setIsSubmitting(false);
       toast({
         title: "¡Inscripción exitosa!",
-        description: `Te has inscrito correctamente en la Factoría de Software.`,
+        description: `Te has inscrito correctamente en el Semillero de Innovación y Emprendimiento.`,
         variant: "default",
       });
       onClose();
     }, 1500);
   };
 
+  const tiposDocumento = ["CC", "TI", "CE", "Pasaporte"];
   const estratoOptions = ["1", "2", "3", "4", "5", "6"];
 
   const gruposEtnicos = [
@@ -162,26 +158,12 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     "Otro",
   ];
 
-  const tecnologias = [
-    "Desarrollo web (HTML, CSS, JavaScript)",
-    "Backend (Python, Java, Node.js, etc.)",
-    "Bases de datos (MySQL, PostgreSQL, MongoDB, etc.)",
-    "Desarrollo móvil (Android, iOS, Flutter, React Native)",
-    "Inteligencia Artificial / Machine Learning",
-    "Ciberseguridad",
-  ];
-
   const areasInteres = [
-    "Desarrollo de Aplicaciones",
-    "Inteligencia Artificial y Aprendizaje Automático",
-    "Bases de Datos y Big Data",
-    "Ciberseguridad",
-    "Computación en la Nube y DevOps",
-    "Internet de las Cosas (IoT)",
-    "Realidad Virtual y Aumentada",
-    "Blockchain y Criptomonedas",
-    "Ingeniería de Software y Metodologías de Desarrollo",
-    "Software para Educación e Inclusión",
+    "Emprendimiento social",
+    "Tecnología e innovación",
+    "Medio ambiente y sostenibilidad",
+    "Transformación digital",
+    "Desarrollo de productos o servicios",
   ];
 
   return (
@@ -194,11 +176,10 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         <h3
           className="text-2xl font-bold mb-2"
           style={{ color: program.color }}>
-          Formulario de Registro - Software Factory
+          Formulario de Registro - Semillero de Innovación y Emprendimiento
         </h3>
         <p className="text-gray-600 mb-6">
-          Complete el siguiente formulario para inscribirse en nuestra factoría
-          de software.
+          Complete el siguiente formulario para inscribirse en el semillero.
         </p>
       </div>
 
@@ -207,7 +188,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Datos Personales
+            <span className="mr-2">📇</span>Datos Personales
           </h4>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -233,10 +214,11 @@ export default function SoftwareFactoryForm({ program, onClose }) {
                     <SelectValue placeholder="Tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CC">CC</SelectItem>
-                    <SelectItem value="TI">TI</SelectItem>
-                    <SelectItem value="CE">CE</SelectItem>
-                    <SelectItem value="Pasaporte">Pasaporte</SelectItem>
+                    {tiposDocumento.map((tipo) => (
+                      <SelectItem key={tipo} value={tipo}>
+                        {tipo}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Input
@@ -362,7 +344,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="direccion">Dirección de residencia física</Label>
+              <Label htmlFor="direccion">Dirección de residencia</Label>
               <Input
                 id="direccion"
                 name="direccion"
@@ -440,157 +422,102 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Información Académica
+            <span className="mr-2">🔗</span>Información de Vinculación
           </h4>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="institucionEducativa">
-                Institución educativa
+          <div className="space-y-4">
+            <div>
+              <Label className="mb-2 block">
+                ¿Cómo desea vincularse al semillero?
               </Label>
-              <Input
-                id="institucionEducativa"
-                name="institucionEducativa"
-                value={formData.institucionEducativa}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="programaAcademico">Programa académico</Label>
-              <Input
-                id="programaAcademico"
-                name="programaAcademico"
-                value={formData.programaAcademico}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="semestreNivel">Semestre o nivel actual</Label>
-              <Input
-                id="semestreNivel"
-                name="semestreNivel"
-                value={formData.semestreNivel}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="mb-2 block">Modalidad de vinculación</Label>
               <RadioGroup
-                value={formData.modalidadVinculacion}
+                value={formData.tipoVinculacion}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, modalidadVinculacion: value })
+                  setFormData({ ...formData, tipoVinculacion: value })
                 }
-                className="flex space-x-4">
+                className="flex flex-col space-y-2">
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pasantia" id="pasantia" />
-                  <Label htmlFor="pasantia">Pasantía</Label>
+                  <RadioGroupItem
+                    value="institucion"
+                    id="vinculacion-institucion"
+                  />
+                  <Label htmlFor="vinculacion-institucion">
+                    A través de una institución educativa
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="voluntariado" id="voluntariado" />
-                  <Label htmlFor="voluntariado">Voluntariado</Label>
+                  <RadioGroupItem
+                    value="comunidad"
+                    id="vinculacion-comunidad"
+                  />
+                  <Label htmlFor="vinculacion-comunidad">
+                    Como miembro de una comunidad
+                  </Label>
                 </div>
               </RadioGroup>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="tiempoDisponible">
-              Tiempo disponible semanalmente
-            </Label>
-            <Input
-              id="tiempoDisponible"
-              name="tiempoDisponible"
-              value={formData.tiempoDisponible}
-              onChange={handleChange}
-              placeholder="Ej: 20 horas"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            Experiencia y Habilidades
-          </h4>
-
-          <div className="space-y-4">
-            <div>
-              <Label className="mb-2 block">
-                Conocimientos en tecnologías de desarrollo (marcar las que
-                apliquen):
-              </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {tecnologias.map((tecnologia) => (
-                  <div key={tecnologia} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tecnologia-${tecnologia}`}
-                      checked={formData.tecnologias.includes(tecnologia)}
-                      onCheckedChange={() => handleTecnologiaChange(tecnologia)}
-                    />
-                    <Label htmlFor={`tecnologia-${tecnologia}`}>
-                      {tecnologia}
-                    </Label>
-                  </div>
-                ))}
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="tecnologia-otras"
-                    checked={formData.tecnologias.includes("Otras")}
-                    onCheckedChange={() => handleTecnologiaChange("Otras")}
-                  />
-                  <Label htmlFor="tecnologia-otras">Otras</Label>
-                </div>
-              </div>
-            </div>
 
             <div className="space-y-2">
-              <Label htmlFor="proyectosRealizados">
-                Proyectos realizados (breve descripción o enlaces):
+              <Label htmlFor="nombreInstitucion">
+                Nombre de la institución educativa o comunidad
               </Label>
-              <Textarea
-                id="proyectosRealizados"
-                name="proyectosRealizados"
-                value={formData.proyectosRealizados}
+              <Input
+                id="nombreInstitucion"
+                name="nombreInstitucion"
+                value={formData.nombreInstitucion}
                 onChange={handleChange}
-                rows={4}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            Motivación e Intereses
-          </h4>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="motivacion">
-                ¿Por qué desea vincularse a la factoría de software?
-              </Label>
-              <Textarea
-                id="motivacion"
-                name="motivacion"
-                value={formData.motivacion}
-                onChange={handleChange}
-                rows={4}
                 required
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="nivelEducativo">
+                Nivel educativo o perfil profesional
+              </Label>
+              <Input
+                id="nivelEducativo"
+                name="nivelEducativo"
+                value={formData.nivelEducativo}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h4
+            className="font-semibold text-lg mb-4"
+            style={{ color: program.color }}>
+            <span className="mr-2">💡</span>Intereses y Experiencia
+          </h4>
+
+          <div className="space-y-4">
             <div>
               <Label className="mb-2 block">
-                Áreas de interés en el desarrollo de software:
+                ¿Ha participado anteriormente en iniciativas de innovación o
+                emprendimiento?
+              </Label>
+              <RadioGroup
+                value={formData.participacionPrevia}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, participacionPrevia: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="participacion-si" />
+                  <Label htmlFor="participacion-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="participacion-no" />
+                  <Label htmlFor="participacion-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div>
+              <Label className="mb-2 block">
+                Áreas de interés (Marcar las que apliquen):
               </Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {areasInteres.map((area) => (
@@ -603,20 +530,102 @@ export default function SoftwareFactoryForm({ program, onClose }) {
                     <Label htmlFor={`area-${area}`}>{area}</Label>
                   </div>
                 ))}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="area-otras"
+                    checked={formData.areasInteres.includes("Otras")}
+                    onCheckedChange={() => handleAreaInteresChange("Otras")}
+                  />
+                  <Label htmlFor="area-otras">Otras</Label>
+                </div>
               </div>
+
+              {formData.areasInteres.includes("Otras") && (
+                <div className="mt-2">
+                  <Input
+                    id="otrasAreas"
+                    name="otrasAreas"
+                    value={formData.otrasAreas}
+                    onChange={handleChange}
+                    placeholder="Especifique otras áreas"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label className="mb-2 block">
+                ¿Tiene un proyecto en marcha o una idea de emprendimiento?
+              </Label>
+              <RadioGroup
+                value={formData.tieneProyecto}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, tieneProyecto: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="proyecto-si" />
+                  <Label htmlFor="proyecto-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="proyecto-no" />
+                  <Label htmlFor="proyecto-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {formData.tieneProyecto === "si" && (
+              <div className="space-y-2">
+                <Label htmlFor="descripcionProyecto">
+                  Describa brevemente su proyecto o idea:
+                </Label>
+                <Textarea
+                  id="descripcionProyecto"
+                  name="descripcionProyecto"
+                  value={formData.descripcionProyecto}
+                  onChange={handleChange}
+                  rows={3}
+                  required
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h4
+            className="font-semibold text-lg mb-4"
+            style={{ color: program.color }}>
+            <span className="mr-2">🛠️</span>Habilidades y Disponibilidad
+          </h4>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="habilidades">
+                ¿En qué áreas considera que tiene habilidades relevantes para el
+                semillero?
+              </Label>
+              <Textarea
+                id="habilidades"
+                name="habilidades"
+                value={formData.habilidades}
+                onChange={handleChange}
+                rows={3}
+                required
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="experienciaAgile">
-                ¿Tienes experiencia en trabajo colaborativo y metodologías
-                ágiles?
+              <Label htmlFor="disponibilidad">
+                Disponibilidad horaria para actividades del semillero
               </Label>
-              <Textarea
-                id="experienciaAgile"
-                name="experienciaAgile"
-                value={formData.experienciaAgile}
+              <Input
+                id="disponibilidad"
+                name="disponibilidad"
+                value={formData.disponibilidad}
                 onChange={handleChange}
-                rows={3}
+                placeholder="Ej: Lunes y miércoles de 3pm a 5pm"
+                required
               />
             </div>
           </div>
@@ -626,7 +635,47 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Autorización al Tratamiento de Datos
+            <span className="mr-2">🌱</span>Motivación
+          </h4>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="motivacion">
+                ¿Por qué desea unirse al Semillero de Innovación y
+                Emprendimiento?
+              </Label>
+              <Textarea
+                id="motivacion"
+                name="motivacion"
+                value={formData.motivacion}
+                onChange={handleChange}
+                rows={3}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="expectativas">
+                ¿Qué espera lograr con su participación en el semillero?
+              </Label>
+              <Textarea
+                id="expectativas"
+                name="expectativas"
+                value={formData.expectativas}
+                onChange={handleChange}
+                rows={3}
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h4
+            className="font-semibold text-lg mb-4"
+            style={{ color: program.color }}>
+            <span className="mr-2">✅</span>Autorización de Participación y
+            Tratamiento de Datos
           </h4>
 
           <div className="flex items-center space-x-2">
@@ -639,9 +688,9 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               }
             />
             <Label htmlFor="aceptaTerminos" className="text-sm">
-              Autorizo a la factoría de software para el uso y almacenamiento de
-              mis datos personales con el propósito de gestionar mi vinculación
-              y participación en sus actividades, según la Ley 1581 de 2012.
+              Autorizo mi participación en el Semillero de Innovación y
+              Emprendimiento y el uso de mis datos personales para efectos de
+              gestión y comunicación del programa, según la Ley 1581 de 2012.
             </Label>
           </div>
         </div>

@@ -28,34 +28,46 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export default function SoftwareFactoryForm({ program, onClose }) {
+export default function EconomiaPForm({ program, onClose }) {
   const { registerProgram } = usePrograms();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState();
 
   const [formData, setFormData] = useState({
+    // Datos Personales
     nombreCompleto: "",
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    telefono: "",
-    correoElectronico: "",
-    direccion: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
     grupoEtnico: "",
-    institucionEducativa: "",
-    programaAcademico: "",
-    semestreNivel: "",
-    modalidadVinculacion: "pasantia",
-    tiempoDisponible: "",
-    tecnologias: [],
-    proyectosRealizados: "",
-    motivacion: "",
+    genero: "",
+    telefonoContacto: "",
+    correoElectronico: "",
+    direccion: "",
+
+    // Situación Económica y Laboral
+    esPensionado: "no",
+    actividadEconomica: "",
+    trabajoAnterior: "no",
+    sectorTrabajo: "",
+    ingresosAdicionales: "no",
+    fuenteIngresos: "",
+
+    // Intereses y Habilidades
     areasInteres: [],
-    experienciaAgile: "",
+    otrasAreas: "",
+    habilidades: "",
+
+    // Disponibilidad y Motivación
+    tiempoSemanal: "",
+    motivacion: "",
+    expectativas: "",
+
+    // Autorización
     aceptaTerminos: false,
   });
 
@@ -85,24 +97,6 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         [name]: value,
       });
     }
-  };
-
-  const handleTecnologiaChange = (tecnologia) => {
-    setFormData((prev) => {
-      const currentTecnologias = [...prev.tecnologias];
-
-      if (currentTecnologias.includes(tecnologia)) {
-        return {
-          ...prev,
-          tecnologias: currentTecnologias.filter((t) => t !== tecnologia),
-        };
-      } else {
-        return {
-          ...prev,
-          tecnologias: [...currentTecnologias, tecnologia],
-        };
-      }
-    });
   };
 
   const handleAreaInteresChange = (area) => {
@@ -143,13 +137,14 @@ export default function SoftwareFactoryForm({ program, onClose }) {
       setIsSubmitting(false);
       toast({
         title: "¡Inscripción exitosa!",
-        description: `Te has inscrito correctamente en la Factoría de Software.`,
+        description: `Te has inscrito correctamente en el Programa Economía Plateada.`,
         variant: "default",
       });
       onClose();
     }, 1500);
   };
 
+  const tiposDocumento = ["CC", "CE", "Pasaporte"];
   const estratoOptions = ["1", "2", "3", "4", "5", "6"];
 
   const gruposEtnicos = [
@@ -162,26 +157,12 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     "Otro",
   ];
 
-  const tecnologias = [
-    "Desarrollo web (HTML, CSS, JavaScript)",
-    "Backend (Python, Java, Node.js, etc.)",
-    "Bases de datos (MySQL, PostgreSQL, MongoDB, etc.)",
-    "Desarrollo móvil (Android, iOS, Flutter, React Native)",
-    "Inteligencia Artificial / Machine Learning",
-    "Ciberseguridad",
-  ];
-
   const areasInteres = [
-    "Desarrollo de Aplicaciones",
-    "Inteligencia Artificial y Aprendizaje Automático",
-    "Bases de Datos y Big Data",
-    "Ciberseguridad",
-    "Computación en la Nube y DevOps",
-    "Internet de las Cosas (IoT)",
-    "Realidad Virtual y Aumentada",
-    "Blockchain y Criptomonedas",
-    "Ingeniería de Software y Metodologías de Desarrollo",
-    "Software para Educación e Inclusión",
+    "Emprendimiento y negocios",
+    "Educación financiera",
+    "Tecnología y digitalización",
+    "Salud y bienestar",
+    "Voluntariado y apoyo comunitario",
   ];
 
   return (
@@ -194,11 +175,10 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         <h3
           className="text-2xl font-bold mb-2"
           style={{ color: program.color }}>
-          Formulario de Registro - Software Factory
+          Formulario de Registro - Programa Economía Plateada
         </h3>
         <p className="text-gray-600 mb-6">
-          Complete el siguiente formulario para inscribirse en nuestra factoría
-          de software.
+          Complete el siguiente formulario para inscribirse en el programa.
         </p>
       </div>
 
@@ -207,7 +187,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Datos Personales
+            <span className="mr-2">📇</span>Datos Personales
           </h4>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -233,10 +213,11 @@ export default function SoftwareFactoryForm({ program, onClose }) {
                     <SelectValue placeholder="Tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CC">CC</SelectItem>
-                    <SelectItem value="TI">TI</SelectItem>
-                    <SelectItem value="CE">CE</SelectItem>
-                    <SelectItem value="Pasaporte">Pasaporte</SelectItem>
+                    {tiposDocumento.map((tipo) => (
+                      <SelectItem key={tipo} value={tipo}>
+                        {tipo}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Input
@@ -348,221 +329,233 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="correoElectronico">Correo electrónico</Label>
-              <Input
-                id="correoElectronico"
-                name="correoElectronico"
-                type="email"
-                value={formData.correoElectronico}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="direccion">Dirección de residencia física</Label>
-              <Input
-                id="direccion"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="comuna">Comuna</Label>
-              <Input
-                id="comuna"
-                name="comuna"
-                value={formData.comuna}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estratoSocial">Estrato social</Label>
-              <Select
-                value={formData.estratoSocial}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, estratoSocial: value })
-                }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {estratoOptions.map((estrato) => (
-                    <SelectItem key={estrato} value={estrato}>
-                      {estrato}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edad">Edad</Label>
-              <Input
-                id="edad"
-                name="edad"
-                type="number"
-                value={formData.edad}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="grupoEtnico">Grupo étnico</Label>
-              <Select
-                value={formData.grupoEtnico}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, grupoEtnico: value })
-                }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gruposEtnicos.map((grupo) => (
-                    <SelectItem key={grupo} value={grupo}>
-                      {grupo}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="genero">Género</Label>
+            <RadioGroup
+              value={formData.genero}
+              onValueChange={(value) =>
+                setFormData({ ...formData, genero: value })
+              }
+              className="flex space-x-4">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="femenino" id="genero-femenino" />
+                <Label htmlFor="genero-femenino">Femenino</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="masculino" id="genero-masculino" />
+                <Label htmlFor="genero-masculino">Masculino</Label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            Información Académica
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="institucionEducativa">
-                Institución educativa
-              </Label>
-              <Input
-                id="institucionEducativa"
-                name="institucionEducativa"
-                value={formData.institucionEducativa}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="programaAcademico">Programa académico</Label>
-              <Input
-                id="programaAcademico"
-                name="programaAcademico"
-                value={formData.programaAcademico}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="semestreNivel">Semestre o nivel actual</Label>
-              <Input
-                id="semestreNivel"
-                name="semestreNivel"
-                value={formData.semestreNivel}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="mb-2 block">Modalidad de vinculación</Label>
-              <RadioGroup
-                value={formData.modalidadVinculacion}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, modalidadVinculacion: value })
-                }
-                className="flex space-x-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pasantia" id="pasantia" />
-                  <Label htmlFor="pasantia">Pasantía</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="voluntariado" id="voluntariado" />
-                  <Label htmlFor="voluntariado">Voluntariado</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div className="space-y-2">
-            <Label htmlFor="tiempoDisponible">
-              Tiempo disponible semanalmente
-            </Label>
+            <Label htmlFor="comuna">Comuna</Label>
             <Input
-              id="tiempoDisponible"
-              name="tiempoDisponible"
-              value={formData.tiempoDisponible}
+              id="comuna"
+              name="comuna"
+              value={formData.comuna}
               onChange={handleChange}
-              placeholder="Ej: 20 horas"
               required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="estratoSocial">Estrato social</Label>
+            <Select
+              value={formData.estratoSocial}
+              onValueChange={(value) =>
+                setFormData({ ...formData, estratoSocial: value })
+              }>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar" />
+              </SelectTrigger>
+              <SelectContent>
+                {estratoOptions.map((estrato) => (
+                  <SelectItem key={estrato} value={estrato}>
+                    {estrato}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edad">Edad</Label>
+            <Input
+              id="edad"
+              name="edad"
+              type="number"
+              value={formData.edad}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="grupoEtnico">Grupo étnico</Label>
+            <Select
+              value={formData.grupoEtnico}
+              onValueChange={(value) =>
+                setFormData({ ...formData, grupoEtnico: value })
+              }>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar" />
+              </SelectTrigger>
+              <SelectContent>
+                {gruposEtnicos.map((grupo) => (
+                  <SelectItem key={grupo} value={grupo}>
+                    {grupo}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="telefonoContacto">Teléfono de contacto</Label>
+            <Input
+              id="telefonoContacto"
+              name="telefonoContacto"
+              value={formData.telefonoContacto}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="correoElectronico">Correo electrónico</Label>
+            <Input
+              id="correoElectronico"
+              name="correoElectronico"
+              type="email"
+              value={formData.correoElectronico}
+              onChange={handleChange}
             />
           </div>
         </div>
 
+        <div className="mt-4 space-y-2">
+          <Label htmlFor="direccion">Dirección de residencia</Label>
+          <Input
+            id="direccion"
+            name="direccion"
+            value={formData.direccion}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <div className="bg-gray-50 p-4 rounded-lg border">
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Experiencia y Habilidades
+            <span className="mr-2">💼</span>Situación Económica y Laboral
           </h4>
 
           <div className="space-y-4">
             <div>
-              <Label className="mb-2 block">
-                Conocimientos en tecnologías de desarrollo (marcar las que
-                apliquen):
-              </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {tecnologias.map((tecnologia) => (
-                  <div key={tecnologia} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tecnologia-${tecnologia}`}
-                      checked={formData.tecnologias.includes(tecnologia)}
-                      onCheckedChange={() => handleTecnologiaChange(tecnologia)}
-                    />
-                    <Label htmlFor={`tecnologia-${tecnologia}`}>
-                      {tecnologia}
-                    </Label>
-                  </div>
-                ))}
+              <Label className="mb-2 block">¿Es pensionado/a?</Label>
+              <RadioGroup
+                value={formData.esPensionado}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, esPensionado: value })
+                }
+                className="flex space-x-4">
                 <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="tecnologia-otras"
-                    checked={formData.tecnologias.includes("Otras")}
-                    onCheckedChange={() => handleTecnologiaChange("Otras")}
-                  />
-                  <Label htmlFor="tecnologia-otras">Otras</Label>
+                  <RadioGroupItem value="si" id="pensionado-si" />
+                  <Label htmlFor="pensionado-si">Sí</Label>
                 </div>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="pensionado-no" />
+                  <Label htmlFor="pensionado-no">No</Label>
+                </div>
+              </RadioGroup>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="proyectosRealizados">
-                Proyectos realizados (breve descripción o enlaces):
+            {formData.esPensionado === "no" && (
+              <div className="space-y-2">
+                <Label htmlFor="actividadEconomica">
+                  En caso de no ser pensionado/a, ¿cuál es su actividad
+                  económica actual?
+                </Label>
+                <Input
+                  id="actividadEconomica"
+                  name="actividadEconomica"
+                  value={formData.actividadEconomica}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+
+            <div>
+              <Label className="mb-2 block">
+                ¿Ha trabajado anteriormente en algún sector específico?
               </Label>
-              <Textarea
-                id="proyectosRealizados"
-                name="proyectosRealizados"
-                value={formData.proyectosRealizados}
-                onChange={handleChange}
-                rows={4}
-              />
+              <RadioGroup
+                value={formData.trabajoAnterior}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, trabajoAnterior: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="trabajo-si" />
+                  <Label htmlFor="trabajo-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="trabajo-no" />
+                  <Label htmlFor="trabajo-no">No</Label>
+                </div>
+              </RadioGroup>
             </div>
+
+            {formData.trabajoAnterior === "si" && (
+              <div className="space-y-2">
+                <Label htmlFor="sectorTrabajo">
+                  Si la respuesta es sí, ¿en qué sector(es)?
+                </Label>
+                <Input
+                  id="sectorTrabajo"
+                  name="sectorTrabajo"
+                  value={formData.sectorTrabajo}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+
+            <div>
+              <Label className="mb-2 block">
+                ¿Recibe ingresos adicionales?
+              </Label>
+              <RadioGroup
+                value={formData.ingresosAdicionales}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, ingresosAdicionales: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="ingresos-si" />
+                  <Label htmlFor="ingresos-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="ingresos-no" />
+                  <Label htmlFor="ingresos-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {formData.ingresosAdicionales === "si" && (
+              <div className="space-y-2">
+                <Label htmlFor="fuenteIngresos">
+                  Si la respuesta es sí, ¿de qué fuente(s)?
+                </Label>
+                <Input
+                  id="fuenteIngresos"
+                  name="fuenteIngresos"
+                  value={formData.fuenteIngresos}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -570,27 +563,13 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Motivación e Intereses
+            <span className="mr-2">💡</span>Intereses y Habilidades
           </h4>
 
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="motivacion">
-                ¿Por qué desea vincularse a la factoría de software?
-              </Label>
-              <Textarea
-                id="motivacion"
-                name="motivacion"
-                value={formData.motivacion}
-                onChange={handleChange}
-                rows={4}
-                required
-              />
-            </div>
-
             <div>
               <Label className="mb-2 block">
-                Áreas de interés en el desarrollo de software:
+                Áreas de interés para el programa (Marcar las que apliquen):
               </Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {areasInteres.map((area) => (
@@ -603,20 +582,40 @@ export default function SoftwareFactoryForm({ program, onClose }) {
                     <Label htmlFor={`area-${area}`}>{area}</Label>
                   </div>
                 ))}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="area-otras"
+                    checked={formData.areasInteres.includes("Otras")}
+                    onCheckedChange={() => handleAreaInteresChange("Otras")}
+                  />
+                  <Label htmlFor="area-otras">Otras</Label>
+                </div>
               </div>
+
+              {formData.areasInteres.includes("Otras") && (
+                <div className="mt-2">
+                  <Input
+                    id="otrasAreas"
+                    name="otrasAreas"
+                    value={formData.otrasAreas}
+                    onChange={handleChange}
+                    placeholder="Especifique otras áreas"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="experienciaAgile">
-                ¿Tienes experiencia en trabajo colaborativo y metodologías
-                ágiles?
+              <Label htmlFor="habilidades">
+                Habilidades y conocimientos previos en:
               </Label>
               <Textarea
-                id="experienciaAgile"
-                name="experienciaAgile"
-                value={formData.experienciaAgile}
+                id="habilidades"
+                name="habilidades"
+                value={formData.habilidades}
                 onChange={handleChange}
                 rows={3}
+                required
               />
             </div>
           </div>
@@ -626,7 +625,60 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Autorización al Tratamiento de Datos
+            <span className="mr-2">⏳</span>Disponibilidad y Motivación
+          </h4>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tiempoSemanal">
+                ¿Cuánto tiempo podría dedicar al programa semanalmente?
+              </Label>
+              <Input
+                id="tiempoSemanal"
+                name="tiempoSemanal"
+                value={formData.tiempoSemanal}
+                onChange={handleChange}
+                placeholder="Ej: 5 horas semanales"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="motivacion">
+                ¿Por qué desea participar en el programa Economía Plateada?
+              </Label>
+              <Textarea
+                id="motivacion"
+                name="motivacion"
+                value={formData.motivacion}
+                onChange={handleChange}
+                rows={3}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="expectativas">
+                ¿Qué espera lograr con su participación en el programa?
+              </Label>
+              <Textarea
+                id="expectativas"
+                name="expectativas"
+                value={formData.expectativas}
+                onChange={handleChange}
+                rows={3}
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h4
+            className="font-semibold text-lg mb-4"
+            style={{ color: program.color }}>
+            <span className="mr-2">✅</span>Autorización de Participación y
+            Tratamiento de Datos
           </h4>
 
           <div className="flex items-center space-x-2">
@@ -639,9 +691,9 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               }
             />
             <Label htmlFor="aceptaTerminos" className="text-sm">
-              Autorizo a la factoría de software para el uso y almacenamiento de
-              mis datos personales con el propósito de gestionar mi vinculación
-              y participación en sus actividades, según la Ley 1581 de 2012.
+              Autorizo mi participación en el Programa Economía Plateada y el
+              uso de mis datos personales para efectos de gestión y comunicación
+              del programa, según la Ley 1581 de 2012.
             </Label>
           </div>
         </div>

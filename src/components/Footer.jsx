@@ -79,11 +79,20 @@ const Footer = () => {
               <Link href="#" className="hover:text-[#3B82F6] transition-colors">
                 Facebook
               </Link>
-              <Link href="#" className="hover:text-[#3B82F6] transition-colors">
+              <Link
+                href="https://x.com/elojimjadach?s=21"
+                className="hover:text-[#3B82F6] transition-colors">
                 Twitter
               </Link>
-              <Link href="#" className="hover:text-[#3B82F6] transition-colors">
+              <Link
+                href="https://www.instagram.com/elojim.jadach_fdn?igsh=MnVwOHphaG85a3Bv&utm_source=qr"
+                className="hover:text-[#3B82F6] transition-colors">
                 Instagram
+              </Link>
+              <Link
+                href="https://www.tiktok.com/@elojim.jadach?_t=ZS-8uO7nzo72rX&_r=1"
+                className="hover:text-[#3B82F6] transition-colors">
+                Tik Tok
               </Link>
             </div>
           </div>
@@ -91,7 +100,7 @@ const Footer = () => {
         <div className="mt-8 pt-8 border-t border-white/20 text-center text-sm opacity-80">
           <p>
             &copy; {new Date().getFullYear()} Fundación Elojim Jadach. Todos los
-            derechos reservados.
+            derechos reservados. Nit-901714461-5
           </p>
         </div>
       </div>

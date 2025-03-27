@@ -29,14 +29,17 @@ const Contactanos = () => {
                   <Phone className="w-6 h-6 text-[#3B82F6] mt-1" />
                   <div>
                     <h4 className="font-semibold">Teléfono</h4>
-                    <p className="text-gray-600">+52 123 456 7890</p>
+                    <p className="text-gray-600">3173172333</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
                   <Mail className="w-6 h-6 text-[#3B82F6] mt-1" />
                   <div>
                     <h4 className="font-semibold">Email</h4>
-                    <p className="text-gray-600">info@fundacionelohim.org</p>
+                    <p className="text-gray-600">
+                      fundacion@elojimjadach.org <br />{" "}
+                      ginav.sm@elojimjadach.org
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">

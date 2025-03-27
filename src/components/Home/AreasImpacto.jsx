@@ -3,23 +3,27 @@ import { Card, CardContent } from "@/components/ui/card";
 const AreasImpacto = () => {
   const areas = [
     {
-      title: "Ayuda Comunitaria",
-      description: "Apoyo directo a familias necesitadas",
+      title: "Empoderamiento de la Mujer 👩‍🎓💜",
+      description:
+        "Brindamos apoyo a mujeres en situación de vulnerabilidad a través de programas de capacitación, emprendimiento y asistencia social.",
       color: "#1B3C8C",
     },
     {
-      title: "Educación",
-      description: "Programas educativos y becas",
+      title: "Innovación y Tecnología Aplicada 🤖🚀",
+      description:
+        "ncorporamos soluciones tecnológicas en el sector agropecuario y social para optimizar procesos productivos y mejorar la calidad de vida.",
       color: "#3B82F6",
     },
     {
-      title: "Salud",
-      description: "Asistencia médica y prevención",
+      title: "Seguridad Alimentaria y Agricultura Sostenible 🌱🍎",
+      description:
+        "Promovemos la producción agrícola inteligente y la agricultura urbana para garantizar el acceso a alimentos saludables y sostenibles.",
       color: "#2E7D32",
     },
     {
-      title: "Desarrollo Social",
-      description: "Proyectos de desarrollo comunitario",
+      title: "Inclusión Social y Diversidad 🌈🤝",
+      description:
+        "Impulsamos espacios de respeto y equidad para poblaciones vulnerables, garantizando su integración y participación en la sociedad.",
       color: "#8B5E3C",
     },
   ];

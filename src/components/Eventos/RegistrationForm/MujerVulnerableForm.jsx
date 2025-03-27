@@ -28,34 +28,48 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export default function SoftwareFactoryForm({ program, onClose }) {
+export default function MujerVulnerableForm({ program, onClose }) {
   const { registerProgram } = usePrograms();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [date, setDate] = useState();
 
   const [formData, setFormData] = useState({
+    // Datos Personales
     nombreCompleto: "",
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    telefono: "",
-    correoElectronico: "",
-    direccion: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
     grupoEtnico: "",
-    institucionEducativa: "",
-    programaAcademico: "",
-    semestreNivel: "",
-    modalidadVinculacion: "pasantia",
-    tiempoDisponible: "",
-    tecnologias: [],
-    proyectosRealizados: "",
+    telefonoContacto: "",
+    correoElectronico: "",
+    direccion: "",
+
+    // Situación Socioeconómica
+    esMadreCabeza: "no",
+    numeroHijos: "",
+    conviveOtros: "no",
+    conQuienesConvive: "",
+    nivelEducativo: "",
+    tieneEmpleo: "no",
+    actividadLaboral: "",
+    fuenteIngresos: "",
+
+    // Intereses y Necesidades
+    areasApoyo: [],
+    otrasAreas: "",
+    tieneApoyoGubernamental: "no",
+    tipoApoyoGubernamental: "",
+
+    // Motivación y Disponibilidad
     motivacion: "",
-    areasInteres: [],
-    experienciaAgile: "",
+    tiempoSemanal: "",
+    expectativas: "",
+
+    // Autorización
     aceptaTerminos: false,
   });
 
@@ -87,37 +101,19 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     }
   };
 
-  const handleTecnologiaChange = (tecnologia) => {
+  const handleAreaApoyoChange = (area) => {
     setFormData((prev) => {
-      const currentTecnologias = [...prev.tecnologias];
-
-      if (currentTecnologias.includes(tecnologia)) {
-        return {
-          ...prev,
-          tecnologias: currentTecnologias.filter((t) => t !== tecnologia),
-        };
-      } else {
-        return {
-          ...prev,
-          tecnologias: [...currentTecnologias, tecnologia],
-        };
-      }
-    });
-  };
-
-  const handleAreaInteresChange = (area) => {
-    setFormData((prev) => {
-      const currentAreas = [...prev.areasInteres];
+      const currentAreas = [...prev.areasApoyo];
 
       if (currentAreas.includes(area)) {
         return {
           ...prev,
-          areasInteres: currentAreas.filter((a) => a !== area),
+          areasApoyo: currentAreas.filter((a) => a !== area),
         };
       } else {
         return {
           ...prev,
-          areasInteres: [...currentAreas, area],
+          areasApoyo: [...currentAreas, area],
         };
       }
     });
@@ -143,13 +139,14 @@ export default function SoftwareFactoryForm({ program, onClose }) {
       setIsSubmitting(false);
       toast({
         title: "¡Inscripción exitosa!",
-        description: `Te has inscrito correctamente en la Factoría de Software.`,
+        description: `Te has inscrito correctamente en el Programa Mujer Vulnerable.`,
         variant: "default",
       });
       onClose();
     }, 1500);
   };
 
+  const tiposDocumento = ["CC", "TI", "CE", "Pasaporte"];
   const estratoOptions = ["1", "2", "3", "4", "5", "6"];
 
   const gruposEtnicos = [
@@ -162,26 +159,21 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     "Otro",
   ];
 
-  const tecnologias = [
-    "Desarrollo web (HTML, CSS, JavaScript)",
-    "Backend (Python, Java, Node.js, etc.)",
-    "Bases de datos (MySQL, PostgreSQL, MongoDB, etc.)",
-    "Desarrollo móvil (Android, iOS, Flutter, React Native)",
-    "Inteligencia Artificial / Machine Learning",
-    "Ciberseguridad",
+  const nivelesEducativos = [
+    "Primaria",
+    "Secundaria",
+    "Técnica/Tecnológica",
+    "Universitaria",
+    "Ninguno",
   ];
 
-  const areasInteres = [
-    "Desarrollo de Aplicaciones",
-    "Inteligencia Artificial y Aprendizaje Automático",
-    "Bases de Datos y Big Data",
-    "Ciberseguridad",
-    "Computación en la Nube y DevOps",
-    "Internet de las Cosas (IoT)",
-    "Realidad Virtual y Aumentada",
-    "Blockchain y Criptomonedas",
-    "Ingeniería de Software y Metodologías de Desarrollo",
-    "Software para Educación e Inclusión",
+  const areasApoyo = [
+    "Capacitación y empleo",
+    "Emprendimiento",
+    "Educación",
+    "Salud y bienestar",
+    "Apoyo psicológico y social",
+    "Vivienda y subsidios",
   ];
 
   return (
@@ -194,11 +186,10 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         <h3
           className="text-2xl font-bold mb-2"
           style={{ color: program.color }}>
-          Formulario de Registro - Software Factory
+          Formulario de Registro - Programa Mujer Vulnerable
         </h3>
         <p className="text-gray-600 mb-6">
-          Complete el siguiente formulario para inscribirse en nuestra factoría
-          de software.
+          Complete el siguiente formulario para inscribirse en el programa.
         </p>
       </div>
 
@@ -207,7 +198,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Datos Personales
+            <span className="mr-2">📇</span>Datos Personales
           </h4>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -233,10 +224,11 @@ export default function SoftwareFactoryForm({ program, onClose }) {
                     <SelectValue placeholder="Tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CC">CC</SelectItem>
-                    <SelectItem value="TI">TI</SelectItem>
-                    <SelectItem value="CE">CE</SelectItem>
-                    <SelectItem value="Pasaporte">Pasaporte</SelectItem>
+                    {tiposDocumento.map((tipo) => (
+                      <SelectItem key={tipo} value={tipo}>
+                        {tipo}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Input
@@ -348,221 +340,90 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               </div>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="correoElectronico">Correo electrónico</Label>
-              <Input
-                id="correoElectronico"
-                name="correoElectronico"
-                type="email"
-                value={formData.correoElectronico}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="direccion">Dirección de residencia física</Label>
-              <Input
-                id="direccion"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="comuna">Comuna</Label>
-              <Input
-                id="comuna"
-                name="comuna"
-                value={formData.comuna}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estratoSocial">Estrato social</Label>
-              <Select
-                value={formData.estratoSocial}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, estratoSocial: value })
-                }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {estratoOptions.map((estrato) => (
-                    <SelectItem key={estrato} value={estrato}>
-                      {estrato}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edad">Edad</Label>
-              <Input
-                id="edad"
-                name="edad"
-                type="number"
-                value={formData.edad}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="grupoEtnico">Grupo étnico</Label>
-              <Select
-                value={formData.grupoEtnico}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, grupoEtnico: value })
-                }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gruposEtnicos.map((grupo) => (
-                    <SelectItem key={grupo} value={grupo}>
-                      {grupo}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            Información Académica
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="institucionEducativa">
-                Institución educativa
-              </Label>
-              <Input
-                id="institucionEducativa"
-                name="institucionEducativa"
-                value={formData.institucionEducativa}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="programaAcademico">Programa académico</Label>
-              <Input
-                id="programaAcademico"
-                name="programaAcademico"
-                value={formData.programaAcademico}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="semestreNivel">Semestre o nivel actual</Label>
-              <Input
-                id="semestreNivel"
-                name="semestreNivel"
-                value={formData.semestreNivel}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="mb-2 block">Modalidad de vinculación</Label>
-              <RadioGroup
-                value={formData.modalidadVinculacion}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, modalidadVinculacion: value })
-                }
-                className="flex space-x-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pasantia" id="pasantia" />
-                  <Label htmlFor="pasantia">Pasantía</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="voluntariado" id="voluntariado" />
-                  <Label htmlFor="voluntariado">Voluntariado</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="space-y-2">
-            <Label htmlFor="tiempoDisponible">
-              Tiempo disponible semanalmente
-            </Label>
+            <Label htmlFor="correoElectronico">Correo electrónico</Label>
             <Input
-              id="tiempoDisponible"
-              name="tiempoDisponible"
-              value={formData.tiempoDisponible}
+              id="correoElectronico"
+              name="correoElectronico"
+              type="email"
+              value={formData.correoElectronico}
               onChange={handleChange}
-              placeholder="Ej: 20 horas"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="direccion">Dirección de residencia</Label>
+            <Input
+              id="direccion"
+              name="direccion"
+              value={formData.direccion}
+              onChange={handleChange}
               required
             />
           </div>
         </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            Experiencia y Habilidades
-          </h4>
-
-          <div className="space-y-4">
-            <div>
-              <Label className="mb-2 block">
-                Conocimientos en tecnologías de desarrollo (marcar las que
-                apliquen):
-              </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {tecnologias.map((tecnologia) => (
-                  <div key={tecnologia} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tecnologia-${tecnologia}`}
-                      checked={formData.tecnologias.includes(tecnologia)}
-                      onCheckedChange={() => handleTecnologiaChange(tecnologia)}
-                    />
-                    <Label htmlFor={`tecnologia-${tecnologia}`}>
-                      {tecnologia}
-                    </Label>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="comuna">Comuna</Label>
+            <Input
+              id="comuna"
+              name="comuna"
+              value={formData.comuna}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="estratoSocial">Estrato social</Label>
+            <Select
+              value={formData.estratoSocial}
+              onValueChange={(value) =>
+                setFormData({ ...formData, estratoSocial: value })
+              }>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar" />
+              </SelectTrigger>
+              <SelectContent>
+                {estratoOptions.map((estrato) => (
+                  <SelectItem key={estrato} value={estrato}>
+                    {estrato}
+                  </SelectItem>
                 ))}
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="tecnologia-otras"
-                    checked={formData.tecnologias.includes("Otras")}
-                    onCheckedChange={() => handleTecnologiaChange("Otras")}
-                  />
-                  <Label htmlFor="tecnologia-otras">Otras</Label>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="proyectosRealizados">
-                Proyectos realizados (breve descripción o enlaces):
-              </Label>
-              <Textarea
-                id="proyectosRealizados"
-                name="proyectosRealizados"
-                value={formData.proyectosRealizados}
-                onChange={handleChange}
-                rows={4}
-              />
-            </div>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edad">Edad</Label>
+            <Input
+              id="edad"
+              name="edad"
+              type="number"
+              value={formData.edad}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="grupoEtnico">Grupo étnico</Label>
+            <Select
+              value={formData.grupoEtnico}
+              onValueChange={(value) =>
+                setFormData({ ...formData, grupoEtnico: value })
+              }>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar" />
+              </SelectTrigger>
+              <SelectContent>
+                {gruposEtnicos.map((grupo) => (
+                  <SelectItem key={grupo} value={grupo}>
+                    {grupo}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -570,53 +431,274 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Motivación e Intereses
+            <span className="mr-2">💼</span>Situación Socioeconómica
+          </h4>
+
+          <div className="space-y-4">
+            <div>
+              <Label className="mb-2 block">¿Es madre cabeza de hogar?</Label>
+              <RadioGroup
+                value={formData.esMadreCabeza}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, esMadreCabeza: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="madre-si" />
+                  <Label htmlFor="madre-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="madre-no" />
+                  <Label htmlFor="madre-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="numeroHijos">Número de hijos a cargo</Label>
+              <Input
+                id="numeroHijos"
+                name="numeroHijos"
+                type="number"
+                value={formData.numeroHijos}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2 block">¿Convive con otras personas?</Label>
+              <RadioGroup
+                value={formData.conviveOtros}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, conviveOtros: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="convive-si" />
+                  <Label htmlFor="convive-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="convive-no" />
+                  <Label htmlFor="convive-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {formData.conviveOtros === "si" && (
+              <div className="space-y-2">
+                <Label htmlFor="conQuienesConvive">
+                  Si la respuesta es sí, ¿con quiénes?
+                </Label>
+                <Input
+                  id="conQuienesConvive"
+                  name="conQuienesConvive"
+                  value={formData.conQuienesConvive}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="nivelEducativo">Nivel educativo alcanzado</Label>
+              <Select
+                value={formData.nivelEducativo}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, nivelEducativo: value })
+                }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {nivelesEducativos.map((nivel) => (
+                    <SelectItem key={nivel} value={nivel}>
+                      {nivel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="mb-2 block">
+                ¿Cuenta con empleo actualmente?
+              </Label>
+              <RadioGroup
+                value={formData.tieneEmpleo}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, tieneEmpleo: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="empleo-si" />
+                  <Label htmlFor="empleo-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="empleo-no" />
+                  <Label htmlFor="empleo-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {formData.tieneEmpleo === "si" ? (
+              <div className="space-y-2">
+                <Label htmlFor="actividadLaboral">
+                  Si la respuesta es sí, ¿en qué actividad laboral?
+                </Label>
+                <Input
+                  id="actividadLaboral"
+                  name="actividadLaboral"
+                  value={formData.actividadLaboral}
+                  onChange={handleChange}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="fuenteIngresos">
+                  Si la respuesta es no, ¿tiene alguna fuente de ingresos?
+                </Label>
+                <Input
+                  id="fuenteIngresos"
+                  name="fuenteIngresos"
+                  value={formData.fuenteIngresos}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h4
+            className="font-semibold text-lg mb-4"
+            style={{ color: program.color }}>
+            <span className="mr-2">💡</span>Intereses y Necesidades
+          </h4>
+
+          <div className="space-y-4">
+            <div>
+              <Label className="mb-2 block">
+                ¿En qué áreas le gustaría recibir apoyo? (Marcar las que
+                apliquen):
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {areasApoyo.map((area) => (
+                  <div key={area} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`area-${area}`}
+                      checked={formData.areasApoyo.includes(area)}
+                      onCheckedChange={() => handleAreaApoyoChange(area)}
+                    />
+                    <Label htmlFor={`area-${area}`}>{area}</Label>
+                  </div>
+                ))}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="area-otras"
+                    checked={formData.areasApoyo.includes("Otras")}
+                    onCheckedChange={() => handleAreaApoyoChange("Otras")}
+                  />
+                  <Label htmlFor="area-otras">Otras</Label>
+                </div>
+              </div>
+
+              {formData.areasApoyo.includes("Otras") && (
+                <div className="mt-2">
+                  <Input
+                    id="otrasAreas"
+                    name="otrasAreas"
+                    value={formData.otrasAreas}
+                    onChange={handleChange}
+                    placeholder="Especifique otras áreas"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label className="mb-2 block">
+                ¿Cuenta con algún tipo de apoyo gubernamental o institucional?
+              </Label>
+              <RadioGroup
+                value={formData.tieneApoyoGubernamental}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, tieneApoyoGubernamental: value })
+                }
+                className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="si" id="apoyo-si" />
+                  <Label htmlFor="apoyo-si">Sí</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="apoyo-no" />
+                  <Label htmlFor="apoyo-no">No</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {formData.tieneApoyoGubernamental === "si" && (
+              <div className="space-y-2">
+                <Label htmlFor="tipoApoyoGubernamental">
+                  Si la respuesta es sí, ¿cuál?
+                </Label>
+                <Input
+                  id="tipoApoyoGubernamental"
+                  name="tipoApoyoGubernamental"
+                  value={formData.tipoApoyoGubernamental}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h4
+            className="font-semibold text-lg mb-4"
+            style={{ color: program.color }}>
+            <span className="mr-2">🌟</span>Motivación y Disponibilidad
           </h4>
 
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="motivacion">
-                ¿Por qué desea vincularse a la factoría de software?
+                ¿Por qué desea participar en el Programa Mujer Vulnerable?
               </Label>
               <Textarea
                 id="motivacion"
                 name="motivacion"
                 value={formData.motivacion}
                 onChange={handleChange}
-                rows={4}
+                rows={3}
                 required
               />
             </div>
 
-            <div>
-              <Label className="mb-2 block">
-                Áreas de interés en el desarrollo de software:
+            <div className="space-y-2">
+              <Label htmlFor="tiempoSemanal">
+                ¿Cuánto tiempo podría dedicar al programa semanalmente?
               </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {areasInteres.map((area) => (
-                  <div key={area} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`area-${area}`}
-                      checked={formData.areasInteres.includes(area)}
-                      onCheckedChange={() => handleAreaInteresChange(area)}
-                    />
-                    <Label htmlFor={`area-${area}`}>{area}</Label>
-                  </div>
-                ))}
-              </div>
+              <Input
+                id="tiempoSemanal"
+                name="tiempoSemanal"
+                value={formData.tiempoSemanal}
+                onChange={handleChange}
+                placeholder="Ej: 5 horas semanales"
+                required
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="experienciaAgile">
-                ¿Tienes experiencia en trabajo colaborativo y metodologías
-                ágiles?
+              <Label htmlFor="expectativas">
+                ¿Qué espera lograr con su participación en el programa?
               </Label>
               <Textarea
-                id="experienciaAgile"
-                name="experienciaAgile"
-                value={formData.experienciaAgile}
+                id="expectativas"
+                name="expectativas"
+                value={formData.expectativas}
                 onChange={handleChange}
                 rows={3}
+                required
               />
             </div>
           </div>
@@ -626,7 +708,8 @@ export default function SoftwareFactoryForm({ program, onClose }) {
           <h4
             className="font-semibold text-lg mb-4"
             style={{ color: program.color }}>
-            Autorización al Tratamiento de Datos
+            <span className="mr-2">✅</span>Autorización de Participación y
+            Tratamiento de Datos
           </h4>
 
           <div className="flex items-center space-x-2">
@@ -639,9 +722,9 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               }
             />
             <Label htmlFor="aceptaTerminos" className="text-sm">
-              Autorizo a la factoría de software para el uso y almacenamiento de
-              mis datos personales con el propósito de gestionar mi vinculación
-              y participación en sus actividades, según la Ley 1581 de 2012.
+              Autorizo mi participación en el Programa Mujer Vulnerable y el uso
+              de mis datos personales para efectos de gestión y comunicación del
+              programa, según la Ley 1581 de 2012.
             </Label>
           </div>
         </div>
