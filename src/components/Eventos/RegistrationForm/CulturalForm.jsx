@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { FormSection } from "../form-components/FormSection";
+import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
+import { RadioOptions } from "../form-components/RadioOptions";
+import { TermsCheckbox } from "../form-components/TermsCheckbox";
+import { FormButtons } from "../form-components/FormButtons";
+import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
 import {
   Select,
   SelectContent,
@@ -15,29 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { usePrograms } from "@/context/ProgramContext";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 export default function CulturalForm({ program, onClose }) {
-  const { registerProgram } = usePrograms();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [date, setDate] = useState();
-
   const [formData, setFormData] = useState({
     // Datos Personales
     nombreCompleto: "",
     fechaNacimiento: "",
+    diaNacimiento: "",
+    mesNacimiento: "",
+    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -71,80 +61,33 @@ export default function CulturalForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  // Función para actualizar la fecha de nacimiento completa
-  const actualizarFechaNacimiento = (dia, mes, ano) => {
-    if (!dia || !mes || !ano) return "";
-
-    // Asegurar que el día tenga dos dígitos
-    const diaFormateado = dia.toString().padStart(2, "0");
-    // Asegurar que el mes tenga dos dígitos
-    const mesFormateado = mes.toString().padStart(2, "0");
-
-    return `${ano}-${mesFormateado}-${diaFormateado}`;
-  };
+  const { isSubmitting, handleSubmit } = useFormSubmit({
+    programId: program.id,
+    onSuccess: onClose,
+    successDescription: `Te has inscrito correctamente en el Programa Cultural.`,
+  });
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-
-    if (type === "checkbox") {
-      setFormData({
-        ...formData,
-        [name]: e.target.checked,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!formData.aceptaTerminos) {
-      toast({
-        title: "Error",
-        description: "Debes aceptar los términos y condiciones para continuar.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    // Simulación de envío de datos
-    setTimeout(() => {
-      registerProgram(program.id);
-      setIsSubmitting(false);
-      toast({
-        title: "¡Inscripción exitosa!",
-        description: `Te has inscrito correctamente en el Programa Cultural.`,
-        variant: "default",
-      });
-      onClose();
-    }, 1500);
+  const handleRadioChange = (name, value) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const estratoOptions = ["1", "2", "3", "4", "5", "6"];
-
-  const gruposEtnicos = [
-    "Ninguno",
-    "Afrodescendiente",
-    "Indígena",
-    "Raizal",
-    "Rom/Gitano",
-    "Palenquero",
-    "Otro",
-  ];
-
-  const nivelesEducativos = [
-    "Primaria",
-    "Secundaria",
-    "Técnica/Tecnológica",
-    "Universitaria",
-    "Otro",
-  ];
+  const handleSelectChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+  };
 
   const areasInteres = [
     "Música",
@@ -172,187 +115,20 @@ export default function CulturalForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            <span className="mr-2">📇</span>Datos Personales
-          </h4>
+      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+        <FormSection title="Datos Personales" icon="📇" color={program.color}>
+          <PersonalInfoFields
+            formData={formData}
+            onChange={setFormData}
+            showContact={true}
+            showEmail={true}
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="nombreCompleto">Nombres y apellidos</Label>
-              <Input
-                id="nombreCompleto"
-                name="nombreCompleto"
-                value={formData.nombreCompleto}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="fechaNacimiento">Fecha de nacimiento</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <Select
-                  value={formData.diaNacimiento || ""}
-                  onValueChange={(value) => {
-                    setFormData({
-                      ...formData,
-                      diaNacimiento: value,
-                      fechaNacimiento: actualizarFechaNacimiento(
-                        value,
-                        formData.mesNacimiento,
-                        formData.anoNacimiento
-                      ),
-                    });
-                  }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Día" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map((dia) => (
-                      <SelectItem key={dia} value={dia.toString()}>
-                        {dia}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={formData.mesNacimiento || ""}
-                  onValueChange={(value) => {
-                    setFormData({
-                      ...formData,
-                      mesNacimiento: value,
-                      fechaNacimiento: actualizarFechaNacimiento(
-                        formData.diaNacimiento,
-                        value,
-                        formData.anoNacimiento
-                      ),
-                    });
-                  }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Mes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[
-                      { value: "1", label: "Enero" },
-                      { value: "2", label: "Febrero" },
-                      { value: "3", label: "Marzo" },
-                      { value: "4", label: "Abril" },
-                      { value: "5", label: "Mayo" },
-                      { value: "6", label: "Junio" },
-                      { value: "7", label: "Julio" },
-                      { value: "8", label: "Agosto" },
-                      { value: "9", label: "Septiembre" },
-                      { value: "10", label: "Octubre" },
-                      { value: "11", label: "Noviembre" },
-                      { value: "12", label: "Diciembre" },
-                    ].map((mes) => (
-                      <SelectItem key={mes.value} value={mes.value}>
-                        {mes.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={formData.anoNacimiento || ""}
-                  onValueChange={(value) => {
-                    setFormData({
-                      ...formData,
-                      anoNacimiento: value,
-                      fechaNacimiento: actualizarFechaNacimiento(
-                        formData.diaNacimiento,
-                        formData.mesNacimiento,
-                        value
-                      ),
-                    });
-                  }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Año" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
-                    {Array.from(
-                      { length: 105 },
-                      (_, i) => new Date().getFullYear() - i
-                    ).map((ano) => (
-                      <SelectItem key={ano} value={ano.toString()}>
-                        {ano}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="comuna">Comuna</Label>
-              <Input
-                id="comuna"
-                name="comuna"
-                value={formData.comuna}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estratoSocial">Estrato social</Label>
-              <Select
-                value={formData.estratoSocial}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, estratoSocial: value })
-                }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {estratoOptions.map((estrato) => (
-                    <SelectItem key={estrato} value={estrato}>
-                      {estrato}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edad">Edad</Label>
-              <Input
-                id="edad"
-                name="edad"
-                type="number"
-                value={formData.edad}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="grupoEtnico">Grupo étnico</Label>
-              <Select
-                value={formData.grupoEtnico}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, grupoEtnico: value })
-                }>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gruposEtnicos.map((grupo) => (
-                    <SelectItem key={grupo} value={grupo}>
-                      {grupo}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="documentoIdentidad">Documento de identidad</Label>
+              <Label htmlFor="documentoIdentidad">
+                Documento de identidad<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="documentoIdentidad"
                 name="documentoIdentidad"
@@ -361,45 +137,9 @@ export default function CulturalForm({ program, onClose }) {
                 required
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="space-y-2">
-              <Label htmlFor="telefonoContacto">Teléfono de contacto</Label>
-              <Input
-                id="telefonoContacto"
-                name="telefonoContacto"
-                value={formData.telefonoContacto}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="correoElectronico">Correo electrónico</Label>
-              <Input
-                id="correoElectronico"
-                name="correoElectronico"
-                type="email"
-                value={formData.correoElectronico}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="direccion">Dirección de residencia</Label>
-              <Input
-                id="direccion"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-                required
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="municipioDepartamento">
-                Municipio / Departamento
+                Municipio / Departamento<span className="text-red-500">*</span>
               </Label>
               <Input
                 id="municipioDepartamento"
@@ -410,28 +150,27 @@ export default function CulturalForm({ program, onClose }) {
               />
             </div>
           </div>
-        </div>
+        </FormSection>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            <span className="mr-2">💼</span>Datos Socioeconómicos
-          </h4>
-
+        <FormSection
+          title="Datos Socioeconómicos"
+          icon="💼"
+          color={program.color}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nivelEducativo">Nivel educativo</Label>
+              <Label htmlFor="nivelEducativo">
+                Nivel educativo<span className="text-red-500">*</span>
+              </Label>
               <Select
                 value={formData.nivelEducativo}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, nivelEducativo: value })
+                  handleSelectChange("nivelEducativo", value)
                 }>
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar" />
                 </SelectTrigger>
                 <SelectContent>
-                  {nivelesEducativos.map((nivel) => (
+                  {NIVELES_EDUCATIVOS.map((nivel) => (
                     <SelectItem key={nivel} value={nivel}>
                       {nivel}
                     </SelectItem>
@@ -440,7 +179,9 @@ export default function CulturalForm({ program, onClose }) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ocupacion">Ocupación</Label>
+              <Label htmlFor="ocupacion">
+                Ocupación<span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="ocupacion"
                 name="ocupacion"
@@ -450,32 +191,22 @@ export default function CulturalForm({ program, onClose }) {
               />
             </div>
           </div>
-        </div>
+        </FormSection>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            <span className="mr-2">🎭</span>Área de Interés
-          </h4>
-
+        <FormSection title="Área de Interés" icon="🎭" color={program.color}>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Seleccione el área en la que deseas participar:</Label>
-              <RadioGroup
-                value={formData.areaInteres}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, areaInteres: value })
-                }
-                className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {areasInteres.map((area) => (
-                  <div key={area} className="flex items-center space-x-2">
-                    <RadioGroupItem value={area} id={`area-${area}`} />
-                    <Label htmlFor={`area-${area}`}>{area}</Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
+            <RadioOptions
+              label="Seleccione el área en la que deseas participar:"
+              name="areaInteres"
+              value={formData.areaInteres}
+              onChange={handleRadioChange}
+              options={areasInteres.map((area) => ({
+                value: area,
+                label: area,
+              }))}
+              orientation="grid"
+              required
+            />
 
             {formData.areaInteres === "Otro" && (
               <div className="space-y-2">
@@ -489,36 +220,20 @@ export default function CulturalForm({ program, onClose }) {
               </div>
             )}
           </div>
-        </div>
+        </FormSection>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            <span className="mr-2">🎓</span>Experiencia en el Área Seleccionada
-          </h4>
-
+        <FormSection
+          title="Experiencia en el Área Seleccionada"
+          icon="🎓"
+          color={program.color}>
           <div className="space-y-4">
-            <div>
-              <Label className="mb-2 block">
-                ¿Has recibido formación previa en esta área?
-              </Label>
-              <RadioGroup
-                value={formData.formacionPrevia}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, formacionPrevia: value })
-                }
-                className="flex space-x-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="si" id="formacion-si" />
-                  <Label htmlFor="formacion-si">Sí</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="formacion-no" />
-                  <Label htmlFor="formacion-no">No</Label>
-                </div>
-              </RadioGroup>
-            </div>
+            <RadioOptions
+              label="¿Has recibido formación previa en esta área?"
+              name="formacionPrevia"
+              value={formData.formacionPrevia}
+              onChange={handleRadioChange}
+              required
+            />
 
             {formData.formacionPrevia === "si" && (
               <div className="space-y-2">
@@ -532,27 +247,13 @@ export default function CulturalForm({ program, onClose }) {
               </div>
             )}
 
-            <div>
-              <Label className="mb-2 block">
-                ¿Perteneces o has pertenecido a algún grupo cultural o
-                artístico?
-              </Label>
-              <RadioGroup
-                value={formData.perteneceGrupo}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, perteneceGrupo: value })
-                }
-                className="flex space-x-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="si" id="grupo-si" />
-                  <Label htmlFor="grupo-si">Sí</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="grupo-no" />
-                  <Label htmlFor="grupo-no">No</Label>
-                </div>
-              </RadioGroup>
-            </div>
+            <RadioOptions
+              label="¿Perteneces o has pertenecido a algún grupo cultural o artístico?"
+              name="perteneceGrupo"
+              value={formData.perteneceGrupo}
+              onChange={handleRadioChange}
+              required
+            />
 
             {formData.perteneceGrupo === "si" && (
               <div className="space-y-2">
@@ -566,19 +267,17 @@ export default function CulturalForm({ program, onClose }) {
               </div>
             )}
           </div>
-        </div>
+        </FormSection>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            <span className="mr-2">📅</span>Disponibilidad y Expectativas
-          </h4>
-
+        <FormSection
+          title="Disponibilidad y Expectativas"
+          icon="📅"
+          color={program.color}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="diasDisponibles">
                 Días disponibles para participar:
+                <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="diasDisponibles"
@@ -592,6 +291,7 @@ export default function CulturalForm({ program, onClose }) {
             <div className="space-y-2">
               <Label htmlFor="motivacion">
                 Motivación para participar en el programa:
+                <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="motivacion"
@@ -606,6 +306,7 @@ export default function CulturalForm({ program, onClose }) {
             <div className="space-y-2">
               <Label htmlFor="expectativas">
                 ¿Qué esperas aprender o desarrollar en este programa?
+                <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="expectativas"
@@ -617,48 +318,26 @@ export default function CulturalForm({ program, onClose }) {
               />
             </div>
           </div>
-        </div>
+        </FormSection>
 
-        <div className="bg-gray-50 p-4 rounded-lg border">
-          <h4
-            className="font-semibold text-lg mb-4"
-            style={{ color: program.color }}>
-            <span className="mr-2">✅</span>Autorización de Participación y
-            Tratamiento de Datos
-          </h4>
+        <FormSection
+          title="Autorización de Participación y Tratamiento de Datos"
+          icon="✅"
+          color={program.color}>
+          <TermsCheckbox
+            checked={formData.aceptaTerminos}
+            onChange={(checked) =>
+              setFormData({ ...formData, aceptaTerminos: checked })
+            }
+            text="Autorizo el uso de mis datos personales para los fines del programa cultural, conforme a la Ley de Protección de Datos Personales (Ley 1581 de 2012)."
+          />
+        </FormSection>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="aceptaTerminos"
-              name="aceptaTerminos"
-              checked={formData.aceptaTerminos}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, aceptaTerminos: checked })
-              }
-            />
-            <Label htmlFor="aceptaTerminos" className="text-sm">
-              Autorizo el uso de mis datos personales para los fines del
-              programa cultural, conforme a la Ley de Protección de Datos
-              Personales (Ley 1581 de 2012).
-            </Label>
-          </div>
-        </div>
-
-        <div className="flex justify-end space-x-4 pt-4">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            style={{
-              backgroundColor: program.color,
-              color: "white",
-              borderColor: program.color,
-            }}>
-            {isSubmitting ? "Procesando..." : "Enviar solicitud"}
-          </Button>
-        </div>
+        <FormButtons
+          onCancel={onClose}
+          isSubmitting={isSubmitting}
+          submitColor={program.color}
+        />
       </form>
     </motion.div>
   );

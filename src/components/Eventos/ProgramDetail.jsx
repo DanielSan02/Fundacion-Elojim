@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { usePrograms } from "@/context/ProgramContext";
 import RegistrationForm from "./RegistrationForm/RegistrationForm";
+import EventsList from "./EventsList";
 
 export default function ProgramDetail({ program, isOpen, onClose }) {
   const { isRegistered } = usePrograms();
