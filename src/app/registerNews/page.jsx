@@ -11,7 +11,7 @@ export default function RegisterNewsPage() {
     const [form, setForm] = useState({
         title: "",
         content: "",
-        image: null
+        images: []
     })
 
     const handleChange = (e) => {
@@ -20,7 +20,7 @@ export default function RegisterNewsPage() {
     }
 
     const handleFileChange = (e) => {
-        setForm({ ...form, image: e.target.files[0] })
+        setForm({ ...form, images: Array.from(e.target.files) })
     }
 
     const handleSubmit = async (e) => {
@@ -28,7 +28,7 @@ export default function RegisterNewsPage() {
         const data = new FormData()
         data.append("title", form.title)
         data.append("content", form.content)
-        if (form.image) data.append("image", form.image)
+        form.images.forEach((img, i) => data.append("images", img))
 
         const res = await fetch("/api/news", {
             method: "POST",
@@ -75,12 +75,13 @@ export default function RegisterNewsPage() {
                         </div>
                         <div>
                             <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-                                Imagen
+                                Imágenes
                             </label>
                             <input
                                 id="image"
                                 type="file"
                                 accept="image/*"
+                                multiple
                                 onChange={handleFileChange}
                                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                            file:rounded-xl file:border-0
