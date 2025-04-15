@@ -2,7 +2,12 @@
 import { notFound } from "next/navigation"
 
 export default async function NewsDetailPage({ params }) {
-    const res = await fetch(`http://localhost:3000/api/news/${params.id}`)
+    const id = params?.id
+
+    const res = await fetch(`http://localhost:3000/api/news/${id}`, {
+        cache: 'no-store' // Para evitar errores por contenido estático
+    })
+
     if (!res.ok) return notFound()
 
     const post = await res.json()
@@ -22,4 +27,4 @@ export default async function NewsDetailPage({ params }) {
             </p>
         </div>
     )
-}  
+}

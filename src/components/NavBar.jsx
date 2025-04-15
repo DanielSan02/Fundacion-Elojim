@@ -19,7 +19,7 @@ const Navbar = () => {
   const navItems = [
     { href: "#inicio", label: "Inicio" },
     { href: "#nosotros", label: "Nosotros" },
-    { href: "#noticias", label: "Noticias" },
+    { href: "/news", label: "Noticias" },
     { href: "#contacto", label: "Contáctanos" },
     { href: "/programas", label: "Programas" },
   ];

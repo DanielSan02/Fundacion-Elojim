@@ -1,16 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Share2, ChevronRight, Calendar } from "lucide-react";
-import newsData from "../NewSection/newsData.json";
 
 const NewSection = () => {
+  const [news, setNews] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
-  const { categories, news } = newsData;
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      const res = await fetch("/api/news");
+      const data = await res.json();
+      setNews(data);
+    };
+    fetchNews();
+  }, []);
 
   const filteredNews =
     activeCategory === "all"
@@ -30,28 +38,8 @@ const NewSection = () => {
           </p>
         </div>
 
-        {/* Categorías */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category.id}
-              variant={activeCategory === category.id ? "default" : "outline"}
-              className={`
-                ${
-                  activeCategory === category.id
-                    ? "bg-[#1B3C8C] text-white"
-                    : "text-[#1B3C8C]"
-                }
-              `}
-              onClick={() => setActiveCategory(category.id)}>
-              {category.name}
-            </Button>
-          ))}
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Noticia Destacada */}
-          {filteredNews.find((item) => item.featured) && (
+          {filteredNews.length > 0 && (
             <Card className="md:col-span-2 lg:col-span-3 overflow-hidden bg-white">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="relative h-64 md:h-full">
@@ -70,7 +58,7 @@ const NewSection = () => {
                     <div className="flex items-center gap-4 mb-4">
                       <div className="flex items-center text-sm text-gray-500">
                         <Calendar className="w-4 h-4 mr-2" />
-                        {new Date(filteredNews[0].date).toLocaleDateString(
+                        {new Date(filteredNews[0].createdAt || Date.now()).toLocaleDateString(
                           "es-ES",
                           {
                             day: "numeric",
@@ -79,16 +67,12 @@ const NewSection = () => {
                           }
                         )}
                       </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="w-4 h-4 mr-2" />
-                        {filteredNews[0].readTime}
-                      </div>
                     </div>
                     <h3 className="text-2xl font-bold text-[#1B3C8C] mb-4">
                       {filteredNews[0].title}
                     </h3>
                     <p className="text-gray-600 mb-6">
-                      {filteredNews[0].excerpt}
+                      {filteredNews[0].content?.slice(0, 120) + "..."}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
@@ -105,9 +89,8 @@ const NewSection = () => {
             </Card>
           )}
 
-          {/* Noticias Regulares */}
           {filteredNews
-            .filter((item) => !item.featured)
+            .slice(1)
             .map((item) => (
               <Card key={item.id} className="group overflow-hidden bg-white">
                 <div className="relative h-48">
@@ -123,20 +106,18 @@ const NewSection = () => {
                   <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2" />
-                      {new Date(item.date).toLocaleDateString("es-ES", {
+                      {new Date(item.createdAt || Date.now()).toLocaleDateString("es-ES", {
                         day: "numeric",
                         month: "long",
                       })}
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-2" />
-                      {item.readTime}
                     </div>
                   </div>
                   <h3 className="text-xl font-bold text-[#1B3C8C] mb-3 group-hover:text-[#3B82F6] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 mb-4">{item.excerpt}</p>
+                  <p className="text-gray-600 mb-4">
+                    {item.content?.slice(0, 100) + "..."}
+                  </p>
                 </CardContent>
                 <CardFooter className="px-6 pb-6 pt-0 flex items-center justify-between">
                   <Button
@@ -153,7 +134,6 @@ const NewSection = () => {
             ))}
         </div>
 
-        {/* Botón Ver Más */}
         <div className="text-center mt-12">
           <Button
             variant="outline"
