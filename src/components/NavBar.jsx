@@ -47,13 +47,13 @@ const Navbar = () => {
                 {item.label}
               </a>
             ))}
-            <Link href="/auth/login">
+            {/* <Link href="/auth/login">
               <Button
                 variant="outline"
                 className="text-[#3B82F6] border-white hover:bg-[#3B82F6] hover:text-white transition-colors">
                 Iniciar Sesión
               </Button>
-            </Link>
+            </Link> */}
           </nav>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
@@ -83,13 +83,13 @@ const Navbar = () => {
                     {item.label}
                   </Link>
                 ))}
-                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                {/* <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                   <Button
                     variant="outline"
                     className="text-[#3B82F6] border-white hover:bg-[#3B82F6] hover:text-white transition-colors">
                     Iniciar Sesión
                   </Button>
-                </Link>
+                </Link> */}
               </nav>
             </SheetContent>
           </Sheet>

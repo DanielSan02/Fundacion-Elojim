@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/Home/Header";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/NavBar";
 import MisionVision from "@/components/Home/MisionVision";
 import AreasImpacto from "@/components/Home/AreasImpacto";
 import NewSection from "@/components/Home/NewSection/NewSection";

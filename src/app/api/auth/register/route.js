@@ -47,5 +47,4 @@ export async function POST(request){
             error: error.message,
         }, { status: 500 });
     }
-    
 }
