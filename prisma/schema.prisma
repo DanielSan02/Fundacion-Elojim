@@ -34,6 +34,8 @@ model Post {
   content   String?
   authorId  Int
   author    Users     @relation(fields: [authorId], references: [id])
+  images    String[]
 
   @@map("posts")  // Mapea a la tabla "posts" en la DB
 }
+

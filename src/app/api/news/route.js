@@ -11,44 +11,51 @@ export async function POST(req) {
         const formData = await req.formData()
         const title = formData.get("title")
         const content = formData.get("content") || ""
-        const image = formData.get("image")
+        const images = formData.getAll("images")
 
-        // Asignar un autor fijo (o extraer de sesión)
         const authorId = 1
 
-        let imagePath = null
+        let imagePaths = [];
 
-        if (image && image.name) {
-            const bytes = await image.arrayBuffer()
-            const buffer = Buffer.from(bytes)
-            const fileName = `${Date.now()}-${image.name}`
-            const uploadDir = path.join(process.cwd(), "public/uploads")
-            if (!existsSync(uploadDir)) await mkdir(uploadDir, { recursive: true })
-
-            const filePath = path.join(uploadDir, fileName)
-            await writeFile(filePath, buffer)
-            imagePath = `/uploads/${fileName}`
+         // Verificar si hay imágenes y procesarlas
+        if (images && images.length > 0) {
+            const uploadDir = path.join(process.cwd(), "public/uploads");
+    
+            // Crear el directorio si no existe
+            if (!existsSync(uploadDir)) await mkdir(uploadDir, { recursive: true });
+    
+            // Procesar cada imagen y guardar la ruta
+            for (const image of images) {
+                const bytes = await image.arrayBuffer();
+                const buffer = Buffer.from(bytes);
+                const fileName = `${Date.now()}-${image.name}`;
+                const filePath = path.join(uploadDir, fileName);
+        
+                // Escribir el archivo en el directorio de uploads
+                await writeFile(filePath, buffer);
+                // Guardar la ruta de la imagen
+                imagePaths.push(`/uploads/${fileName}`);
+            }
         }
-
+    
         const post = await prisma.post.create({
             data: {
-                title,
-                content,
-                authorId,
-                // image: imagePath // solo si lo agregaste al modelo
+            title,
+            content,
+            authorId,
+            images: imagePaths,
             },
-        })
-
+        });
+  
         return new Response(JSON.stringify(post), {
-            headers: { "Content-Type": "application/json" },
-            status: 201,
-        })
+        headers: { "Content-Type": "application/json" },
+        status: 201,
+        });
     } catch (error) {
-        console.error("❌ Error al crear noticia:", error)
-        return new Response("Error interno", { status: 500 })
+      console.error("❌ Error al crear noticia:", error);
+      return new Response("Error interno", { status: 500 });
     }
 }
-
 
 export async function GET() {
     try {
