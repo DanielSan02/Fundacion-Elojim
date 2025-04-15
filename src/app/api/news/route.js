@@ -12,51 +12,43 @@ export async function POST(req) {
         const title = formData.get("title")
         const content = formData.get("content") || ""
         const images = formData.getAll("images")
+        const authorId = 1 // asignación temporal
 
-        const authorId = 1
+        const uploadDir = path.join(process.cwd(), "public/uploads")
+        if (!existsSync(uploadDir)) await mkdir(uploadDir, { recursive: true })
 
-        let imagePaths = [];
+        const savedPaths = []
 
-         // Verificar si hay imágenes y procesarlas
-        if (images && images.length > 0) {
-            const uploadDir = path.join(process.cwd(), "public/uploads");
-    
-            // Crear el directorio si no existe
-            if (!existsSync(uploadDir)) await mkdir(uploadDir, { recursive: true });
-    
-            // Procesar cada imagen y guardar la ruta
-            for (const image of images) {
-                const bytes = await image.arrayBuffer();
-                const buffer = Buffer.from(bytes);
-                const fileName = `${Date.now()}-${image.name}`;
-                const filePath = path.join(uploadDir, fileName);
-        
-                // Escribir el archivo en el directorio de uploads
-                await writeFile(filePath, buffer);
-                // Guardar la ruta de la imagen
-                imagePaths.push(`/uploads/${fileName}`);
-            }
+        for (const image of images) {
+            if (typeof image.name !== "string") continue
+
+            const buffer = Buffer.from(await image.arrayBuffer())
+            const fileName = `${Date.now()}-${image.name}`
+            const filePath = path.join(uploadDir, fileName)
+
+            await writeFile(filePath, buffer)
+            savedPaths.push(`/uploads/${fileName}`)
         }
-    
+
         const post = await prisma.post.create({
             data: {
-            title,
-            content,
-            authorId,
-            images: imagePaths,
-            },
-        });
-  
+                title,
+                content,
+                authorId,
+                images: savedPaths
+            }
+        })
+
         return new Response(JSON.stringify(post), {
-        headers: { "Content-Type": "application/json" },
-        status: 201,
-        });
+            status: 201,
+            headers: { "Content-Type": "application/json" }
+        })
+
     } catch (error) {
-      console.error("❌ Error al crear noticia:", error);
-      return new Response("Error interno", { status: 500 });
+        console.error("❌ Error creando noticia:", error)
+        return new Response("Error interno", { status: 500 })
     }
 }
-
 export async function GET() {
     try {
         const prisma = new PrismaClient()
