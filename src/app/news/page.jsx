@@ -33,9 +33,9 @@ export default function NewsListPage() {
                             className="cursor-pointer bg-white shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition"
                         >
                             <div className="h-48 w-full bg-gray-100">
-                                {item.image && (
+                                {item.images && (
                                     <img
-                                        src={item.image}
+                                        src={item.images[0]}
                                         alt={item.title}
                                         className="h-full w-full object-cover"
                                     />
