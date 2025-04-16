@@ -1,4 +1,3 @@
-// src/app/news/page.jsx
 "use client"
 
 import { useEffect, useState } from "react"
