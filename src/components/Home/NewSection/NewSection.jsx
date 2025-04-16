@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Share2, ChevronRight, Calendar } from "lucide-react";
+import Link from "next/link";
 
 const NewSection = () => {
   const [news, setNews] = useState([]);
@@ -24,6 +25,32 @@ const NewSection = () => {
     activeCategory === "all"
       ? news
       : news.filter((item) => item.category === activeCategory);
+
+  // Función auxiliar para obtener la primera imagen con URL correcta
+  const getFirstImage = (newsItem) => {
+    if (newsItem?.images && newsItem.images.length > 0) {
+      // Asegurarse de que la URL sea absoluta y correcta
+      const imagePath = newsItem.images[0];
+      
+      // Si la ruta ya comienza con http:// o https://, usarla tal cual
+      if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+        return imagePath;
+      }
+      
+      // Si la ruta comienza con doble barra, añadir https:
+      if (imagePath.startsWith("//")) {
+        return `https:${imagePath}`;
+      }
+      
+      // Si la ruta no comienza con /, añadirla
+      if (!imagePath.startsWith("/")) {
+        return `/${imagePath}`;
+      }
+      
+      return imagePath;
+    }
+    return "/placeholder.svg";
+  };
 
   return (
     <section id="noticias" className="py-20 bg-[#E8E6E1]">
@@ -44,7 +71,7 @@ const NewSection = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="relative h-64 md:h-full">
                   <Image
-                    src={filteredNews[0].image || "/placeholder.svg"}
+                    src={getFirstImage(filteredNews[0])}
                     alt={filteredNews[0].title}
                     fill
                     className="object-cover"
@@ -76,10 +103,12 @@ const NewSection = () => {
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Button className="bg-[#1B3C8C] hover:bg-[#2563EB]">
-                      Leer más
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
+                    <Link href={`/news/${filteredNews[0].id}`}>
+                      <Button className="bg-[#1B3C8C] hover:bg-[#2563EB]">
+                        Leer más
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
                     <Button variant="ghost" size="icon">
                       <Share2 className="w-5 h-5" />
                     </Button>
@@ -95,7 +124,7 @@ const NewSection = () => {
               <Card key={item.id} className="group overflow-hidden bg-white">
                 <div className="relative h-48">
                   <Image
-                    src={item.image || "/placeholder.svg"}
+                    src={getFirstImage(item)}
                     alt={item.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -120,12 +149,14 @@ const NewSection = () => {
                   </p>
                 </CardContent>
                 <CardFooter className="px-6 pb-6 pt-0 flex items-center justify-between">
-                  <Button
-                    variant="link"
-                    className="text-[#1B3C8C] p-0 hover:text-[#3B82F6]">
-                    Leer más
-                    <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
+                  <Link href={`/news/${item.id}`}>
+                    <Button
+                      variant="link"
+                      className="text-[#1B3C8C] p-0 hover:text-[#3B82F6]">
+                      Leer más
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
                   <Button variant="ghost" size="icon">
                     <Share2 className="w-5 h-5" />
                   </Button>
@@ -135,11 +166,13 @@ const NewSection = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button
-            variant="outline"
-            className="text-[#1B3C8C] border-[#1B3C8C] hover:bg-[#1B3C8C] hover:text-white">
-            Ver Más Noticias
-          </Button>
+          <Link href="/news">
+            <Button
+              variant="outline"
+              className="text-[#1B3C8C] border-[#1B3C8C] hover:bg-[#1B3C8C] hover:text-white">
+              Ver Más Noticias
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
