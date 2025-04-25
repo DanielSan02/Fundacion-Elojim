@@ -1,27 +1,27 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     domains: ["hebbkx1anhila5yf.public.blob.vercel-storage.com"],
   },
-  // Configuración para Turbopack (opcional, según necesidades)
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        "@": path.resolve(__dirname, "src"), // Alias para Turbopack
-      },
-    },
+  // Nueva ubicación para la configuración de Turbopack
+  turbopack: {
+    resolveAlias: {
+      "@": path.resolve(__dirname, "src")
+    }
   },
-  // Elimina webpack si solo usas Turbopack en desarrollo
-  // (Opcional: mantenerlo para compatibilidad con `next build`)
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      "@": path.resolve(__dirname, "src"),
+      "@": path.resolve(__dirname, "src")
     };
     return config;
-  },
+  }
 };
 
 export default nextConfig;
