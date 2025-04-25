@@ -1,11 +1,20 @@
-import path from 'path'; // Add this import at the top
+import path from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     domains: ["hebbkx1anhila5yf.public.blob.vercel-storage.com"],
   },
-  // Remove `experimental.appDir` (deprecated in Next.js 13+)
+  // Configuración para Turbopack (opcional, según necesidades)
+  experimental: {
+    turbo: {
+      resolveAlias: {
+        "@": path.resolve(__dirname, "src"), // Alias para Turbopack
+      },
+    },
+  },
+  // Elimina webpack si solo usas Turbopack en desarrollo
+  // (Opcional: mantenerlo para compatibilidad con `next build`)
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
