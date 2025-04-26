@@ -1,0 +1,16 @@
+module.exports = {
+  apps: [{
+    name: "next-app",
+    script: "node_modules/next/dist/bin/next",
+    args: "start -p 8081",
+    cwd: "/home/elojimjadach.org/Fundacion-Elojim",
+    instances: "max",
+    exec_mode: "cluster",
+    autorestart: true,
+    watch: false,
+    max_memory_restart: "1G",
+    env: {
+      NODE_ENV: "production"
+    }
+  }]
+}

@@ -9,13 +9,20 @@ const nextConfig = {
   images: {
     domains: ["hebbkx1anhila5yf.public.blob.vercel-storage.com"],
   },
-  // Elimina la sección de turbopack y usa solo webpack
-  webpack: (config) => {
+  // Configuración moderna sin turbopack
+  webpack: (config, { isServer }) => {
+    // Configuración de alias
     config.resolve.alias = {
       ...config.resolve.alias,
       "@": path.resolve(__dirname, "src")
     };
+    
     return config;
+  },
+  // Opciones modernas recomendadas
+  experimental: {
+    serverActions: true,
+    optimizePackageImports: ['@components']
   }
 };
 
