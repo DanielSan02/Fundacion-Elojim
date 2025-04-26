@@ -9,12 +9,7 @@ const nextConfig = {
   images: {
     domains: ["hebbkx1anhila5yf.public.blob.vercel-storage.com"],
   },
-  // Nueva ubicación para la configuración de Turbopack
-  turbopack: {
-    resolveAlias: {
-      "@": path.resolve(__dirname, "src")
-    }
-  },
+  // Elimina la sección de turbopack y usa solo webpack
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
