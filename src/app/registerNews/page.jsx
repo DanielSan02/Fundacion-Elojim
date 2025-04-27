@@ -94,7 +94,7 @@ export default function RegisterNewsPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
-            <Navbar />
+            {/* <Navbar /> */}
 
             <main className="flex-grow py-12 justify-center">
                 <div className="max-w-2xl mx-auto my-12 bg-white shadow-lg rounded-2xl p-8">
@@ -108,7 +108,7 @@ export default function RegisterNewsPage() {
                                 id="title"
                                 type="text"
                                 name="title"
-                                className={`w-full p-3 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                                className={`w-full p-3 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black dark:bg-white dark:text-black`}
                                 value={form.title}
                                 onChange={handleChange}
                                 required
@@ -123,7 +123,7 @@ export default function RegisterNewsPage() {
                                 id="content"
                                 name="content"
                                 rows="6"
-                                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black dark:bg-white dark:text-black"
                                 value={form.content}
                                 onChange={handleChange}
                             ></textarea>
@@ -189,7 +189,7 @@ export default function RegisterNewsPage() {
                 </div>
             </main>
 
-            <Footer />
+            {/* <Footer /> */}
         </div>
     )
 }
