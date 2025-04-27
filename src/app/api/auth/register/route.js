@@ -25,13 +25,13 @@ export async function POST(request){
         // Hashear la contraseña antes de guardarla
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Estructura de datos para la creación del usuario
+        // Estructura de datos para la creación del usuario con rol 2 = usuario
         const userData = {
             name,
             lastName,
             email,
             password: hashedPassword,
-            rolId: rolId || 1
+            rolId: rolId || 2
         };
 
         // Crear el usuario en la base de datos

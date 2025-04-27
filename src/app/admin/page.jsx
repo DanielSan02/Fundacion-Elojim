@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
   Breadcrumb,
@@ -19,31 +21,35 @@ import {
 } from "@/components/ui/tooltip";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { useStore } from "@/hooks/use-store";
+import ProtectedAdmin from "@/components/ProtectedAdmin";
 
 export default function DashboardPage() {
   const sidebar = useStore(useSidebar, (x) => x);
   if (!sidebar) return null;
   const { settings, setSettings } = sidebar;
   return (
-    <ContentLayout title="Dashboard">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <TooltipProvider>
-        <div className="flex gap-6 mt-6">
-          <p className="text-lg font-medium text-gray-900 dark:text-white">Bienvenidos al dashboard administrativo del sitio web perteneciente a la fundacion ElojiJadach. Desde este panel por el momento se pueden agregar y listar las noticias o posts</p>
-        </div>
-      </TooltipProvider>
-    </ContentLayout>
+    <ProtectedAdmin>
+      <ContentLayout title="Dashboard">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <TooltipProvider>
+          <div className="flex gap-6 mt-6">
+            <p className="text-lg font-medium text-gray-900 dark:text-white">Bienvenidos al dashboard administrativo del sitio web perteneciente a la fundacion ElojiJadach. Desde este panel por el momento se pueden agregar y listar las noticias o posts</p>
+          </div>
+        </TooltipProvider>
+      </ContentLayout>
+    </ProtectedAdmin>
+
   );
 }
