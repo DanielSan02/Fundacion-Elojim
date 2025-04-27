@@ -38,11 +38,11 @@ export function getMenuList(pathname) {
             }
           ]
         },
-        {
-          href: "/admin/categorias",
-          label: "Categorias",
-          icon: Bookmark
-        },
+        // {
+        //   href: "/admin/categorias",
+        //   label: "Categorias",
+        //   icon: Bookmark
+        // },
         // {
         //   href: "/tags",
         //   label: "Tags",
