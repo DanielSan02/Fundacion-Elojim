@@ -98,7 +98,7 @@ export default function RegisterNewsPage() {
 
             <main className="flex-grow py-12 justify-center">
                 <div className="max-w-2xl mx-auto my-12 bg-white shadow-lg rounded-2xl p-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-6">Registrar Noticia</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 mb-6">Registrar Post o Noticia</h1>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">

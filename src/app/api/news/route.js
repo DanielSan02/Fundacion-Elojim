@@ -72,3 +72,44 @@ export async function GET() {
     return new Response("Error al obtener noticias", { status: 500 });
   }
 }
+
+// Nuevo endpoint DELETE para eliminar una noticia
+export async function DELETE(req) {
+  try {
+    const { id } = await req.json(); // Obtener el id de la noticia a eliminar desde el body de la solicitud
+
+    // Obtener la noticia que se eliminará
+    const postToDelete = await prisma.post.findUnique({
+      where: { id },
+    });
+
+    if (!postToDelete) {
+      return new Response("Noticia no encontrada", { status: 404 });
+    }
+
+    // Eliminar las imágenes relacionadas (si existen)
+    if (postToDelete.images && postToDelete.images.length > 0) {
+      const uploadDir = path.join(process.cwd(), "public/uploads");
+
+      // Eliminar cada archivo de imagen
+      postToDelete.images.forEach((image) => {
+        const imagePath = path.join(uploadDir, image);
+        if (existsSync(imagePath)) {
+          unlinkSync(imagePath); // Eliminar la imagen
+        }
+      });
+    }
+
+    // Eliminar el registro de la base de datos
+    await prisma.post.delete({
+      where: { id },
+    });
+
+    return new Response("Noticia eliminada exitosamente", {
+      status: 200,
+    });
+  } catch (error) {
+    console.error("❌ Error al eliminar noticia:", error);
+    return new Response("Error interno al eliminar noticia", { status: 500 });
+  }
+}
