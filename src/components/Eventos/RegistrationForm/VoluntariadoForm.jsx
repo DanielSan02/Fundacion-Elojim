@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
+
+import { NIVELES_EDUCATIVOS, TIPOS_DOCUMENTO } from "../form-utils/formConstants";
 
 export default function VoluntariadoForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -27,9 +28,6 @@ export default function VoluntariadoForm({ program, onClose }) {
     nombreCompleto: "",
     documentoIdentidad: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     direccion: "",
     telefono: "",
     correoElectronico: "",
@@ -164,25 +162,34 @@ export default function VoluntariadoForm({ program, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="documentoIdentidad">
-                Documento de identidad<span className="text-red-500">*</span>
+              <Label htmlFor="tipoDocumento">
+                Tipo de documento<span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="documentoIdentidad"
-                name="documentoIdentidad"
-                value={formData.documentoIdentidad}
-                onChange={handleChange}
-                required
-              />
+              <Select
+                value={formData.tipoDocumento}
+                onValueChange={(value) =>
+                  handleSelectChange("tipoDocumento", value)
+                }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIPOS_DOCUMENTO.map((tipo) => (
+                    <SelectItem key={tipo.value} value={tipo.value}>
+                      {tipo.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefono">
-                Teléfono<span className="text-red-500">*</span>
+              <Label htmlFor="numeroDocumento">
+                Número de documento<span className="text-red-500">*</span>
               </Label>
               <Input
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
+                id="numeroDocumento"
+                name="numeroDocumento"
+                value={formData.numeroDocumento}
                 onChange={handleChange}
                 required
               />

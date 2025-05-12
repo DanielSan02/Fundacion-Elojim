@@ -1,0 +1,30 @@
+-- CreateTable
+CREATE TABLE "registros_taller_steam" (
+    "id" SERIAL NOT NULL,
+    "nombreCompleto" VARCHAR(100) NOT NULL,
+    "fechaNacimiento" TIMESTAMP(3) NOT NULL,
+    "comuna" VARCHAR(50) NOT NULL,
+    "estratoSocial" "EstratoSocial" NOT NULL,
+    "edad" INTEGER NOT NULL,
+    "grupoEtnico" "GrupoEtnico" NOT NULL,
+    "institucionEducativa" VARCHAR(100) NOT NULL,
+    "cursoGrado" VARCHAR(50) NOT NULL,
+    "direccion" VARCHAR(100) NOT NULL,
+    "nombreAcudiente" VARCHAR(100) NOT NULL,
+    "relacionNino" VARCHAR(50) NOT NULL,
+    "telefonoContacto" VARCHAR(15) NOT NULL,
+    "correoElectronico" VARCHAR(100),
+    "participacionPrevia" BOOLEAN NOT NULL DEFAULT false,
+    "actividadesInteres" TEXT[],
+    "otrasActividades" VARCHAR(100),
+    "disponibilidad" VARCHAR(100) NOT NULL,
+    "accesoComputadora" BOOLEAN NOT NULL DEFAULT false,
+    "accesoInternet" BOOLEAN NOT NULL DEFAULT false,
+    "motivacion" TEXT NOT NULL,
+    "expectativa" TEXT NOT NULL,
+    "aceptaTerminos" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "registros_taller_steam_pkey" PRIMARY KEY ("id")
+);

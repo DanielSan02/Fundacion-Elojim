@@ -3,7 +3,7 @@
  */
 
 // Opciones de estrato social
-export const ESTRATOS = ["1", "2", "3", "4", "5", "6"]
+export const ESTRATOS = ["E1", "E2", "E3", "E4", "E5", "E6"]
 
 // Grupos étnicos
 export const GRUPOS_ETNICOS = ["Ninguno", "Afrodescendiente", "Indígena", "Raizal", "Rom/Gitano", "Palenquero", "Otro"]

@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { TIPOS_DOCUMENTO } from "../form-utils/formConstants";
 
+import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
+
 export default function SemilleroForm({ program, onClose }) {
   const [formData, setFormData] = useState({
     // Datos Personales
@@ -28,9 +30,6 @@ export default function SemilleroForm({ program, onClose }) {
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     telefonoContacto: "",
     correoElectronico: "",
     direccion: "",
@@ -198,18 +197,26 @@ export default function SemilleroForm({ program, onClose }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nivelEducativo">
-                Nivel educativo o perfil profesional
-                <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="nivelEducativo"
-                name="nivelEducativo"
-                value={formData.nivelEducativo}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                          <Label htmlFor="nivelEducativo">
+                            Nivel educativo alcanzado<span className="text-red-500">*</span>
+                          </Label>
+                          <Select
+                            value={formData.nivelEducativo}
+                            onValueChange={(value) =>
+                              handleSelectChange("nivelEducativo", value)
+                            }>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {NIVELES_EDUCATIVOS.map((nivel) => (
+                                <SelectItem key={nivel} value={nivel}>
+                                  {nivel}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
           </div>
         </FormSection>
 

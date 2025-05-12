@@ -21,6 +21,9 @@ import {
 } from "@/components/ui/select";
 import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
 
+import { TIPOS_DOCUMENTO } from "../form-utils/formConstants";
+
+
 export default function MujerVulnerableForm({ program, onClose }) {
   const [formData, setFormData] = useState({
     // Datos Personales
@@ -28,9 +31,6 @@ export default function MujerVulnerableForm({ program, onClose }) {
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -69,6 +69,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
     onSuccess: onClose,
     successDescription: `Te has inscrito correctamente en el Programa Mujer Vulnerable.`,
   });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,17 +137,26 @@ export default function MujerVulnerableForm({ program, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="tipoDocumento">
-                Tipo de documento<span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="tipoDocumento"
-                name="tipoDocumento"
-                value={formData.tipoDocumento}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                          <Label htmlFor="tipoDocumento">
+                            Tipo de documento<span className="text-red-500">*</span>
+                          </Label>
+                          <Select
+                            value={formData.tipoDocumento}
+                            onValueChange={(value) =>
+                              setFormData({ ...formData, tipoDocumento: value })
+                            }>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {TIPOS_DOCUMENTO.map((tipo) => (
+                                <SelectItem key={tipo.value} value={tipo.value}>
+                                  {tipo.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
             <div className="space-y-2">
               <Label htmlFor="numeroDocumento">
                 Número de documento<span className="text-red-500">*</span>
