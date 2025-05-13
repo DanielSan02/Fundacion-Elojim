@@ -25,9 +25,6 @@ export default function CulturalForm({ program, onClose }) {
     // Datos Personales
     nombreCompleto: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",

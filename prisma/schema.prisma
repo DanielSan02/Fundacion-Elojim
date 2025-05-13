@@ -433,3 +433,122 @@ model RegistroVoluntariado {
 
   @@map("registros_voluntariado")
 }
+
+
+enum AreaInteresCultural {
+  Musica
+  Danza
+  Manualidades
+  Maquillaje
+  Dibujo
+  Otro
+}
+
+model RegistroCultural {
+  id                   Int       @id @default(autoincrement())
+
+  // ===== Datos Personales =====
+  nombreCompleto        String           @db.VarChar(100)
+  fechaNacimiento       DateTime
+  comuna                String           @db.VarChar(50)
+  estratoSocial         EstratoSocial
+  edad                  Int
+  grupoEtnico           GrupoEtnico
+  telefonoContacto      String           @db.VarChar(15)
+  correoElectronico     String?          @db.VarChar(100)
+  direccion             String           @db.VarChar(100)
+  documentoIdentidad    String           @db.VarChar(20) @unique
+  municipioDepartamento String           @db.VarChar(20)
+
+  // ===== Datos Socioeconomicos =====
+
+  nivelEducativo        NivelEducativo
+  ocupacion             String           @db.VarChar(20)
+
+  // ====== Areas Intereses =====     
+
+  areaInteresPrincipal AreaInteresCultural
+  otraAreaInteres      String?   @db.VarChar(100)
+
+  // ======== Experiencias =========  
+
+  formacionPrevia      Boolean   @default(false)
+  detalleFormacion     String?   @db.VarChar(100)    
+  perteneceGrupo       Boolean   @default(false)
+  detalleGrupo         String?   @db.VarChar(100)
+
+
+  // ========== Disponibilidad ==========
+
+  diasDisponibles      String    @db.Text
+  motivacion           String    @db.Text
+  expectativas         String    @db.Text
+
+
+  // ===== Autorización =====
+
+  aceptaTerminos       Boolean   @default(false)
+
+  // ===== Auditoría =====
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt()
+
+  @@map("registros_cultural")
+}
+
+
+enum Genero {
+  FEMENINO
+  MASCULINO
+}
+
+model RegistroEconomiaPlateada {
+  id                   Int       @id @default(autoincrement())
+
+  // ===== Datos Personales =====
+  nombreCompleto        String           @db.VarChar(100)
+  fechaNacimiento       DateTime
+  comuna                String           @db.VarChar(50)
+  estratoSocial         EstratoSocial
+  edad                  Int
+  grupoEtnico           GrupoEtnico
+  telefonoContacto      String           @db.VarChar(15)
+  correoElectronico     String?          @db.VarChar(100)
+  direccion             String           @db.VarChar(100)
+  tipoDocumento         TipoDocumento
+  numeroDocumento       String           @db.VarChar(20) @unique
+  genero                Genero
+
+  // ===== Situacion Economica =====
+
+  esPensionado          Boolean          @default(false)
+  actividadEconomica    String?          @db.VarChar(100)
+  trabajoAnterior       Boolean          @default(false)
+  sectorTrabajo         String?          @db.VarChar(100)
+  ingresosAdicionales   Boolean          @default(false)
+  fuenteIngresos        String?          @db.VarChar(100)   
+  
+
+  // ====== Intereses y Habilidades =====     
+
+  areasInteres          String[]
+  otrasAreas            String?          @db.VarChar(100)
+  habilidades           String           @db.Text
+
+  // ========== Disponibilidad ==========
+
+  tiempoSemanal        String            @db.VarChar(100)
+  motivacion           String            @db.Text
+  expectativas         String            @db.Text
+
+
+  // ===== Autorización =====
+
+  aceptaTerminos       Boolean   @default(false)
+
+  // ===== Auditoría =====
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt()
+
+  @@map("registros_economia_plateada")
+}

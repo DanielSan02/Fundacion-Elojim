@@ -1,34 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-
 import {
   EstratoSocial,
   GrupoEtnico,
   NivelEducativo,
-  TipoDocumento,
-  TipoVinculacion,
+  AreaInteresCultural,
 } from "@prisma/client";
 
-const areasInteresValidas = [
-    "Emprendimiento social",
-    "Tecnología e innovación",
-    "Medio ambiente y sostenibilidad",
-    "Transformación digital",
-    "Desarrollo de productos o servicios",
-    "Otras"
-  ];
-
+// Enums válidos
 const ESTRATOS = Object.values(EstratoSocial);
 const GRUPOS_ETNICOS = Object.values(GrupoEtnico);
 const NIVELES_EDUCATIVOS = Object.values(NivelEducativo);
-const TIPOS_DOCUMENTO = Object.values(TipoDocumento);
-const TIPOS_VINCULACION = Object.values(TipoVinculacion);
+const AREAS_INTERES = Object.values(AreaInteresCultural);
 
+// Campos obligatorios
 const CAMPOS_OBLIGATORIOS = [
   "nombreCompleto",
-  "tipoDocumento",
-  "numeroDocumento",
   "fechaNacimiento",
   "comuna",
   "estratoSocial",
@@ -36,11 +24,14 @@ const CAMPOS_OBLIGATORIOS = [
   "grupoEtnico",
   "telefonoContacto",
   "direccion",
-  "tipoVinculacion",
-  "nombreEntidadVinculacion",
+  "documentoIdentidad",
+  "municipioDepartamento",
   "nivelEducativo",
-  "habilidades",
-  "disponibilidad",
+  "ocupacion",
+  "areaInteresPrincipal",
+  "formacionPrevia",
+  "perteneceGrupo",
+  "diasDisponibles",
   "motivacion",
   "expectativas",
   "aceptaTerminos",
@@ -53,8 +44,8 @@ function validarDatos(data) {
     }
   }
 
-  if (!/^\d{8,10}$/.test(data.numeroDocumento)) {
-    throw new Error("El número de documento debe tener entre 8 y 10 dígitos.");
+  if (!/^\d{8,10}$/.test(data.documentoIdentidad)) {
+    throw new Error("El documento de identidad debe tener entre 8 y 10 dígitos.");
   }
 
   if (!/^\d{10}$/.test(data.telefonoContacto)) {
@@ -63,10 +54,6 @@ function validarDatos(data) {
 
   if (data.correoElectronico && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.correoElectronico)) {
     throw new Error("El correo electrónico tiene un formato inválido.");
-  }
-
-  if (!TIPOS_DOCUMENTO.includes(data.tipoDocumento)) {
-    throw new Error("El tipo de documento no es válido.");
   }
 
   if (!ESTRATOS.includes(data.estratoSocial)) {
@@ -81,27 +68,16 @@ function validarDatos(data) {
     throw new Error("El nivel educativo no es válido.");
   }
 
-  if (!TIPOS_VINCULACION.includes(data.tipoVinculacion)) {
-    throw new Error("El tipo de vinculación no es válido.");
+  if (!AREAS_INTERES.includes(data.areaInteresPrincipal)) {
+    throw new Error("El área de interés principal no es válida.");
   }
 
-  // Validación de actividadesInteres
-  if (!Array.isArray(data.areasInteres)) {
-    throw new Error("El campo 'areasInteres' debe ser una lista.");
+  if (data.formacionPrevia === true && !data.detalleFormacion) {
+    throw new Error("Debe detallar la formación previa.");
   }
 
-  const areasInvalidas = data.areasInteres.filter(
-    (area) => !areasInteresValidas.includes(area)
-  );
-
-  if (areasInvalidas.length > 0) {
-    throw new Error(
-      `Las siguientes áreas de interés no son válidas: ${areasInvalidas.join(", ")}`
-    );
-  }
-
-  if (data.tieneProyecto === true && !data.descripcionProyecto) {
-    throw new Error("Debe especificar la descripción del proyecto.");
+  if (data.perteneceGrupo === true && !data.detalleGrupo) {
+    throw new Error("Debe detallar el grupo cultural al que pertenece.");
   }
 }
 
@@ -111,17 +87,16 @@ export async function POST(request) {
 
     validarDatos(data);
 
-    const nuevoRegistro = await prisma.registroSemilleroInnovacion.create({
+    const nuevoRegistro = await prisma.registroCultural.create({
       data: {
         ...data,
         fechaNacimiento: new Date(data.fechaNacimiento),
-        areasInteres: data.areasInteres || [],
       },
     });
 
     return NextResponse.json(nuevoRegistro, { status: 201 });
   } catch (error) {
-    console.error("Error al registrar en semillero de innovación:", error);
+    console.error("Error al registrar participante cultural:", error);
     return NextResponse.json(
       {
         error: error.message || "Error interno del servidor",

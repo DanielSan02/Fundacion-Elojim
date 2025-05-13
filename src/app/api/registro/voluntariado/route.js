@@ -25,6 +25,7 @@ const areasInteresValidas = [
   "Actividades recreativas",
   "Logística y eventos",
   "Visitar comunidades para entrega de alimentos",
+  "Otros"
 ];
 
 const CAMPOS_OBLIGATORIOS = [

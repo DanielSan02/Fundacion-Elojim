@@ -11,6 +11,7 @@ const actividadesTecnologicas = [
   "Diseño de videojuegos",
   "Inteligencia Artificial para niños",
   "Ciencia y experimentos",
+  "Otras"
 ];
 
 const CAMPOS_OBLIGATORIOS = [

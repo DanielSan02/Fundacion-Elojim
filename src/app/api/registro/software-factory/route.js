@@ -27,6 +27,7 @@ const AREAS_INTERES_VALIDAS = [
     "Blockchain y Criptomonedas",
     "Ingeniería de Software y Metodologías de Desarrollo",
     "Software para Educación e Inclusión",
+    "Otras"
 ];
 
 const CAMPOS_OBLIGATORIOS = [
