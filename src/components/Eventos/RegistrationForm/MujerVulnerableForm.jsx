@@ -64,12 +64,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el Programa Mujer Vulnerable.`,
-  });
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,6 +95,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
     });
   };
 
+
   const areasApoyo = [
     "Capacitación y empleo",
     "Emprendimiento",
@@ -108,6 +104,77 @@ export default function MujerVulnerableForm({ program, onClose }) {
     "Apoyo psicológico y social",
     "Vivienda y subsidios",
   ];
+
+  const AREAS_APOYO_MAP = {
+    "Capacitación y empleo": "CAPACITACION",
+    "Emprendimiento": "EMPRENDIMIENTO",
+    "Educación": "EDUCACION",
+    "Salud y bienestar": "SALUD",
+    "Apoyo psicológico y social": "APOYO_PSI",
+    "Vivienda y subsidios": "VIVIENDA"
+  };
+
+
+
+    const adaptToBoolean = (value) => value === "si";
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+  const mappedAreas = formData.areasApoyo
+    .filter(area => AREAS_APOYO_MAP.hasOwnProperty(area))
+    .map(area => AREAS_APOYO_MAP[area]);
+
+
+    const adaptedData = {
+      ...formData,
+      edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
+      esMadreCabeza: adaptToBoolean(formData.esMadreCabeza),
+      numeroHijos: parseInt(formData.numeroHijos, 10),
+      conviveConOtrasPersonas: adaptToBoolean(formData.conviveOtros),
+      tieneEmpleo: adaptToBoolean(formData.tieneEmpleo),
+      tieneApoyoGubernamental: adaptToBoolean(formData.tieneApoyoGubernamental),
+      aceptaTerminos: Boolean(formData.aceptaTerminos),
+      areasApoyo: mappedAreas,
+      fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
+      tiempoSemanalDisponible: formData.tiempoSemanal,
+    };
+
+    if (!adaptedData.conviveConOtrasPersonas) {
+      adaptedData.conQuienesConvive = "";
+    }
+
+    if (adaptedData.tieneEmpleo) {
+      adaptedData.fuenteIngresos = "";
+    }
+
+    if (!adaptedData.tieneApoyoGubernamental) {
+      adaptedData.tipoApoyoGubernamental = "";
+    }
+
+    try {
+      const response = await fetch("/api/registro/mujer-vulnerable", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(adaptedData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error);
+
+      alert("Formulario enviado exitosamente.");
+      onClose?.();
+    } catch (error) {
+      alert(error.message || "Error al enviar el formulario.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
 
   return (
     <motion.div
@@ -126,7 +193,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={handleSubmit}  className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
