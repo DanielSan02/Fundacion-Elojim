@@ -18,9 +18,6 @@ export default function SteamForm({ program, onClose }) {
     // Datos del Niño/a
     nombreCompleto: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -53,11 +50,7 @@ export default function SteamForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Has inscrito correctamente al niño/a en el Taller STEAM+H.`,
-  });
+   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -81,6 +74,44 @@ export default function SteamForm({ program, onClose }) {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.aceptaTerminos) {
+      alert("Debes aceptar los términos y condiciones antes de continuar.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+          const dataToSend = {
+            ...formData,
+      edad: parseInt(formData.edad, 10),
+      participacionPrevia: Boolean(formData.participacionPrevia),
+      accesoComputadora: Boolean(formData.accesoComputadora),
+      accesoInternet: Boolean(formData.accesoInternet)
+    };
+
+      const res = await fetch("/api/registro/taller-steam", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.error || "Error al enviar el formulario.");
+
+      alert("Has inscrito correctamente al niño/a en el Taller STEAM+H.");
+      onClose?.();
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const actividadesTecnologicas = [
     "Programación básica",
     "Robótica educativa",
@@ -88,6 +119,7 @@ export default function SteamForm({ program, onClose }) {
     "Inteligencia Artificial para niños",
     "Ciencia y experimentos",
   ];
+
 
   return (
     <motion.div
@@ -133,6 +165,7 @@ export default function SteamForm({ program, onClose }) {
               <Input
                 id="cursoGrado"
                 name="cursoGrado"
+                type="number"
                 value={formData.cursoGrado}
                 onChange={handleChange}
                 required
@@ -179,6 +212,7 @@ export default function SteamForm({ program, onClose }) {
                 name="telefonoContacto"
                 value={formData.telefonoContacto}
                 onChange={handleChange}
+                type="number"
                 required
               />
             </div>
