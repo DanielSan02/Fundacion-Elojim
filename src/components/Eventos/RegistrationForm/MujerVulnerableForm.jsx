@@ -120,6 +120,12 @@ export default function MujerVulnerableForm({ program, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.aceptaTerminos) {
+    alert("Debes aceptar los términos y condiciones antes de continuar.");
+    return;
+    }
+    
     setIsSubmitting(true);
 
   const mappedAreas = formData.areasApoyo
