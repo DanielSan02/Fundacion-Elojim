@@ -20,7 +20,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { NIVELES_EDUCATIVOS, TIPOS_DOCUMENTO } from "../form-utils/formConstants";
+import {
+  NIVELES_EDUCATIVOS,
+  TIPOS_DOCUMENTO,
+} from "../form-utils/formConstants";
 
 export default function VoluntariadoForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -29,7 +32,7 @@ export default function VoluntariadoForm({ program, onClose }) {
     documentoIdentidad: "",
     fechaNacimiento: "",
     direccion: "",
-    telefono: "",
+    telefonoContacto: "",
     correoElectronico: "",
     comuna: "",
     estratoSocial: "",
@@ -71,13 +74,14 @@ export default function VoluntariadoForm({ program, onClose }) {
   });
 
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "voluntariado",
     onSuccess: onClose,
     successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("Campo:", name, "Valor:", value);
     setFormData({
       ...formData,
       [name]: value,
@@ -166,7 +170,7 @@ export default function VoluntariadoForm({ program, onClose }) {
                 Tipo de documento<span className="text-red-500">*</span>
               </Label>
               <Select
-                value={formData.tipoDocumento}
+                value={formData.tipoDocumento || ""}
                 onValueChange={(value) =>
                   handleSelectChange("tipoDocumento", value)
                 }>
@@ -189,7 +193,7 @@ export default function VoluntariadoForm({ program, onClose }) {
               <Input
                 id="numeroDocumento"
                 name="numeroDocumento"
-                value={formData.numeroDocumento}
+                value={formData.numeroDocumento || ""}
                 onChange={handleChange}
                 required
               />
@@ -243,10 +247,10 @@ export default function VoluntariadoForm({ program, onClose }) {
               value={formData.disponibilidad}
               onChange={handleRadioChange}
               options={[
-                { value: "completo", label: "Tiempo completo" },
-                { value: "parcial", label: "Tiempo parcial" },
-                { value: "fines-semana", label: "Fines de semana" },
-                { value: "dias-especificos", label: "Días específicos" },
+                { value: "TIEMPO_COMPLETO", label: "Tiempo completo" },
+                { value: "TIEMPO_PARCIAL", label: "Tiempo parcial" },
+                { value: "FINES_DE_SEMANA", label: "Fines de semana" },
+                { value: "DIAS_ESPECIFICOS", label: "Días específicos" },
               ]}
               orientation="vertical"
               required

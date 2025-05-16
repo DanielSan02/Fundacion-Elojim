@@ -59,7 +59,7 @@ export default function CulturalForm({ program, onClose }) {
   });
 
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "cultural",
     onSuccess: onClose,
     successDescription: `Te has inscrito correctamente en el Programa Cultural.`,
   });

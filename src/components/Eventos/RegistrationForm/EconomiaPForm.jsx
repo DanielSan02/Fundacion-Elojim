@@ -63,7 +63,7 @@ export default function EconomiaPForm({ program, onClose }) {
   });
 
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "economia-plateada",
     onSuccess: onClose,
     successDescription: `Te has inscrito correctamente en el Programa Economía Plateada.`,
   });
@@ -167,8 +167,8 @@ export default function EconomiaPForm({ program, onClose }) {
               value={formData.genero}
               onChange={handleRadioChange}
               options={[
-                { value: "femenino", label: "Femenino" },
-                { value: "masculino", label: "Masculino" },
+                { value: "FEMENINO", label: "Femenino" },
+                { value: "MASCULINO", label: "Masculino" },
               ]}
               required
             />

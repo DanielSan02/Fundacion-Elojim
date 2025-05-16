@@ -44,58 +44,66 @@ const CAMPOS_OBLIGATORIOS = [
   "disponibilidadTipo",
   "horasDisponibles",
   "habilidades",
-  "motivacion",
-  "fundacion",      
-  "funcion",        
-  "tiempo",  
+  "motivacion",  
   "aceptaTerminos"
 ];
 
 function validarDatos(data) {
+ 
   for (const campo of CAMPOS_OBLIGATORIOS) {
     if (
       data[campo] === undefined ||
       data[campo] === null ||
       data[campo] === ""
     ) {
+      
       throw new Error(`El campo '${campo}' es obligatorio.`);
     }
   }
 
   if (!/^\d{8,10}$/.test(data.numeroDocumento)) {
+    
     throw new Error("El número de documento debe tener entre 8 y 10 dígitos.");
   }
 
   if (!/^\d{10}$/.test(data.telefonoContacto)) {
+    
     throw new Error("El teléfono de contacto debe tener 10 dígitos.");
   }
 
   if (data.correoElectronico && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.correoElectronico)) {
+    
     throw new Error("El correo electrónico tiene un formato inválido.");
   }
 
   if (!TIPOS_DOCUMENTO.includes(data.tipoDocumento)) {
+    
     throw new Error("El tipo de documento no es válido.");
   }
 
   if (!ESTRATOS.includes(data.estratoSocial)) {
+    
     throw new Error("El estrato social no es válido.");
   }
 
   if (!GRUPOS_ETNICOS.includes(data.grupoEtnico)) {
+    
     throw new Error("El grupo étnico no es válido.");
   }
 
   if (!NIVELES_EDUCATIVOS.includes(data.nivelEducativo)) {
+    
     throw new Error("El nivel educativo no es válido.");
   }
 
   if (!TIPOS_DISPONIBILIDAD.includes(data.disponibilidadTipo)) {
+    
     throw new Error("El tipo de disponibilidad no es válido.");
   }
 
   // Validación de actividadesInteres
   if (!Array.isArray(data.areasInteres)) {
+   
     throw new Error("El campo 'areasInteres' debe ser una lista.");
   }
 
@@ -104,6 +112,7 @@ function validarDatos(data) {
   );
 
   if (areasInvalidas.length > 0) {
+    
     throw new Error(
       `Las siguientes áreas de interés no son válidas: ${areasInvalidas.join(", ")}`
     );
@@ -114,8 +123,10 @@ function validarDatos(data) {
 export async function POST(request) {
   try {
     const data = await request.json();
+    
 
     validarDatos(data);
+    
 
     const nuevoRegistro = await prisma.registroVoluntariado.create({
       data: {
@@ -131,9 +142,10 @@ export async function POST(request) {
       },
     });
 
+    
     return NextResponse.json(nuevoRegistro, { status: 201 });
   } catch (error) {
-    console.error("Error al registrar voluntariado:", error);
+    
     return NextResponse.json(
       {
         error: error.message || "Error interno del servidor",
@@ -143,6 +155,7 @@ export async function POST(request) {
     );
   }
 }
+
 
 export const config = {
   api: {

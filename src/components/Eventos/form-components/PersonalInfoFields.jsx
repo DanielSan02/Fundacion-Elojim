@@ -34,11 +34,14 @@ export function PersonalInfoFields({
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
         age--;
       }
-      
+
       onChange({ ...formData, fechaNacimiento: value, edad: age.toString() });
     }
   };
@@ -85,10 +88,9 @@ export function PersonalInfoFields({
             value={formData.fechaNacimiento || ""}
             onChange={handleChange}
             required
-            max={new Date().toISOString().split('T')[0]} // No permite fechas futuras
+            max={new Date().toISOString().split("T")[0]} // No permite fechas futuras
           />
         </div>
-
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -189,13 +191,16 @@ export function PersonalInfoFields({
 
       {showEmail && (
         <div className="space-y-2">
-          <Label htmlFor="correoElectronico">Correo electrónico</Label>
+          <Label htmlFor="correoElectronico">
+            Correo electrónico<span className="text-red-500">*</span>
+          </Label>
           <Input
             id="correoElectronico"
             name="correoElectronico"
             type="email"
             value={formData.correoElectronico || ""}
             onChange={handleChange}
+            required
           />
         </div>
       )}
