@@ -33,14 +33,15 @@ export default function SteamForm({ program, onClose }) {
     correoElectronico: "",
 
     // Intereses y Conocimientos
-    participacionPrevia: "no",
+    participacionPrevia: false,
     actividadesInteres: [],
     otrasActividades: "",
 
     // Disponibilidad y Acceso
-    disponibilidad: "",
-    accesoComputadora: "no",
-    accesoInternet: "no",
+    disponibilidad: "",    
+    accesoComputadora: false,
+    accesoInternet: false,
+
 
     // Motivación
     motivacion: "",
@@ -88,9 +89,9 @@ export default function SteamForm({ program, onClose }) {
           const dataToSend = {
             ...formData,
       edad: parseInt(formData.edad, 10),
-      participacionPrevia: Boolean(formData.participacionPrevia),
-      accesoComputadora: Boolean(formData.accesoComputadora),
-      accesoInternet: Boolean(formData.accesoInternet)
+      //participacionPrevia: Boolean(formData.participacionPrevia),
+      //accesoComputadora: Boolean(formData.accesoComputadora),
+      //accesoInternet: Boolean(formData.accesoInternet)
     };
 
       const res = await fetch("/api/registro/taller-steam", {

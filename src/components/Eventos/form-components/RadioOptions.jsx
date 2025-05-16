@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 /**
- * Componente reutilizable para opciones de radio
+ * Componente reutilizable para opciones de radio, soporta booleanos o strings
  */
 export function RadioOptions({
   label,
@@ -12,15 +12,27 @@ export function RadioOptions({
   value,
   onChange,
   options = [
-    { value: "si", label: "Sí" },
-    { value: "no", label: "No" },
+    { value: "true", label: "Sí" },
+    { value: "false", label: "No" },
   ],
-  orientation = "horizontal", // horizontal o vertical
+  orientation = "horizontal",
   required = false,
   className = "",
 }) {
   const handleChange = (newValue) => {
-    onChange(name, newValue);
+    let parsedValue;
+
+    // Si los únicos valores posibles son "true"/"false", los convertimos a booleano
+    const allValuesAreBooleans =
+      options.every((opt) => opt.value === "true" || opt.value === "false");
+
+    if (allValuesAreBooleans) {
+      parsedValue = newValue === "true";
+    } else {
+      parsedValue = newValue; // mantener como string
+    }
+
+    onChange(name, parsedValue);
   };
 
   const orientationClass =
@@ -33,9 +45,10 @@ export function RadioOptions({
         {required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       <RadioGroup
-        value={value}
+        value={String(value)}
         onValueChange={handleChange}
-        className={orientationClass}>
+        className={orientationClass}
+      >
         {options.map((option) => (
           <div key={option.value} className="flex items-center space-x-2">
             <RadioGroupItem

@@ -103,7 +103,7 @@ export default function SemilleroForm({ program, onClose }) {
     const NIVELES_EDUCATIVOS_MAP = {
     "Primaria": "Primaria",
     "Secundaria": "Secundaria",
-    "Técnica o Tecnológica": "Tecnica_Tecnologica",
+    "Técnica/Tecnológica": "Tecnica_Tecnologica",
     "Universitaria": "Universitaria",
     "Especialización": "Especializacion",
     "Maestría": "Maestria",
@@ -128,9 +128,6 @@ export default function SemilleroForm({ program, onClose }) {
     }
 
     setIsSubmitting(true);
-
-    const adaptToBoolean = (value) => value === "si";
-
     
     const dataToSend = {
       ...formData,
@@ -138,8 +135,6 @@ export default function SemilleroForm({ program, onClose }) {
       tipoVinculacion: TIPO_VINCULACION_MAP[formData.tipoVinculacion],
       nivelEducativo: NIVELES_EDUCATIVOS_MAP[formData.nivelEducativo],
       nombreEntidadVinculacion: formData.nombreEntidadVinculacion, // <- Aquí está la corrección
-      tieneProyecto: adaptToBoolean(formData.tieneProyecto),
-      participacionPrevia: adaptToBoolean(formData.participacionPrevia),
       aceptaTerminos: Boolean(formData.aceptaTerminos),
       fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
       areasInteres: formData.areasInteres,
@@ -227,6 +222,8 @@ export default function SemilleroForm({ program, onClose }) {
               </Label>
               <Input
                 id="numeroDocumento"
+                type="number"
+                max="10"
                 name="numeroDocumento"
                 value={formData.numeroDocumento}
                 onChange={handleChange}
@@ -331,7 +328,7 @@ export default function SemilleroForm({ program, onClose }) {
               required
             />
 
-            {formData.tieneProyecto === "si" && (
+            {formData.tieneProyecto === true && (
               <div className="space-y-2">
                 <Label htmlFor="descripcionProyecto">
                   Describa brevemente su proyecto o idea:
