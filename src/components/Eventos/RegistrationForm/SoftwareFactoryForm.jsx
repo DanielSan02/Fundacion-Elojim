@@ -28,9 +28,6 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     telefonoContacto: "",
     correoElectronico: "",
     direccion: "",
@@ -60,11 +57,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en la Factoría de Software.`,
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -116,6 +109,50 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     "Ingeniería de Software y Metodologías de Desarrollo",
     "Software para Educación e Inclusión",
   ];
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.aceptaTerminos) {
+    alert("Debes aceptar los términos y condiciones antes de continuar.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  const adaptedData = {
+    ...formData,
+    edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
+    aceptaTerminos: Boolean(formData.aceptaTerminos),
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
+    tecnologias: formData.tecnologias || [],
+    areasInteres: formData.areasInteres || [],
+  };
+
+  // Opcional: limpiar campos innecesarios antes del envío
+  delete adaptedData.diaNacimiento;
+  delete adaptedData.mesNacimiento;
+  delete adaptedData.anoNacimiento;
+
+  try {
+    const response = await fetch("/api/registro/software-factory", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(adaptedData),
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Error al registrar");
+
+    alert("Formulario enviado exitosamente.");
+    onClose?.();
+  } catch (error) {
+    alert(error.message || "Error al enviar el formulario.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <motion.div
@@ -135,7 +172,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}

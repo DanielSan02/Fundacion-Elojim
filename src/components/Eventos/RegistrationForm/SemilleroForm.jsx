@@ -223,7 +223,7 @@ export default function SemilleroForm({ program, onClose }) {
               <Input
                 id="numeroDocumento"
                 type="number"
-                max="10"
+                
                 name="numeroDocumento"
                 value={formData.numeroDocumento}
                 onChange={handleChange}
@@ -281,9 +281,9 @@ export default function SemilleroForm({ program, onClose }) {
                               <SelectValue placeholder="Seleccionar" />
                             </SelectTrigger>
                             <SelectContent>
-                              {NIVELES_EDUCATIVOS.map((nivel) => (
-                                <SelectItem key={nivel} value={nivel}>
-                                  {nivel}
+                              {Object.entries(NIVELES_EDUCATIVOS_MAP).map(([label, value]) => (
+                                <SelectItem key={value} value={label}>
+                                  {label}
                                 </SelectItem>
                               ))}
                             </SelectContent>

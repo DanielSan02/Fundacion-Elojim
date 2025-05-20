@@ -12,9 +12,9 @@ export const GRUPOS_ETNICOS = ["Ninguno", "Afrodescendiente", "Indígena", "Raiz
 export const NIVELES_EDUCATIVOS = [
   "Primaria",
   "Secundaria",
-  "Técnica/Tecnológica",
+  "Tecnica_Tecnologica",
   "Universitaria",
-  "Especialización",
+  "Especializacion",
   "Maestría",
   "Doctorado",
   "Ninguno",

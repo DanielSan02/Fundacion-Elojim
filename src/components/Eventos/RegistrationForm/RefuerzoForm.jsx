@@ -18,9 +18,6 @@ export default function RefuerzoForm({ program, onClose }) {
     // Datos del Niño/a
     nombreCompleto: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -36,7 +33,7 @@ export default function RefuerzoForm({ program, onClose }) {
     correoElectronico: "",
 
     // Información Académica
-    areasApoyo: [],
+    areasAyuda: [],
     otrasAreas: "",
     refuerzoPrevio: "no",
     dificultadesAcademicas: "",
@@ -54,11 +51,7 @@ export default function RefuerzoForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Has inscrito correctamente al niño/a en las Jornadas de Refuerzo.`,
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,17 +71,71 @@ export default function RefuerzoForm({ program, onClose }) {
   const handleAreaChange = (newValues) => {
     setFormData({
       ...formData,
-      areasApoyo: newValues,
+      areasAyuda: newValues,
     });
   };
 
-  const areasApoyo = [
+  const areasAyuda = [
     "Matemáticas",
     "Lectura y comprensión",
     "Escritura",
     "Ciencias naturales",
     "Inglés",
   ];
+  
+  const AREAS_APOYO_MAP = {
+  "Matemáticas": "Matemáticas",
+  "Lectura y comprensión": "Lectura y comprensión",
+  "Escritura": "Escritura",
+  "Ciencias naturales": "Ciencias naturales",
+  "Inglés": "Inglés"
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.aceptaTerminos) {
+    alert("Debes aceptar los términos y condiciones antes de continuar.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  const mappedAreas = formData.areasAyuda
+    .filter(area => AREAS_APOYO_MAP.hasOwnProperty(area))
+    .map(area => AREAS_APOYO_MAP[area]);
+
+  const adaptedData = {
+    ...formData,
+    edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
+    aceptaTerminos: Boolean(formData.aceptaTerminos),
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
+    areasAyuda: mappedAreas
+  };
+
+  try {
+    const response = await fetch("/api/registro/refuerzo-escolar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(adaptedData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) throw new Error(result.error || "Error al registrar");
+
+    alert("Formulario enviado exitosamente.");
+    onClose?.();
+  } catch (error) {
+    alert(error.message || "Error al enviar el formulario.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
 
   return (
     <motion.div
@@ -108,7 +155,7 @@ export default function RefuerzoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <FormSection
           title="Datos del Niño, Niña o Adolescente"
           color={program.color}>
@@ -205,8 +252,8 @@ export default function RefuerzoForm({ program, onClose }) {
           <div className="space-y-4">
             <CheckboxGroup
               label="¿En qué áreas necesita apoyo el niño/a? (Marcar las que apliquen):"
-              options={areasApoyo}
-              selectedValues={formData.areasApoyo}
+              options={areasAyuda}
+              selectedValues={formData.areasAyuda}
               onChange={handleAreaChange}
               columns={2}
               showOtherOption={true}

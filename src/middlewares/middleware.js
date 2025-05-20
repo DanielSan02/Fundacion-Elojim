@@ -1,33 +1,30 @@
 // middleware.js
-import { NextResponse } from 'next/server';
+/*import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
-  // Obtener la ruta solicitada
   const path = request.nextUrl.pathname;
-  
-  // Definir rutas públicas (no requieren autenticación)
-  const publicPaths = ['/auth/login', '/auth/register', '/', '/about', '/news', '/programas'];
-  const isPublicPath = publicPaths.includes(path) || 
-                      path.startsWith('/api/') ||
-                      !path.startsWith('/dashboard') && !path.startsWith('/admin');
-  
-  // Obtener el token de sesión
+
+  // Rutas protegidas por roles
+  const isDashboard = path.startsWith('/dashboard');
+  const isAdmin = path.startsWith('/admin');
+  const isAuthPage = path === '/auth/login' || path === '/auth/register';
+
+  // Obtener token
   const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET
+    secret: process.env.NEXTAUTH_SECRET,
   });
-  
-  // Si el usuario no está autenticado y la ruta no es pública, redirigir al login
-  if (!token && !isPublicPath) {
-    const url = new URL('/auth/login', request.url);
-    url.searchParams.set('callbackUrl', encodeURI(request.url));
-    return NextResponse.redirect(url);
+
+  // Si no hay token y se accede a ruta protegida, redirigir al login
+  if (!token && (isDashboard || isAdmin)) {
+    const loginUrl = new URL('/auth/login', request.url);
+    loginUrl.searchParams.set('callbackUrl', encodeURIComponent(request.url));
+    return NextResponse.redirect(loginUrl);
   }
-  
-  // Si el usuario está autenticado pero intenta acceder a rutas de autenticación
-  if (token && (path === '/auth/login' || path === '/auth/register')) {
-    // Redirigir según el rol
+
+  // Si hay token y se intenta acceder a login o register, redirigir por rol
+  if (token && isAuthPage) {
     if (token.rolId === 1) {
       return NextResponse.redirect(new URL('/admin', request.url));
     } else if (token.rolId === 2) {
@@ -36,23 +33,20 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL('/', request.url));
     }
   }
-  
-  // Verificar acceso al dashboard (solo para usuarios con rolId 2)
-  if (path.startsWith('/dashboard') && token?.rolId !== 2) {
-    // Redirigir a página de acceso denegado
+
+  // Validación de acceso por rol
+  if (isDashboard && token?.rolId !== 2) {
     return NextResponse.redirect(new URL('/access-denied', request.url));
   }
-  
-  // Verificar acceso al panel admin (solo para usuarios con rolId 1)
-  if (path.startsWith('/admin') && token?.rolId !== 1) {
-    // Redirigir a página de acceso denegado
+
+  if (isAdmin && token?.rolId !== 3) {
     return NextResponse.redirect(new URL('/access-denied', request.url));
   }
-  
+
+  // Permitir el paso si todo es válido
   return NextResponse.next();
 }
 
-// Configurar qué rutas serán interceptadas por el middleware
 export const config = {
   matcher: [
     '/dashboard/:path*',
@@ -61,3 +55,4 @@ export const config = {
     '/auth/register',
   ]
 };
+*/

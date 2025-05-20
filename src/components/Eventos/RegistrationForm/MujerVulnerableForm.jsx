@@ -42,7 +42,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
     // Situación Socioeconómica
     esMadreCabeza: "no",
     numeroHijos: "",
-    conviveOtros: "no",
+    conviveConOtrasPersonas: "no",
     conQuienesConvive: "",
     nivelEducativo: "",
     tieneEmpleo: "no",
@@ -106,17 +106,14 @@ export default function MujerVulnerableForm({ program, onClose }) {
   ];
 
   const AREAS_APOYO_MAP = {
-    "Capacitación y empleo": "CAPACITACION",
+    "Capacitación y empleo": "CAPACITACION_Y_EMPLEO",
     "Emprendimiento": "EMPRENDIMIENTO",
     "Educación": "EDUCACION",
-    "Salud y bienestar": "SALUD",
-    "Apoyo psicológico y social": "APOYO_PSI",
-    "Vivienda y subsidios": "VIVIENDA"
+    "Salud y bienestar": "SALUD_Y_BIENESTAR",
+    "Apoyo psicológico y social": "APOYO_PSICOLOGICO_Y_SOCIAL",
+    "Vivienda y subsidios": "VIVIENDA_Y_SUBSIDIOS"
   };
 
-
-
-    const adaptToBoolean = (value) => value === "si";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -136,20 +133,13 @@ export default function MujerVulnerableForm({ program, onClose }) {
     const adaptedData = {
       ...formData,
       edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
-      esMadreCabeza: adaptToBoolean(formData.esMadreCabeza),
       numeroHijos: parseInt(formData.numeroHijos, 10),
-      conviveConOtrasPersonas: adaptToBoolean(formData.conviveOtros),
-      tieneEmpleo: adaptToBoolean(formData.tieneEmpleo),
-      tieneApoyoGubernamental: adaptToBoolean(formData.tieneApoyoGubernamental),
       aceptaTerminos: Boolean(formData.aceptaTerminos),
       areasApoyo: mappedAreas,
       fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
       tiempoSemanalDisponible: formData.tiempoSemanal,
     };
 
-    if (!adaptedData.conviveConOtrasPersonas) {
-      adaptedData.conQuienesConvive = "";
-    }
 
     if (adaptedData.tieneEmpleo) {
       adaptedData.fuenteIngresos = "";
@@ -274,13 +264,13 @@ export default function MujerVulnerableForm({ program, onClose }) {
 
             <RadioOptions
               label="¿Convive con otras personas?"
-              name="conviveOtros"
-              value={formData.conviveOtros}
+              name="conviveConOtrasPersonas"
+              value={formData.conviveConOtrasPersonas}
               onChange={handleRadioChange}
               required
             />
 
-            {formData.conviveOtros === "si" && (
+            {formData.conviveConOtrasPersonas === true && (
               <div className="space-y-2">
                 <Label htmlFor="conQuienesConvive">
                   Si la respuesta es sí, ¿con quiénes?
@@ -324,7 +314,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
               required
             />
 
-            {formData.tieneEmpleo === "si" ? (
+            {formData.tieneEmpleo === true ? (
               <div className="space-y-2">
                 <Label htmlFor="actividadLaboral">
                   Si la respuesta es sí, ¿en qué actividad laboral?
@@ -380,7 +370,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
               required
             />
 
-            {formData.tieneApoyoGubernamental === "si" && (
+            {formData.tieneApoyoGubernamental === true && (
               <div className="space-y-2">
                 <Label htmlFor="tipoApoyoGubernamental">
                   Si la respuesta es sí, ¿cuál?

@@ -70,11 +70,7 @@ export default function VoluntariadoForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -133,6 +129,54 @@ export default function VoluntariadoForm({ program, onClose }) {
     "Logística y eventos",
     "Visitar comunidades para entrega de alimentos",
   ];
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.aceptaTerminos) {
+    alert("Debes aceptar los términos y condiciones antes de continuar.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const adaptedData = {
+      ...formData,
+      fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
+      edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
+      aceptaTerminos: Boolean(formData.aceptaTerminos),
+      numeroDocumento: formData.numeroDocumento,
+      telefonoContacto: formData.telefono,
+      disponibilidadTipo: formData.disponibilidad,
+      fundacion: formData.experienciaPrevia.fundacion,
+      funcion: formData.experienciaPrevia.funcion,
+      tiempo: formData.experienciaPrevia.tiempo,
+      referencia1Nombre: formData.referencias[0].nombre || null,
+      referencia1Telefono: formData.referencias[0].telefono || null,
+      referencia2Nombre: formData.referencias[1].nombre || null,
+      referencia2Telefono: formData.referencias[1].telefono || null,
+    };
+
+    const response = await fetch("/api/registro/voluntariado", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(adaptedData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) throw new Error(result.error || "Error al registrar.");
+
+    alert("Formulario enviado exitosamente.");
+    onClose?.();
+  } catch (error) {
+    alert(error.message || "Error al enviar el formulario.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <motion.div
@@ -151,7 +195,7 @@ export default function VoluntariadoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <FormSection title="Información Personal" color={program.color}>
           <PersonalInfoFields
             formData={formData}
