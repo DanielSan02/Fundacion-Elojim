@@ -61,7 +61,7 @@ export default function CulturalForm({ program, onClose }) {
   const { isSubmitting, handleSubmit } = useFormSubmit({
     programId: "cultural",
     onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el Programa Cultural.`,
+    successDescription: "Te has inscrito correctamente en el Programa Cultural",
   });
 
   const handleChange = (e) => {
@@ -232,7 +232,7 @@ export default function CulturalForm({ program, onClose }) {
               required
             />
 
-            {formData.formacionPrevia === "si" && (
+            {formData.formacionPrevia === true && (
               <div className="space-y-2">
                 <Label htmlFor="detalleFormacion">Especificar:</Label>
                 <Input
@@ -252,7 +252,7 @@ export default function CulturalForm({ program, onClose }) {
               required
             />
 
-            {formData.perteneceGrupo === "si" && (
+            {formData.perteneceGrupo === true && (
               <div className="space-y-2">
                 <Label htmlFor="detalleGrupo">Especificar:</Label>
                 <Input

@@ -138,7 +138,6 @@ export default function VoluntariadoForm({ program, onClose }) {
     "Visitar comunidades para entrega de alimentos",
   ];
 
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -156,7 +155,7 @@ export default function VoluntariadoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
         <FormSection title="Información Personal" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -257,7 +256,7 @@ export default function VoluntariadoForm({ program, onClose }) {
               required
             />
 
-            {formData.disponibilidad === "dias-especificos" && (
+            {formData.disponibilidad === "DIAS_ESPECIFICOS" && (
               <div className="space-y-2">
                 <Label htmlFor="diasEspecificos">Especifique los días</Label>
                 <Input
@@ -265,7 +264,6 @@ export default function VoluntariadoForm({ program, onClose }) {
                   name="diasEspecificos"
                   value={formData.diasEspecificos}
                   onChange={handleChange}
-                  placeholder="Ej: Lunes y miércoles"
                 />
               </div>
             )}

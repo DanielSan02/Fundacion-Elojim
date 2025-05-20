@@ -13,12 +13,9 @@ export const NIVELES_EDUCATIVOS = [
   "Primaria",
   "Secundaria",
   "Tecnica_Tecnologica",
-  "Tecnica_Tecnologica",
   "Universitaria",
   "Especializacion",
   "Maestria",
-  "Especializacion",
-  "Maestría",
   "Doctorado",
   "Ninguno",
 ]
