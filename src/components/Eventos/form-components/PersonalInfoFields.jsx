@@ -54,9 +54,9 @@ export function PersonalInfoFields({
   const gruposEtnicos = [
     "Ninguno",
     "Afrodescendiente",
-    "Indígena",
+    "Indigena",
     "Raizal",
-    "Rom/Gitano",
+    "Rom_Gitano",
     "Palenquero",
     "Otro",
   ];
@@ -102,6 +102,7 @@ export function PersonalInfoFields({
             <Input
               id="comuna"
               name="comuna"
+              type="number"
               value={formData.comuna || ""}
               onChange={handleChange}
               required

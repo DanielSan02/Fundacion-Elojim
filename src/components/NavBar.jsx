@@ -27,7 +27,7 @@ const Navbar = () => {
     if (session && session.user) {
       // Verifica si rolId existe, de lo contrario intenta obtenerlo a través de una API
       if (session.user.rolId !== undefined) {
-        setIsAdmin(session.user.rolId === 1);
+        setIsAdmin(session.user.rolId === 2);
         // setIsVoluntario(session.user.rolId === 2);
       }
     } else {

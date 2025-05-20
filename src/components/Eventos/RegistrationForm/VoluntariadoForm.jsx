@@ -138,6 +138,7 @@ export default function VoluntariadoForm({ program, onClose }) {
     "Visitar comunidades para entrega de alimentos",
   ];
 
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -155,7 +156,7 @@ export default function VoluntariadoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <FormSection title="Información Personal" color={program.color}>
           <PersonalInfoFields
             formData={formData}

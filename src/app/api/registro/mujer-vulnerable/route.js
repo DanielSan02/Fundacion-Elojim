@@ -100,9 +100,37 @@ export async function POST(request) {
 
     const nuevoRegistro = await prisma.registroMujerVulnerable.create({
       data: {
-        ...data,
+        nombreCompleto: data.nombreCompleto,
+        tipoDocumento: data.tipoDocumento,
+        numeroDocumento: data.numeroDocumento,
         fechaNacimiento: new Date(data.fechaNacimiento),
-        areasApoyo: data.areasApoyo || [],
+        comuna: data.comuna,
+        estratoSocial: data.estratoSocial,
+        edad: parseInt(data.edad),
+        grupoEtnico: data.grupoEtnico,
+        telefonoContacto: data.telefonoContacto,
+        correoElectronico: data.correoElectronico || null,
+        direccion: data.direccion,
+
+        esMadreCabeza: Boolean(data.esMadreCabeza),
+        numeroHijos: parseInt(data.numeroHijos),
+        conviveConOtrasPersonas: Boolean(data.conviveConOtrasPersonas),
+        conQuienesConvive: data.conQuienesConvive || null,
+        nivelEducativo: data.nivelEducativo,
+        tieneEmpleo: Boolean(data.tieneEmpleo),
+        actividadLaboral: data.actividadLaboral || null,
+        fuenteIngresos: data.fuenteIngresos || null,
+
+        areasApoyo: Array.isArray(data.areasApoyo) ? data.areasApoyo : [],
+        otrasAreas: data.otrasAreas || null,
+        tieneApoyoGubernamental: Boolean(data.tieneApoyoGubernamental),
+        tipoApoyoGubernamental: data.tipoApoyoGubernamental || null,
+
+        motivacion: data.motivacion,
+        tiempoSemanalDisponible: data.tiempoSemanalDisponible,
+        expectativas: data.expectativas,
+        aceptaTerminos: Boolean(data.aceptaTerminos),
+
       },
     });
 

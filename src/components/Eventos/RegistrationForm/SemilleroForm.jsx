@@ -40,7 +40,7 @@ export default function SemilleroForm({ program, onClose }) {
 
     // Información de Vinculación
     tipoVinculacion: "institucion",
-    nombreInstitucion: "",
+    nombreEntidadVinculacion: "",
     nivelEducativo: "",
 
     // Intereses y Experiencia
@@ -62,11 +62,7 @@ export default function SemilleroForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el Semillero de Innovación y Emprendimiento.`,
-  });
+ const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,6 +86,13 @@ export default function SemilleroForm({ program, onClose }) {
     });
   };
 
+  const handleSelectChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+  };
+
   const areasInteres = [
     "Emprendimiento social",
     "Tecnología e innovación",
@@ -97,6 +100,73 @@ export default function SemilleroForm({ program, onClose }) {
     "Transformación digital",
     "Desarrollo de productos o servicios",
   ];
+    const NIVELES_EDUCATIVOS_MAP = {
+    "Primaria": "Primaria",
+    "Secundaria": "Secundaria",
+    "Técnica/Tecnológica": "Tecnica_Tecnologica",
+    "Universitaria": "Universitaria",
+    "Especialización": "Especializacion",
+    "Maestría": "Maestria",
+    "Doctorado": "Doctorado",
+    "Ninguno": "Ninguno"
+  };
+
+    const TIPO_VINCULACION_MAP = {
+    institucion: "INSTITUCION_EDUCATIVA",
+    comunidad: "COMUNIDAD"
+  };
+   
+
+  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.aceptaTerminos) {
+    alert("Debes aceptar los términos y condiciones antes de continuar.");
+    return;
+    }
+
+    setIsSubmitting(true);
+    
+    const dataToSend = {
+      ...formData,
+      edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
+      tipoVinculacion: TIPO_VINCULACION_MAP[formData.tipoVinculacion],
+      nivelEducativo: NIVELES_EDUCATIVOS_MAP[formData.nivelEducativo],
+      nombreEntidadVinculacion: formData.nombreEntidadVinculacion, // <- Aquí está la corrección
+      aceptaTerminos: Boolean(formData.aceptaTerminos),
+      fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
+      areasInteres: formData.areasInteres,
+    };
+
+    if (!dataToSend.tieneProyecto) {
+      dataToSend.descripcionProyecto = "";
+    }
+
+    try {
+      const res = await fetch("/api/registro/semillero-innovacion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.error || "Error al registrar");
+
+      alert("Formulario enviado exitosamente.");
+      onClose?.();
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
 
   return (
     <motion.div
@@ -152,6 +222,8 @@ export default function SemilleroForm({ program, onClose }) {
               </Label>
               <Input
                 id="numeroDocumento"
+                type="number"
+                
                 name="numeroDocumento"
                 value={formData.numeroDocumento}
                 onChange={handleChange}
@@ -183,14 +255,14 @@ export default function SemilleroForm({ program, onClose }) {
             />
 
             <div className="space-y-2">
-              <Label htmlFor="nombreInstitucion">
+              <Label htmlFor="nombreEntidadVinculacion">
                 Nombre de la institución educativa o comunidad
                 <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="nombreInstitucion"
-                name="nombreInstitucion"
-                value={formData.nombreInstitucion}
+                id="nombreEntidadVinculacion"
+                name="nombreEntidadVinculacion"
+                value={formData.nombreEntidadVinculacion}
                 onChange={handleChange}
                 required
               />
@@ -209,9 +281,9 @@ export default function SemilleroForm({ program, onClose }) {
                               <SelectValue placeholder="Seleccionar" />
                             </SelectTrigger>
                             <SelectContent>
-                              {NIVELES_EDUCATIVOS.map((nivel) => (
-                                <SelectItem key={nivel} value={nivel}>
-                                  {nivel}
+                              {Object.entries(NIVELES_EDUCATIVOS_MAP).map(([label, value]) => (
+                                <SelectItem key={value} value={label}>
+                                  {label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -256,7 +328,7 @@ export default function SemilleroForm({ program, onClose }) {
               required
             />
 
-            {formData.tieneProyecto === "si" && (
+            {formData.tieneProyecto === true && (
               <div className="space-y-2">
                 <Label htmlFor="descripcionProyecto">
                   Describa brevemente su proyecto o idea:

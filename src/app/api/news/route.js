@@ -2,48 +2,49 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { existsSync } from "fs";
+import { getToken } from "next-auth/jwt";
+
 
 const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
+    // 🔐 Obtener token JWT desde la cookie
+    const token = await getToken({ req });
+
+    if (!token || !token.sub) {
+      return new Response("No autorizado", { status: 401 });
+    }
+
+    const authorId = parseInt(token.sub); // ID del usuario logueado
+
     const formData = await req.formData();
     const title = formData.get("title");
     const content = formData.get("content") || "";
     const images = formData.getAll("images");
 
-    const authorId = 1;
-
     let imagePaths = [];
 
-    // Verificar si hay imágenes y procesarlas
     if (images && images.length > 0) {
       const uploadDir = path.join(process.cwd(), "public/uploads");
 
-      // Crear el directorio si no existe
       if (!existsSync(uploadDir)) await mkdir(uploadDir, { recursive: true });
 
-      // Procesar cada imagen y guardar la ruta
       for (const image of images) {
-        const buffer = Buffer.from(await image.arrayBuffer()); // Leer archivo como buffer
-        const fileName = `${Date.now()}-${image.name}`; // Nombre único para el archivo
-        const filePath = path.join(uploadDir, fileName); // Ruta completa de destino
-
-        // Escribir el archivo en el directorio de uploads
+        const buffer = Buffer.from(await image.arrayBuffer());
+        const fileName = `${Date.now()}-${image.name}`;
+        const filePath = path.join(uploadDir, fileName);
         await writeFile(filePath, buffer);
-
-        // Guardar la ruta relativa (sin la barra inicial '/')
         imagePaths.push(`uploads/${fileName}`);
       }
     }
 
-    // Crear la publicación en la base de datos con las rutas de las imágenes
     const post = await prisma.post.create({
       data: {
         title,
         content,
         authorId,
-        images: imagePaths, // Guardamos las rutas de las imágenes como un arreglo de texto (String[])
+        images: imagePaths,
       },
     });
 

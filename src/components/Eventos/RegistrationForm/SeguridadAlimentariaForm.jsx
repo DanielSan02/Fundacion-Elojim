@@ -60,11 +60,8 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el Programa de Seguridad Alimentaria.`,
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,6 +92,44 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
     "Páramo (+3.000 m.s.n.m.)",
   ];
 
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.aceptaTerminos) {
+    alert("Debes aceptar los términos y condiciones antes de continuar.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  const adaptedData = {
+    ...formData,
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
+    edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
+  };
+
+  try {
+    const response = await fetch("/api/registro/seguridad-alimentaria", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(adaptedData),
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Error al registrar");
+
+    alert("Formulario enviado exitosamente.");
+    onClose?.();
+  } catch (error) {
+    alert(error.message || "Error al enviar el formulario.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -112,7 +147,7 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}

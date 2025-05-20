@@ -3,13 +3,12 @@ import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico, TipoDocumento } from "@prisma/client";
 
 const CAMPOS_OBLIGATORIOS = [
-  "nombreResponsable",
+  "nombreCompleto",
   "tipoDocumento",
   "numeroDocumento",
   "fechaNacimiento",
-  "telefono",
+  "telefonoContacto",
   "direccion",
-  "barrio",
   "comuna",
   "estratoSocial",
   "grupoEtnico",
