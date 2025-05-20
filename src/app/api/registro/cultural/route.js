@@ -137,6 +137,48 @@ export async function POST(request) {
   }
 }
 
+export async function GET() {
+  try {
+    const registros = await prisma.registroCultural.findMany({
+      orderBy: { id: "desc" },
+    });
+
+    return NextResponse.json(registros, { status: 200 });
+  } catch (error) {
+    console.error("Error al obtener registros culturales:", error);
+    return NextResponse.json(
+      { error: "Error al obtener registros" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { id } = await request.json();
+
+    const registro = await prisma.registroCultural.findUnique({
+      where: { id },
+    });
+
+    if (!registro) {
+      return NextResponse.json({ error: "Registro no encontrado" }, { status: 404 });
+    }
+
+    await prisma.registroCultural.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ mensaje: "Registro eliminado correctamente" }, { status: 200 });
+  } catch (error) {
+    console.error("Error al eliminar registro cultural:", error);
+    return NextResponse.json(
+      { error: "Error al eliminar el registro" },
+      { status: 500 }
+    );
+  }
+}
+
 export const config = {
   api: {
     bodyParser: {

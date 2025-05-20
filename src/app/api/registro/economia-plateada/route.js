@@ -145,6 +145,48 @@ export async function POST(request) {
   }
 }
 
+export async function GET() {
+  try {
+    const registros = await prisma.registroEconomiaPlateada.findMany({
+      orderBy: { id: "desc" },
+    });
+
+    return NextResponse.json(registros, { status: 200 });
+  } catch (error) {
+    console.error("Error al obtener registros de economía plateada:", error);
+    return NextResponse.json(
+      { error: "Error al obtener registros" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { id } = await request.json();
+
+    const registro = await prisma.registroEconomiaPlateada.findUnique({
+      where: { id },
+    });
+
+    if (!registro) {
+      return NextResponse.json({ error: "Registro no encontrado" }, { status: 404 });
+    }
+
+    await prisma.registroEconomiaPlateada.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ mensaje: "Registro eliminado correctamente" }, { status: 200 });
+  } catch (error) {
+    console.error("Error al eliminar registro de economía plateada:", error);
+    return NextResponse.json(
+      { error: "Error al eliminar el registro" },
+      { status: 500 }
+    );
+  }
+}
+
 export const config = {
   api: {
     bodyParser: {

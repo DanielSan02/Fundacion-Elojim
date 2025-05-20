@@ -141,6 +141,47 @@ export async function POST(request) {
   }
 }
 
+export async function GET() {
+  try {
+    const registros = await prisma.registroSoftwareFactory.findMany({
+      orderBy: { id: "desc" },
+    });
+
+    return new Response(JSON.stringify(registros), {
+      headers: { "Content-Type": "application/json" },
+      status: 200,
+    });
+  } catch (error) {
+    console.error("❌ Error al obtener registros:", error);
+    return new Response("Error al obtener registros", { status: 500 });
+  }
+}
+
+
+export async function DELETE(req) {
+  try {
+    const { id } = await req.json();
+
+    const registro = await prisma.registroSoftwareFactory.findUnique({
+      where: { id },
+    });
+
+    if (!registro) {
+      return new Response("Registro no encontrado", { status: 404 });
+    }
+
+    await prisma.registroSoftwareFactory.delete({
+      where: { id },
+    });
+
+    return new Response("Registro eliminado exitosamente", { status: 200 });
+  } catch (error) {
+    console.error("❌ Error al eliminar registro:", error);
+    return new Response("Error interno al eliminar registro", { status: 500 });
+  }
+}
+
+
 export const config = {
   api: {
     bodyParser: {
