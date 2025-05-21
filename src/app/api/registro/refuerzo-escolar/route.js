@@ -100,7 +100,7 @@ export async function POST(request) {
 
 export async function GET() {
   try {
-    const registros = await prisma.registroMujerVulnerable.findMany({
+    const registros = await prisma.registroRefuerzoEscolar.findMany({
       orderBy: { id: "desc" },
     });
 
@@ -119,7 +119,7 @@ export async function DELETE(req) {
   try {
     const { id } = await req.json();
 
-    const registro = await prisma.registroMujerVulnerable.findUnique({
+    const registro = await prisma.registroRefuerzoEscolar.findUnique({
       where: { id },
     });
 
@@ -127,7 +127,7 @@ export async function DELETE(req) {
       return new Response("Registro no encontrado", { status: 404 });
     }
 
-    await prisma.registroMujerVulnerable.delete({
+    await prisma.registroRefuerzoEscolar.delete({
       where: { id },
     });
 

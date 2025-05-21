@@ -38,6 +38,53 @@ export function getMenuList(pathname) {
             }
           ]
         },
+
+        {
+          href: "",
+          label: "Programas",
+          icon: SquarePen,
+          submenus: [
+            {
+              href: "/admin/programas/mujer-vulnerable",
+              label: "P. Mujer Vulnerable"
+            },
+            {
+              href: "/admin/programas/semillero-innovacion",
+              label: "Semillero de Innovacion"
+            },
+            {
+              href: "/admin/programas/taller-steam",
+              label: "Taller Steam"
+            },
+            {
+              href: "/admin/programas/seguridad-alimentarias",
+              label: "P. Seguridad Alimentaria"
+            },
+            {
+              href: "/admin/programas/refuerzo-escolar",
+              label: "P. Refuerzo Escolar"
+            },
+            {
+              href: "/admin/programas/software-factory",
+              label: "P. Factoria Software"
+            },
+            {
+              href: "/admin/programas/voluntariado",
+              label: "Voluntariado"
+            },
+            {
+              href: "/admin/programas/cultural",
+              label: "P. Cultural"
+            },
+            {
+              href: "/admin/programas/economia-plateada",
+              label: "Economia Plateada"
+            },
+          ]
+        },
+
+        
+        
         // {
         //   href: "/admin/categorias",
         //   label: "Categorias",

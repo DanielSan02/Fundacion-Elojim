@@ -1,7 +1,6 @@
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "./node_modules/.prisma/client" 
+  provider = "prisma-client-js" 
 }
 
 datasource db {
@@ -121,7 +120,7 @@ model RegistroMujerVulnerable {
   grupoEtnico            GrupoEtnico
   telefonoContacto       String    @db.VarChar(15)
   correoElectronico      String?   @db.VarChar(100)
-  direccion              String    @db.VarChar(30)
+  direccion              String    @db.VarChar(100)
 
   // ===== Situación Socioeconómica =====
   esMadreCabeza          Boolean   @default(false)
@@ -168,7 +167,7 @@ model RegistroSemilleroInnovacion {
   grupoEtnico            GrupoEtnico
   telefonoContacto       String    @db.VarChar(15)
   correoElectronico      String?   @db.VarChar(100)
-  direccion              String    @db.VarChar(30)
+  direccion              String    @db.VarChar(100)
 
   // ===== Información de Vinculación =====
   tipoVinculacion          TipoVinculacion
@@ -241,54 +240,6 @@ model RegistroTallerSteam {
   updatedAt              DateTime  @updatedAt()
 
   @@map("registros_taller_steam")
-}
-
-
-model RegistroSeguridadAlimentaria {
-  id                    Int       @id @default(autoincrement())
-
-  // ===== Datos del Hogar =====
-  nombreResponsable     String    @db.VarChar(100)
-  tipoDocumento         TipoDocumento
-  numeroDocumento       String    @db.VarChar(20)
-  fechaNacimiento       DateTime
-  telefono              String    @db.VarChar(15)
-  correoElectronico     String?   @db.VarChar(100)
-  direccion             String    @db.VarChar(100)
-  barrio                String    @db.VarChar(100)
-  comuna                String    @db.VarChar(50)
-  estratoSocial         EstratoSocial
-  grupoEtnico           GrupoEtnico
-
-   // ===== Situación Productiva y Agrícola =====
-  esAgricultor         Boolean   @default(false)
-  tieneTierras         Boolean   @default(false)
-  hectareas            Float?    // solo si tieneTierras == true
-  pisoTermico          String?   @db.VarChar(50) // solo si tieneTierras == true
-  tieneCultivo         Boolean   @default(false)
-  tiposCultivo         String?   @db.VarChar(100) // solo si tieneCultivo == true
-  participacionPrevia  Boolean   @default(false)
-  proyectosAnteriores  String?   @db.VarChar(100) // solo si participacionPrevia == true
-
-  // ===== Infraestructura y Recursos =====
-  tieneRiego           Boolean   @default(false)
-  tieneHerramientas    Boolean   @default(false)
-  tiposHerramientas    String?   @db.VarChar(100) // solo si tieneHerramientas == true
-  tieneAsistenciaTecnica Boolean @default(false)
-
-  // ===== Motivación y Disponibilidad =====
-  motivacion           String    @db.Text
-  tiempoSemanal        String    @db.VarChar(100)
-  expectativas         String    @db.Text
-
-  // ===== Autorización =====
-  aceptaTerminos       Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt()
-
-  @@map("registros_seguridad_alimentaria")
 }
 
 model RegistroRefuerzoEscolar {
@@ -462,7 +413,7 @@ model RegistroCultural {
   documentoIdentidad    String           @db.VarChar(20) @unique
   municipioDepartamento String           @db.VarChar(20)
 
-  // ===== Datos Socioeconomicos =====
+  // ===== Datos Socioeconomicos ======
 
   nivelEducativo        NivelEducativo
   ocupacion             String           @db.VarChar(20)
