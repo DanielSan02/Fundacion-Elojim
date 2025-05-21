@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,36 +8,71 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { usePrograms } from "@/context/ProgramContext";
 import { useToast } from "@/hooks/use-toast";
-import { events } from "@/data/events";
 
 export default function EventsList({ program }) {
   const { registerEvent, isEventRegistered } = usePrograms();
   const { toast } = useToast();
   const [registering, setRegistering] = useState(null);
+  const [apiEvents, setApiEvents] = useState([]); // <-- Aquí guardaremos los eventos de la API
+  const [loadingEvents, setLoadingEvents] = useState(true); // <-- Estado para el indicador de carga
+  const [errorEvents, setErrorEvents] = useState(null); // <-- Estado para manejar errores de la API
 
-  // Filtrar eventos por programa
-  const programEvents = events.filter(
-    (event) => event.programId === program.id
-  );
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoadingEvents(true);
+      setErrorEvents(null); // Limpiar errores previos
+      try {
+        const response = await fetch(`/api/eventos/${program.id}`);
 
-  // Ordenar eventos por fecha
-  const sortedEvents = [...programEvents].sort(
+        if (!response.ok) {
+          // Si la respuesta no es 2xx, lanza un error
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || `Error HTTP! status: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        setApiEvents(data);
+      } catch (error) {
+        console.error("Error al cargar eventos:", error);
+        setErrorEvents("No se pudieron cargar los eventos. " + error.message);
+        toast({
+          title: "Error al cargar eventos",
+          description:
+            "Hubo un problema al obtener los eventos. " + error.message,
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+
+    // Solo realiza la llamada si 'program' existe y tiene un 'id'
+    if (program?.id) {
+      fetchEvents();
+    }
+  }, [program?.id, toast]); // El efecto se ejecuta cuando program.id cambia
+
+  const sortedEvents = [...apiEvents].sort(
     (a, b) => new Date(a.date) - new Date(b.date)
   );
 
   const handleRegister = (eventId) => {
     setRegistering(eventId);
 
-    // Simulación de registro
+    // Simulación de registro - AQUI ES DONDE TAMBIEN DEBERIAS LLAMAR AL BACKEND
+    // para notificar que un usuario se ha inscrito en un evento
+    // (si quieres que el contador de 'registered' en el backend se actualice)
     setTimeout(() => {
-      registerEvent(eventId);
+      registerEvent(eventId); // Esto registra localmente en tu ProgramContext
       setRegistering(null);
       toast({
         title: "¡Registro exitoso!",
         description: "Te has registrado correctamente en este evento.",
         variant: "default",
       });
-    }, 1000);
+    }, 1000); // Esto sigue siendo una simulación, considera cambiarlo por una llamada real
   };
 
   const formatDate = (dateString) => {
@@ -68,7 +103,15 @@ export default function EventsList({ program }) {
         </p>
       </div>
 
-      {sortedEvents.length === 0 ? (
+      {loadingEvents ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Cargando eventos...</p>
+        </div>
+      ) : errorEvents ? (
+        <div className="text-center py-8 text-red-500">
+          <p>{errorEvents}</p>
+        </div>
+      ) : sortedEvents.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500">
             No hay eventos programados actualmente.
@@ -110,6 +153,7 @@ export default function EventsList({ program }) {
                           </div>
                           <div className="flex items-center">
                             <Users className="h-4 w-4 mr-1" />
+                            {/* Los valores 'registered' y 'capacity' ahora vienen directamente del backend */}
                             {event.registered}/{event.capacity} participantes
                           </div>
                         </div>
