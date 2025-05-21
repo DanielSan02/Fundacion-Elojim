@@ -89,33 +89,44 @@ export function CollapseMenuButton({
       </CollapsibleTrigger>
       <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         <div className="bg-background pt-1">
-          {submenus.map(({ href, label, active }, index) => (
-            <Button
-              key={index}
-              variant={
-                (active === undefined && pathname === href) || active
-                  ? "secondary"
-                  : "ghost"
-              }
-              className="w-full justify-start h-10 mb-1"
-              asChild
-            >
-              <Link href={href}>
-                <span className="mr-4 ml-2">
-                  <Dot size={18} />
-                </span>
-                <p
-                  className={cn(
-                    "max-w-[170px] truncate",
-                    isOpen
-                      ? "translate-x-0 opacity-100"
-                      : "-translate-x-96 opacity-0"
-                  )}
-                >
-                  {label}
-                </p>
-              </Link>
-            </Button>
+          {submenus.map((submenu, index) =>
+  submenu.submenus && submenu.submenus.length > 0 ? (
+    <div className="ml-4" key={index}>
+      <CollapseMenuButton
+        icon={Dot} // o cualquier otro ícono si deseas diferenciar niveles
+        label={submenu.label}
+        active={submenu.active}
+        submenus={submenu.submenus}
+        isOpen={isOpen}
+      />
+    </div>
+  ) : (
+    <Button
+      key={index}
+      variant={
+        (submenu.active === undefined && pathname === submenu.href) || submenu.active
+          ? "secondary"
+          : "ghost"
+      }
+      className="w-full justify-start h-10 mb-1"
+      asChild
+    >
+      <Link href={submenu.href}>
+        <span className="mr-4 ml-2">
+          <Dot size={18} />
+        </span>
+        <p
+          className={cn(
+            "max-w-[170px] truncate",
+            isOpen
+              ? "translate-x-0 opacity-100"
+              : "-translate-x-96 opacity-0"
+          )}
+        >
+          {submenu.label}
+        </p>
+      </Link>
+    </Button>
           ))}
         </div>
       </CollapsibleContent>

@@ -408,3 +408,33 @@ enum Genero {
   FEMENINO
   MASCULINO
 }
+
+
+enum ProgramaId {
+  MUJER_VULNERABLE      @map("mujer-vulnerable")
+  SEMILLERO_INNOVACION  @map("semillero-innovacion")
+  SEGURIDAD_ALIMENTARIA @map("seguridad-alimentaria")
+  VOLUNTARIADO          @map("voluntariado")
+  ECONOMIA_PLATEADA     @map("economia-plateada")
+  CULTURAL              @map("cultural")
+  TALLER_STEAM          @map("taller-steam")
+  REFUERZO_ESCOLAR      @map("refuerzo-escolar")
+  SOFTWARE_FACTORY      @map("software-factory")
+}
+
+
+model Evento {
+  id          Int         @id @default(autoincrement())
+  programId   ProgramaId
+  title       String
+  description String
+  date        DateTime
+  location    String
+  duration    String
+  capacity    Int
+  registered  Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("eventos")
+}

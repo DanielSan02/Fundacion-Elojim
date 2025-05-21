@@ -1,5 +1,5 @@
 // middleware.js
-/*import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
@@ -16,6 +16,9 @@ export async function middleware(request) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
+  console.log('Token en middleware:', token);
+
+
   // Si no hay token y se accede a ruta protegida, redirigir al login
   if (!token && (isDashboard || isAdmin)) {
     const loginUrl = new URL('/auth/login', request.url);
@@ -25,23 +28,23 @@ export async function middleware(request) {
 
   // Si hay token y se intenta acceder a login o register, redirigir por rol
   if (token && isAuthPage) {
-    if (token.rolId === 1) {
-      return NextResponse.redirect(new URL('/admin', request.url));
-    } else if (token.rolId === 2) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    } else {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+  if (token.rolId === 2) {
+    return NextResponse.redirect(new URL('/dashboard', request.url)); // corregido
+  } else if (token.rolId === 1) {
+    return NextResponse.redirect(new URL('/admin', request.url)); // corregido
+  } else {
+    return NextResponse.redirect(new URL('/', request.url));
   }
+}
 
   // Validación de acceso por rol
   if (isDashboard && token?.rolId !== 2) {
-    return NextResponse.redirect(new URL('/access-denied', request.url));
-  }
+  return NextResponse.redirect(new URL('/access-denied', request.url));
+}
 
-  if (isAdmin && token?.rolId !== 3) {
-    return NextResponse.redirect(new URL('/access-denied', request.url));
-  }
+if (isAdmin && token?.rolId !== 2) {
+  return NextResponse.redirect(new URL('/access-denied', request.url));
+}
 
   // Permitir el paso si todo es válido
   return NextResponse.next();
@@ -55,4 +58,3 @@ export const config = {
     '/auth/register',
   ]
 };
-*/

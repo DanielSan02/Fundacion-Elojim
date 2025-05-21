@@ -41,7 +41,7 @@ export function getMenuList(pathname) {
 
         {
           href: "",
-          label: "Programas",
+          label: "Registros",
           icon: SquarePen,
           submenus: [
             {
@@ -57,7 +57,7 @@ export function getMenuList(pathname) {
               label: "Taller Steam"
             },
             {
-              href: "/admin/programas/seguridad-alimentarias",
+              href: "/admin/programas/seguridad-alimentaria",
               label: "P. Seguridad Alimentaria"
             },
             {
@@ -79,6 +79,70 @@ export function getMenuList(pathname) {
             {
               href: "/admin/programas/economia-plateada",
               label: "Economia Plateada"
+            },
+          ]
+        },
+
+                {
+          href: "",
+          label: "Eventos",
+          icon: SquarePen,
+          submenus: [
+            {
+              href: "",
+              label: "P. Mujer Vulnerable",
+              submenus: [
+                  {
+                  href: "/admin/eventos/mujer-vulnerable/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/mujer-vulnerable/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "Semillero de Innovación",
+              submenus: [
+                  {
+                  href: "/admin/eventos/semillero-innovacion/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/semillero-innovacion/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "Taller Steam",
+              submenus: [
+                  {
+                  href: "/admin/eventos/taller-steam/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/taller-steam/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "P. Cultural",
+              submenus: [
+                  {
+                  href: "/admin/eventos/cultural/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/cultural/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
             },
           ]
         },

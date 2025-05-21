@@ -25,7 +25,7 @@ export default function SeguridadAlimentariaPage() {
 
   const fetchRegistros = async () => {
     try {
-      const res = await fetch("/api/registro/seguridad-alimentarias");
+      const res = await fetch("/api/registro/seguridad-alimentaria");
       if (res.ok) {
         const data = await res.json();
         const sorted = data.sort((a, b) => {

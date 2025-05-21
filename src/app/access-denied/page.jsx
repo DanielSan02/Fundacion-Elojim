@@ -1,4 +1,3 @@
-// app/access-denied/page.jsx
 "use client"
 
 import { useEffect } from "react";
@@ -11,9 +10,14 @@ export default function AccessDenied() {
   const router = useRouter();
   
   useEffect(() => {
-    // Si no hay sesión, redirigir al login
     if (!session) {
       router.push("/auth/login");
+      return;
+    }
+
+    // Redirigir si no es admin
+    if (session.user?.rolId !== 2) {
+      router.push("/");
     }
   }, [session, router]);
 

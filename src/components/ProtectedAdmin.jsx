@@ -14,7 +14,7 @@ export default function ProtectedAdmin({ children }) {
     
     if (!session) {
       router.push("/auth/login");
-    } else if (session.user.rolId !== 1) {
+    } else if (session.user.rolId !== 2) {
       router.push("/access-denied");
     }
   }, [session, status, router]);
@@ -29,7 +29,7 @@ export default function ProtectedAdmin({ children }) {
   }
   
   // Solo renderiza el contenido si el usuario tiene el rol correcto
-  if (session?.user?.rolId === 1) {
+  if (session?.user?.rolId === 2) {
     return <>{children}</>;
   }
   
