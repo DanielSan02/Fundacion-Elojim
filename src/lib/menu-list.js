@@ -132,6 +132,62 @@ export function getMenuList(pathname) {
             },
             {
               href: "",
+              label: "P. Seguridad Alimentaria",
+              submenus: [
+                  {
+                  href: "/admin/eventos/seguridad-alimentaria/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/seguridad-alimentaria/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "P. Software Factory",
+              submenus: [
+                  {
+                  href: "/admin/eventos/software-factory/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/software-factory/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "P. Refuerzo Escolar",
+              submenus: [
+                  {
+                  href: "/admin/eventos/refuerzo-escolar/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/refuerzo-escolar/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "P. Voluntariado",
+              submenus: [
+                  {
+                  href: "/admin/eventos/voluntariado/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/voluntariado/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
               label: "P. Cultural",
               submenus: [
                   {
@@ -140,6 +196,20 @@ export function getMenuList(pathname) {
                   },
                   {
                   href: "/admin/eventos/cultural/crear-evento",
+                  label: "Agregar Evento",
+                  }
+              ]
+            },
+            {
+              href: "",
+              label: "P. Economia Plateada ",
+              submenus: [
+                  {
+                  href: "/admin/eventos/economia-plateada/todos",
+                  label: "Todos los eventos",
+                  },
+                  {
+                  href: "/admin/eventos/economia-plateada/crear-evento",
                   label: "Agregar Evento",
                   }
               ]
