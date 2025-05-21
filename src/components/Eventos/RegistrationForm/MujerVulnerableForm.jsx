@@ -19,10 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
-
-import { TIPOS_DOCUMENTO } from "../form-utils/formConstants";
-
+import {
+  NIVELES_EDUCATIVOS,
+  TIPOS_DOCUMENTO,
+} from "../form-utils/formConstants";
 
 export default function MujerVulnerableForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -40,19 +40,19 @@ export default function MujerVulnerableForm({ program, onClose }) {
     direccion: "",
 
     // Situación Socioeconómica
-    esMadreCabeza: "no",
+    esMadreCabeza: false,
     numeroHijos: "",
-    conviveConOtrasPersonas: "no",
+    conviveConOtrasPersonas: false,
     conQuienesConvive: "",
     nivelEducativo: "",
-    tieneEmpleo: "no",
+    tieneEmpleo: false,
     actividadLaboral: "",
     fuenteIngresos: "",
 
     // Intereses y Necesidades
     areasApoyo: [],
     otrasAreas: "",
-    tieneApoyoGubernamental: "no",
+    tieneApoyoGubernamental: false,
     tipoApoyoGubernamental: "",
 
     // Motivación y Disponibilidad
@@ -64,7 +64,11 @@ export default function MujerVulnerableForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isSubmitting, handleSubmit } = useFormSubmit({
+    programId: "mujer-vulnerable",
+    onSuccess: onClose,
+    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,7 +99,6 @@ export default function MujerVulnerableForm({ program, onClose }) {
     });
   };
 
-
   const areasApoyo = [
     "Capacitación y empleo",
     "Emprendimiento",
@@ -104,73 +107,6 @@ export default function MujerVulnerableForm({ program, onClose }) {
     "Apoyo psicológico y social",
     "Vivienda y subsidios",
   ];
-
-  const AREAS_APOYO_MAP = {
-    "Capacitación y empleo": "CAPACITACION_Y_EMPLEO",
-    "Emprendimiento": "EMPRENDIMIENTO",
-    "Educación": "EDUCACION",
-    "Salud y bienestar": "SALUD_Y_BIENESTAR",
-    "Apoyo psicológico y social": "APOYO_PSICOLOGICO_Y_SOCIAL",
-    "Vivienda y subsidios": "VIVIENDA_Y_SUBSIDIOS"
-  };
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.aceptaTerminos) {
-    alert("Debes aceptar los términos y condiciones antes de continuar.");
-    return;
-    }
-    
-    setIsSubmitting(true);
-
-  const mappedAreas = formData.areasApoyo
-    .filter(area => AREAS_APOYO_MAP.hasOwnProperty(area))
-    .map(area => AREAS_APOYO_MAP[area]);
-
-
-    const adaptedData = {
-      ...formData,
-      edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
-      numeroHijos: parseInt(formData.numeroHijos, 10),
-      aceptaTerminos: Boolean(formData.aceptaTerminos),
-      areasApoyo: mappedAreas,
-      fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
-      tiempoSemanalDisponible: formData.tiempoSemanal,
-    };
-
-
-    if (adaptedData.tieneEmpleo) {
-      adaptedData.fuenteIngresos = "";
-    }
-
-    if (!adaptedData.tieneApoyoGubernamental) {
-      adaptedData.tipoApoyoGubernamental = "";
-    }
-
-    try {
-      const response = await fetch("/api/registro/mujer-vulnerable", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(adaptedData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) throw new Error(result.error);
-
-      alert("Formulario enviado exitosamente.");
-      onClose?.();
-    } catch (error) {
-      alert(error.message || "Error al enviar el formulario.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
 
   return (
     <motion.div
@@ -189,7 +125,12 @@ export default function MujerVulnerableForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit}  className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // <-- ¡ESENCIAL! Previene la recarga de la página
+          handleSubmit(formData); // <-- SOLO pasar formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -200,26 +141,26 @@ export default function MujerVulnerableForm({ program, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
-                          <Label htmlFor="tipoDocumento">
-                            Tipo de documento<span className="text-red-500">*</span>
-                          </Label>
-                          <Select
-                            value={formData.tipoDocumento}
-                            onValueChange={(value) =>
-                              setFormData({ ...formData, tipoDocumento: value })
-                            }>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {TIPOS_DOCUMENTO.map((tipo) => (
-                                <SelectItem key={tipo.value} value={tipo.value}>
-                                  {tipo.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+              <Label htmlFor="tipoDocumento">
+                Tipo de documento<span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.tipoDocumento}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, tipoDocumento: value })
+                }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIPOS_DOCUMENTO.map((tipo) => (
+                    <SelectItem key={tipo.value} value={tipo.value}>
+                      {tipo.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="numeroDocumento">
                 Número de documento<span className="text-red-500">*</span>

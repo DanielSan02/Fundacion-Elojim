@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -49,7 +49,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
 
     // Motivación e Intereses
     areasInteres: [],
-    otrasAreas: "",
+    otrasAreas: "", // Mantener para el campo "Otras" si aplica en CheckboxGroup
     experienciaAgile: "",
     motivacion: "",
 
@@ -57,7 +57,12 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Utiliza el hook useFormSubmit
+  const { isSubmitting, handleSubmit } = useFormSubmit({
+    programId: "software-factory", // <--- ¡Importante! Nuevo programId
+    onSuccess: onClose,
+    successDescription: `Te has inscrito correctamente en la factoría de software.`,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,50 +114,6 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     "Ingeniería de Software y Metodologías de Desarrollo",
     "Software para Educación e Inclusión",
   ];
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!formData.aceptaTerminos) {
-    alert("Debes aceptar los términos y condiciones antes de continuar.");
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  const adaptedData = {
-    ...formData,
-    edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
-    aceptaTerminos: Boolean(formData.aceptaTerminos),
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
-    tecnologias: formData.tecnologias || [],
-    areasInteres: formData.areasInteres || [],
-  };
-
-  // Opcional: limpiar campos innecesarios antes del envío
-  delete adaptedData.diaNacimiento;
-  delete adaptedData.mesNacimiento;
-  delete adaptedData.anoNacimiento;
-
-  try {
-    const response = await fetch("/api/registro/software-factory", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(adaptedData),
-    });
-
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Error al registrar");
-
-    alert("Formulario enviado exitosamente.");
-    onClose?.();
-  } catch (error) {
-    alert(error.message || "Error al enviar el formulario.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
 
   return (
     <motion.div
@@ -172,7 +133,12 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          handleSubmit(formData); // Llama al handleSubmit del hook, pasándole formData
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -306,7 +272,11 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               columns={2}
               showOtherOption={true}
               otherOptionLabel="Otras"
-              required
+              otherValue={formData.otrasAreas} // Reutilizamos otrasAreas del estado para esto
+              onOtherValueChange={(value) =>
+                setFormData({ ...formData, otrasAreas: value })
+              }
+              required // Considera si es realmente requerido o si pueden no tener ninguna
             />
 
             <div className="space-y-2">
@@ -350,7 +320,13 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               selectedValues={formData.areasInteres}
               onChange={handleAreasInteresChange}
               columns={2}
-              required
+              showOtherOption={true} // Agregado showOtherOption para áreas de interés
+              otherOptionLabel="Otras"
+              otherValue={formData.otrasAreasInteres} // Nuevo campo para "otras" áreas de interés
+              onOtherValueChange={(value) =>
+                setFormData({ ...formData, otrasAreasInteres: value })
+              }
+              required // Considera si es realmente requerido o si pueden no tener ninguna
             />
 
             <div className="space-y-2">
@@ -384,7 +360,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting viene del hook
           submitColor={program.color}
         />
       </form>

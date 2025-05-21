@@ -3,12 +3,13 @@ import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico, TipoDocumento } from "@prisma/client";
 
 const CAMPOS_OBLIGATORIOS = [
-  "nombreCompleto",
+  "nombreResponsable", // Ahora se espera este nombre
   "tipoDocumento",
   "numeroDocumento",
   "fechaNacimiento",
-  "telefonoContacto",
+  "telefono",          // Ahora se espera este nombre
   "direccion",
+  "barrio",            // Ahora se espera este nombre
   "comuna",
   "estratoSocial",
   "grupoEtnico",
@@ -33,8 +34,13 @@ function validarDatos(data) {
     throw new Error("El número de documento debe tener entre 8 y 10 dígitos.");
   }
 
-  if (!/^\d{10}$/.test(data.telefono)) {
+  const telefonoLimpio = String(data.telefono || '').replace(/\D/g, ''); // Usa data.telefono
+  if (!/^\d{10}$/.test(telefonoLimpio)) {
     throw new Error("El teléfono debe tener 10 dígitos.");
+  }
+
+  if (!data.barrio) {
+      throw new Error("El barrio es obligatorio.");
   }
 
   if (data.correoElectronico && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.correoElectronico)) {

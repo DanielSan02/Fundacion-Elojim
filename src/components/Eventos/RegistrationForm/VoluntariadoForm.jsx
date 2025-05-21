@@ -81,7 +81,6 @@ export default function VoluntariadoForm({ program, onClose }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log("Campo:", name, "Valor:", value);
     setFormData({
       ...formData,
       [name]: value,
@@ -155,7 +154,12 @@ export default function VoluntariadoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // <-- ¡ESENCIAL! Previene la recarga de la página
+          handleSubmit(formData); // <-- SOLO pasar formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Información Personal" color={program.color}>
           <PersonalInfoFields
             formData={formData}

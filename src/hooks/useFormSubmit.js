@@ -4,96 +4,19 @@ import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { usePrograms } from "@/context/ProgramContext"
 
-// Función para transformar los datos del formulario de voluntariado
-function transformVoluntariadoDataForApi(formData) {
-  return {
-    nombreCompleto: formData.nombreCompleto,
-    tipoDocumento: formData.tipoDocumento,
-    numeroDocumento: formData.numeroDocumento,
-    fechaNacimiento: formData.fechaNacimiento,
-    direccion: formData.direccion,
-    telefonoContacto: formData.telefonoContacto,
-    correoElectronico: formData.correoElectronico,
-    comuna: formData.comuna,
-    estratoSocial: formData.estratoSocial,
-    edad: parseInt(formData.edad, 10),
-    grupoEtnico: formData.grupoEtnico,
-    nivelEducativo: formData.nivelEducativo,
-    profesionOcupacion: formData.profesionOcupacion,
-    disponibilidadTipo: formData.disponibilidad,
-    diasEspecificos: formData.diasEspecificos,
-    horasDisponibles: parseInt(formData.horasDisponibles, 10),
-    areasInteres: formData.areasInteres,
-    otrasAreas: formData.otrasAreas,
-    habilidades: formData.habilidades,
-    motivacion: formData.motivacion,
-    fundacion: formData.experienciaPrevia?.fundacion,
-    funcion: formData.experienciaPrevia?.funcion,
-    tiempo: formData.experienciaPrevia?.tiempo,
-    referencia1Nombre: formData.referencias?.[0]?.nombre,
-    referencia1Telefono: formData.referencias?.[0]?.telefono,
-    referencia2Nombre: formData.referencias?.[1]?.nombre,
-    referencia2Telefono: formData.referencias?.[1]?.telefono,
-    aceptaTerminos: formData.aceptaTerminos,
-  };
-}
+// Importar todas las funciones de transformación desde el archivo centralizado
+import {
+  transformVoluntariadoDataForApi,
+  transformCulturalDataForApi,
+  transformEconomiaPDataForApi,
+  transformMujerVulnerableDataForApi, // <-- ¡Importa esta nueva función!
+  transformSemilleroDataForApi,
+  transformSteamDataForAp,
+  transformSeguridadAlimentariaDataForApi,
+  transformRefuerzoEscolarDataForApi,
+  transformSoftwareFactoryDataForApi
+} from '../hooks/apiTransformers'; // Ajusta la ruta si es diferente
 
-// Función para transformar los datos del formulario cultural
-function transformCulturalDataForApi(formData) {
-  return {
-    nombreCompleto: formData.nombreCompleto,
-    fechaNacimiento: formData.fechaNacimiento,
-    comuna: formData.comuna,
-    estratoSocial: formData.estratoSocial,
-    edad: parseInt(formData.edad, 10),
-    grupoEtnico: formData.grupoEtnico,
-    telefonoContacto: formData.telefonoContacto,
-    direccion: formData.direccion,
-    documentoIdentidad: formData.documentoIdentidad,
-    municipioDepartamento: formData.municipioDepartamento,
-    nivelEducativo: formData.nivelEducativo,
-    ocupacion: formData.ocupacion,
-    areaInteresPrincipal: formData.areaInteres === 'Otro' ? formData.otraArea : formData.areaInteres,
-    formacionPrevia: formData.formacionPrevia === 'si',
-    detalleFormacion: formData.detalleFormacion,
-    perteneceGrupo: formData.perteneceGrupo === 'si',
-    detalleGrupo: formData.detalleGrupo,
-    diasDisponibles: formData.diasDisponibles,
-    motivacion: formData.motivacion,
-    expectativas: formData.expectativas,
-    aceptaTerminos: formData.aceptaTerminos,
-  };
-}
-
-function transformEconomiaPDataForApi(formData) {
-  return {
-    nombreCompleto: formData.nombreCompleto,
-    tipoDocumento: formData.tipoDocumento,
-    numeroDocumento: formData.numeroDocumento,
-    fechaNacimiento: formData.fechaNacimiento,
-    comuna: formData.comuna,
-    estratoSocial: formData.estratoSocial,
-    edad: parseInt(formData.edad, 10),
-    grupoEtnico: formData.grupoEtnico,
-    genero: formData.genero,
-    telefonoContacto: formData.telefonoContacto,
-    correoElectronico: formData.correoElectronico,
-    direccion: formData.direccion,
-    esPensionado: formData.esPensionado === 'si',
-    actividadEconomica: formData.actividadEconomica,
-    trabajoAnterior: formData.trabajoAnterior === 'si',
-    sectorTrabajo: formData.sectorTrabajo,
-    ingresosAdicionales: formData.ingresosAdicionales === 'si',
-    fuenteIngresos: formData.fuenteIngresos,
-    areasInteres: formData.areasInteres,
-    otrasAreas: formData.otrasAreas,
-    habilidades: formData.habilidades,
-    tiempoSemanal: formData.tiempoSemanal,
-    motivacion: formData.motivacion,
-    expectativas: formData.expectativas,
-    aceptaTerminos: formData.aceptaTerminos,
-  };
-}
 
 export function useFormSubmit({
   programId,
@@ -108,8 +31,8 @@ export function useFormSubmit({
   const { registerProgram } = usePrograms();
   const { toast } = useToast();
 
-  const handleSubmit = async (e, formData) => {
-    e.preventDefault();
+  const handleSubmit = async (formData) => { // <-- ¡Importante! Ahora solo recibe formData
+   
 
     if (!formData.aceptaTerminos) {
       toast({
@@ -117,9 +40,10 @@ export function useFormSubmit({
         description: termsErrorMessage,
         variant: "destructive",
       });
-      return;
+      return; // Detener la ejecución si no se aceptan los términos
     }
 
+    // La validación `validationFn` si la usas, se ejecuta aquí
     if (validationFn && !validationFn(formData)) {
       return;
     }
@@ -130,7 +54,8 @@ export function useFormSubmit({
       let payload;
       let endpoint;
 
-      if (programId === "voluntariado") {
+      // Aquí se determina qué función de transformación usar según programId
+       if (programId === "voluntariado") {
         payload = transformVoluntariadoDataForApi(formData);
         endpoint = "/api/registro/voluntariado";
       } else if (programId === "cultural") {
@@ -139,12 +64,27 @@ export function useFormSubmit({
       } else if (programId === "economia-plateada") {
         payload = transformEconomiaPDataForApi(formData);
         endpoint = "/api/registro/economia-plateada";
-      } else if (programId === "otroFormulario") {
-        throw new Error(`Función de transformación y endpoint no definidos para: ${programId}`);
+      } else if (programId === "mujer-vulnerable") {
+        payload = transformMujerVulnerableDataForApi(formData);
+        endpoint = "/api/registro/mujer-vulnerable";
+      } else if (programId === "semillero-innovacion") {
+        payload = transformSemilleroDataForApi(formData);
+        endpoint = "/api/registro/semillero-innovacion";
+      } else if (programId === "taller-steam") {
+        payload = transformSteamDataForAp(formData);
+        endpoint = "/api/registro/taller-steam";
+      } else if (programId === "seguridad-alimentaria") {
+        payload = transformSeguridadAlimentariaDataForApi(formData);
+        endpoint = "/api/registro/seguridad-alimentaria";
+      } else if (programId === "refuerzo-escolar") {
+        payload = transformRefuerzoEscolarDataForApi(formData);
+        endpoint = "/api/registro/refuerzo-escolar";
+      } else if (programId === "software-factory") { // <--- ¡NUEVO CASO!
+        payload = transformSoftwareFactoryDataForApi(formData); // <--- Llama a la nueva función
+        endpoint = "/api/registro/software-factory"; // <--- Define el endpoint para este formulario
       } else {
-        throw new Error(`ID de programa no válido: ${programId}`);
+        throw new Error(`ID de programa no manejado o transformación/endpoint no definidos para: ${programId}`);
       }
-
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -155,29 +95,33 @@ export function useFormSubmit({
 
       if (!response.ok) {
         const errorData = await response.json();
+        // Muestra el error específico del backend si existe
+        toast({
+          title: errorMessage,
+          description: errorData?.error || "Error desconocido al enviar el formulario.",
+          variant: "destructive",
+        });
         throw new Error(errorData?.error || "Error desconocido");
       }
 
-      registerProgram(programId);
-
+      // Si todo es exitoso:
+      registerProgram(programId); // Registrar el programa en el contexto
       toast({
         title: successMessage,
         description: successDescription,
         variant: "default",
       });
+      onSuccess?.(); // Ejecutar la función de éxito proporcionada (ej. cerrar el modal)
 
-      if (onSuccess) {
-        onSuccess();
-      }
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-      toast({
-        title: "Error",
-        description:
-          error.message ||
-          "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente.",
-        variant: "destructive",
-      });
+      if (!error.message.includes("Error desconocido")) { // Para evitar duplicados si el error ya fue toast
+          toast({
+              title: "Error",
+              description: error.message || "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente.",
+              variant: "destructive",
+          });
+      }
     } finally {
       setIsSubmitting(false);
     }

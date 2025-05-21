@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -19,6 +19,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TIPOS_DOCUMENTO } from "../form-utils/formConstants";
+// Asumiendo que EstratoSocial y GrupoEtnico se manejan en PersonalInfoFields
+// Si no, necesitarás constantes para ellos aquí también.
+const radioYesNoOptions = [
+  { value: "true", label: "Sí" },
+  { value: "false", label: "No" },
+];
 
 export default function SeguridadAlimentariaForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -30,26 +36,27 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
     telefonoContacto: "",
     correoElectronico: "",
     direccion: "",
+    barrio: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
     grupoEtnico: "",
 
     // Situación Productiva y Agrícola
-    esAgricultor: "no",
-    tieneTierras: "no",
+    esAgricultor: false, // ¡Cambiado a booleano!
+    tieneTierras: false, // ¡Cambiado a booleano!
     hectareas: "",
     pisoTermico: "",
-    tieneCultivo: "no",
+    tieneCultivo: false, // ¡Cambiado a booleano!
     tiposCultivo: "",
-    participacionPrevia: "no",
+    participacionPrevia: false, // ¡Cambiado a booleano!
     proyectosAnteriores: "",
 
     // Infraestructura y Recursos
-    tieneRiego: "no",
-    tieneHerramientas: "no",
+    tieneRiego: false, // ¡Cambiado a booleano!
+    tieneHerramientas: false, // ¡Cambiado a booleano!
     tiposHerramientas: "",
-    tieneAsistenciaTecnica: "no",
+    tieneAsistenciaTecnica: false, // ¡Cambiado a booleano!
 
     // Motivación y Disponibilidad
     motivacion: "",
@@ -60,8 +67,13 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // Usamos el hook useFormSubmit
+  const { isSubmitting, handleSubmit } = useFormSubmit({
+    programId: "seguridad-alimentaria", // Un ID único para este programa
+    onSuccess: onClose,
+    successDescription: "Formulario enviado exitosamente.",
+    // Aquí puedes añadir un validationFn si necesitas validaciones extra en el frontend
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,9 +84,27 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
   };
 
   const handleRadioChange = (name, value) => {
-    setFormData({
-      ...formData,
-      [name]: value,
+    let storedValue = value;
+    if (
+      name === "esAgricultor" ||
+      name === "tieneTierras" ||
+      name === "tieneCultivo" ||
+      name === "participacionPrevia" ||
+      name === "tieneRiego" ||
+      name === "tieneHerramientas" ||
+      name === "tieneAsistenciaTecnica"
+    ) {
+      storedValue = value === "si"; // True si es "si", False si es "no"
+    }
+    setFormData((prevFormData) => {
+      const newFormData = {
+        ...prevFormData,
+        [name]: storedValue,
+      };
+      console.log(
+        `Campo: ${name}, Valor anterior: ${prevFormData[name]}, Nuevo valor: ${newFormData[name]}`
+      );
+      return newFormData;
     });
   };
 
@@ -91,44 +121,6 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
     "Frío (2.000 - 3.000 m.s.n.m.)",
     "Páramo (+3.000 m.s.n.m.)",
   ];
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!formData.aceptaTerminos) {
-    alert("Debes aceptar los términos y condiciones antes de continuar.");
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  const adaptedData = {
-    ...formData,
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
-    edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
-  };
-
-  try {
-    const response = await fetch("/api/registro/seguridad-alimentaria", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(adaptedData),
-    });
-
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Error al registrar");
-
-    alert("Formulario enviado exitosamente.");
-    onClose?.();
-  } catch (error) {
-    alert(error.message || "Error al enviar el formulario.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
 
   return (
     <motion.div
@@ -147,7 +139,13 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Actualiza el onSubmit para usar el handleSubmit del hook */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          handleSubmit(formData); // Pasa solo formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -155,6 +153,19 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
             showContact={true}
             showEmail={true}
           />
+
+          <div className="space-y-2">
+            <Label htmlFor="barrio">
+              Barrio<span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="barrio"
+              name="barrio"
+              value={formData.barrio}
+              onChange={handleChange}
+              required // Es requerido según tu esquema
+            />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
@@ -201,20 +212,20 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
             <RadioOptions
               label="¿Es agricultor/a?"
               name="esAgricultor"
-              value={formData.esAgricultor}
+              value={formData.esAgricultor} // Pasa el booleano
               onChange={handleRadioChange}
+              options={radioYesNoOptions}
               required
             />
-
             <RadioOptions
               label="¿Cuenta con tierras disponibles para participar en el cultivo del proyecto?"
               name="tieneTierras"
-              value={formData.tieneTierras}
+              value={formData.tieneTierras} // Pasa el booleano
               onChange={handleRadioChange}
+              options={radioYesNoOptions}
               required
             />
-
-            {formData.tieneTierras === "si" && (
+            {formData.tieneTierras === true && ( // Compara con true (booleano)
               <div className="space-y-2">
                 <Label htmlFor="hectareas">
                   Si la respuesta es sí, ¿cuántas hectáreas?
@@ -227,8 +238,7 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
                 />
               </div>
             )}
-
-            {formData.tieneTierras === "si" && (
+            {formData.tieneTierras === true && ( // Compara con true (booleano)
               <div className="space-y-2">
                 <Label htmlFor="pisoTermico">
                   ¿En qué piso térmico o clima se encuentran sus tierras?
@@ -251,16 +261,14 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
                 </Select>
               </div>
             )}
-
             <RadioOptions
               label="¿Tiene actualmente una actividad de cultivo específica?"
               name="tieneCultivo"
-              value={formData.tieneCultivo}
+              value={formData.tieneCultivo} // Pasa el booleano
               onChange={handleRadioChange}
               required
             />
-
-            {formData.tieneCultivo === "si" && (
+            {formData.tieneCultivo === true && ( // Compara con true (booleano)
               <div className="space-y-2">
                 <Label htmlFor="tiposCultivo">
                   Si la respuesta es sí, ¿qué cultivos realiza?
@@ -273,16 +281,14 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
                 />
               </div>
             )}
-
             <RadioOptions
               label="¿Ha participado en otros proyectos de seguridad alimentaria o agrícolas?"
               name="participacionPrevia"
-              value={formData.participacionPrevia}
+              value={formData.participacionPrevia} // Pasa el booleano
               onChange={handleRadioChange}
               required
             />
-
-            {formData.participacionPrevia === "si" && (
+            {formData.participacionPrevia === true && ( // Compara con true (booleano)
               <div className="space-y-2">
                 <Label htmlFor="proyectosAnteriores">
                   Si la respuesta es sí, ¿en cuáles?
@@ -306,7 +312,7 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
             <RadioOptions
               label="¿Cuenta con acceso a riego en sus tierras?"
               name="tieneRiego"
-              value={formData.tieneRiego}
+              value={formData.tieneRiego} // Pasa el booleano
               onChange={handleRadioChange}
               required
             />
@@ -314,12 +320,12 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
             <RadioOptions
               label="¿Dispone de herramientas o maquinaria agrícola?"
               name="tieneHerramientas"
-              value={formData.tieneHerramientas}
+              value={formData.tieneHerramientas} // Pasa el booleano
               onChange={handleRadioChange}
               required
             />
 
-            {formData.tieneHerramientas === "si" && (
+            {formData.tieneHerramientas === true && ( // Compara con true (booleano)
               <div className="space-y-2">
                 <Label htmlFor="tiposHerramientas">
                   Si la respuesta es sí, ¿cuáles?
@@ -336,7 +342,7 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
             <RadioOptions
               label="¿Cuenta con acceso a asistencia técnica o capacitación agrícola?"
               name="tieneAsistenciaTecnica"
-              value={formData.tieneAsistenciaTecnica}
+              value={formData.tieneAsistenciaTecnica} // Pasa el booleano
               onChange={handleRadioChange}
               required
             />
@@ -411,7 +417,7 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting ahora viene del hook
           submitColor={program.color}
         />
       </form>

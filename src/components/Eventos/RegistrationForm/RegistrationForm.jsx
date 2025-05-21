@@ -16,63 +16,48 @@ import ProgramaCulturalForm from "./CulturalForm";
 import SteamForm from "./SteamForm";
 
 export default function RegistrationForm({ program, onClose }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    reason: "",
-    acceptTerms: false,
-  });
-
-  const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
-    onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el ${program.title}.`,
-  });
-
   // Determinar qué formulario mostrar según el programa
-  if (program.id === 1) {
+  if (program.id === "mujer-vulnerable") {
     // Programa Mujer Vulnerable
     return <MujerVulnerableForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 2) {
+  if (program.id === "semillero-innovacion") {
     // Semillero de Innovación y Emprendimiento
     return <SemilleroForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 3) {
+  if (program.id === "taller-steam") {
     // Programa Taller STEAM+H
     return <SteamForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 4) {
+  if (program.id === "seguridad-alimentaria") {
     // Programa de Seguridad Alimentaria
     return <SeguridadAlimentariaForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 6) {
+  if (program.id === "refuerzo-escolar") {
     // Programa de Jornadas de Refuerzo Escolar
     return <RefuerzoForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 7) {
+  if (program.id === "software-factory") {
     // Programa de Factoría de Software
     return <SoftwareFactoryForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 8) {
+  if (program.id === "voluntariado") {
     // Programa de Voluntariado Social
     return <VoluntariadoForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 9) {
+  if (program.id === "cultural") {
     // Programa Cultural
     return <ProgramaCulturalForm program={program} onClose={onClose} />;
   }
 
-  if (program.id === 10) {
+  if (program.id === "economia-plateada") {
     // Programa Economía Plateada
     return <EconomiaPForm program={program} onClose={onClose} />;
   }

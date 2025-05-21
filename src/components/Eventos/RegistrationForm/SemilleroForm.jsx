@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -19,9 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TIPOS_DOCUMENTO } from "../form-utils/formConstants";
-
-import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
+import {
+  NIVELES_EDUCATIVOS,
+  TIPOS_DOCUMENTO,
+} from "../form-utils/formConstants";
 
 export default function SemilleroForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -39,15 +40,15 @@ export default function SemilleroForm({ program, onClose }) {
     grupoEtnico: "",
 
     // Información de Vinculación
-    tipoVinculacion: "institucion",
+    tipoVinculacion: "institucion", // Este es un string, lo dejaremos así
     nombreEntidadVinculacion: "",
     nivelEducativo: "",
 
     // Intereses y Experiencia
-    participacionPrevia: "no",
+    participacionPrevia: false, // Cambiado de "no" a false (booleano)
     areasInteres: [],
     otrasAreas: "",
-    tieneProyecto: "no",
+    tieneProyecto: false, // Cambiado de "no" a false (booleano)
     descripcionProyecto: "",
 
     // Habilidades y Disponibilidad
@@ -62,7 +63,12 @@ export default function SemilleroForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
- const [isSubmitting, setIsSubmitting] = useState(false);
+  // Usamos el hook useFormSubmit
+  const { isSubmitting, handleSubmit } = useFormSubmit({
+    programId: "semillero-innovacion", // Un ID único para este programa
+    onSuccess: onClose,
+    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,9 +79,13 @@ export default function SemilleroForm({ program, onClose }) {
   };
 
   const handleRadioChange = (name, value) => {
+    let storedValue = value;
+    if (name === "participacionPrevia" || name === "tieneProyecto") {
+      storedValue = value === "si" || value === true;
+    }
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: storedValue,
     });
   };
 
@@ -100,73 +110,6 @@ export default function SemilleroForm({ program, onClose }) {
     "Transformación digital",
     "Desarrollo de productos o servicios",
   ];
-    const NIVELES_EDUCATIVOS_MAP = {
-    "Primaria": "Primaria",
-    "Secundaria": "Secundaria",
-    "Técnica/Tecnológica": "Tecnica_Tecnologica",
-    "Universitaria": "Universitaria",
-    "Especialización": "Especializacion",
-    "Maestría": "Maestria",
-    "Doctorado": "Doctorado",
-    "Ninguno": "Ninguno"
-  };
-
-    const TIPO_VINCULACION_MAP = {
-    institucion: "INSTITUCION_EDUCATIVA",
-    comunidad: "COMUNIDAD"
-  };
-   
-
-  
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!formData.aceptaTerminos) {
-    alert("Debes aceptar los términos y condiciones antes de continuar.");
-    return;
-    }
-
-    setIsSubmitting(true);
-    
-    const dataToSend = {
-      ...formData,
-      edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
-      tipoVinculacion: TIPO_VINCULACION_MAP[formData.tipoVinculacion],
-      nivelEducativo: NIVELES_EDUCATIVOS_MAP[formData.nivelEducativo],
-      nombreEntidadVinculacion: formData.nombreEntidadVinculacion, // <- Aquí está la corrección
-      aceptaTerminos: Boolean(formData.aceptaTerminos),
-      fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
-      areasInteres: formData.areasInteres,
-    };
-
-    if (!dataToSend.tieneProyecto) {
-      dataToSend.descripcionProyecto = "";
-    }
-
-    try {
-      const res = await fetch("/api/registro/semillero-innovacion", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) throw new Error(result.error || "Error al registrar");
-
-      alert("Formulario enviado exitosamente.");
-      onClose?.();
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-
 
   return (
     <motion.div
@@ -185,7 +128,13 @@ export default function SemilleroForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      {/* Actualiza el onSubmit para usar el handleSubmit del hook */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          handleSubmit(formData); // Pasa solo formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -223,7 +172,6 @@ export default function SemilleroForm({ program, onClose }) {
               <Input
                 id="numeroDocumento"
                 type="number"
-                
                 name="numeroDocumento"
                 value={formData.numeroDocumento}
                 onChange={handleChange}
@@ -238,6 +186,7 @@ export default function SemilleroForm({ program, onClose }) {
           icon="🔗"
           color={program.color}>
           <div className="space-y-4">
+            {/* Si RadioOptions maneja solo strings 'si'/'no', este está bien */}
             <RadioOptions
               label="¿Cómo desea vincularse al semillero?"
               name="tipoVinculacion"
@@ -269,26 +218,26 @@ export default function SemilleroForm({ program, onClose }) {
             </div>
 
             <div className="space-y-2">
-                          <Label htmlFor="nivelEducativo">
-                            Nivel educativo alcanzado<span className="text-red-500">*</span>
-                          </Label>
-                          <Select
-                            value={formData.nivelEducativo}
-                            onValueChange={(value) =>
-                              handleSelectChange("nivelEducativo", value)
-                            }>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.entries(NIVELES_EDUCATIVOS_MAP).map(([label, value]) => (
-                                <SelectItem key={value} value={label}>
-                                  {label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+              <Label htmlFor="nivelEducativo">
+                Nivel educativo alcanzado<span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.nivelEducativo}
+                onValueChange={(value) =>
+                  handleSelectChange("nivelEducativo", value)
+                }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NIVELES_EDUCATIVOS.map((nivel) => (
+                    <SelectItem key={nivel} value={nivel}>
+                      {nivel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </FormSection>
 
@@ -297,6 +246,7 @@ export default function SemilleroForm({ program, onClose }) {
           icon="💡"
           color={program.color}>
           <div className="space-y-4">
+            {/* Cambiar la condición a booleano */}
             <RadioOptions
               label="¿Ha participado anteriormente en iniciativas de innovación o emprendimiento?"
               name="participacionPrevia"
@@ -320,6 +270,7 @@ export default function SemilleroForm({ program, onClose }) {
               required
             />
 
+            {/* Cambiar la condición a booleano */}
             <RadioOptions
               label="¿Tiene un proyecto en marcha o una idea de emprendimiento?"
               name="tieneProyecto"
@@ -328,6 +279,7 @@ export default function SemilleroForm({ program, onClose }) {
               required
             />
 
+            {/* Renderizado condicional con booleano */}
             {formData.tieneProyecto === true && (
               <div className="space-y-2">
                 <Label htmlFor="descripcionProyecto">
@@ -435,7 +387,7 @@ export default function SemilleroForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting ahora viene del hook
           submitColor={program.color}
         />
       </form>
