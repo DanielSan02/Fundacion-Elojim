@@ -36,24 +36,27 @@ const Navbar = () => {
     }
   }, [session]);
 
-  const navItems = [
+  const getConditionalNavItems = () => {
+  let items = [
     { href: "/", label: "Inicio" },
     { href: "/#nosotros", label: "Nosotros" },
     { href: "/news", label: "Noticias" },
     { href: "/#contacto", label: "Contáctanos" },
-    { href: "/programas", label: "Programas" },
   ];
 
-  // Agregar elementos de navegación condicionales basados en el rol
-  const getConditionalNavItems = () => {
-    let items = [...navItems];
-    
-    if (isAdmin) {
-      items.push({ href: "/admin", label: "Panel Administrativo" });
-    }
-    
-    return items;
-  };
+  // Solo mostrar "Programas" si el usuario está autenticado
+  if (status === "authenticated") {
+    items.push({ href: "/programas", label: "Programas" });
+  }
+
+  // Agregar enlace admin si corresponde
+  if (isAdmin) {
+    items.push({ href: "/admin", label: "Panel Administrativo" });
+  }
+
+  return items;
+};
+
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
