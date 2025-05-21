@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -35,13 +35,13 @@ export default function RefuerzoForm({ program, onClose }) {
     // Información Académica
     areasAyuda: [],
     otrasAreas: "",
-    refuerzoPrevio: "no",
+    refuerzoPrevio: false, // Cambiado a booleano para consistencia con RadioOptions
     dificultadesAcademicas: "",
 
     // Disponibilidad y Recursos
     disponibilidad: "",
-    accesoMateriales: "no",
-    apoyoHabitos: "no",
+    accesoMateriales: false, // Cambiado a booleano
+    apoyoHabitos: false, // Cambiado a booleano
 
     // Motivación
     motivacion: "",
@@ -51,7 +51,12 @@ export default function RefuerzoForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Utiliza el hook useFormSubmit
+  const { isSubmitting, handleSubmit } = useFormSubmit({
+    programId: "refuerzo-escolar", // <--- ¡Importante! Nuevo programId
+    onSuccess: onClose,
+    successDescription: `Has inscrito correctamente al niño/a en las jornadas de refuerzo.`,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,9 +67,10 @@ export default function RefuerzoForm({ program, onClose }) {
   };
 
   const handleRadioChange = (name, value) => {
+    // Asegurarse de que el valor sea un booleano si la opción de RadioOptions lo devuelve como string
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: typeof value === "string" ? value === "true" : value,
     });
   };
 
@@ -82,60 +88,6 @@ export default function RefuerzoForm({ program, onClose }) {
     "Ciencias naturales",
     "Inglés",
   ];
-  
-  const AREAS_APOYO_MAP = {
-  "Matemáticas": "Matemáticas",
-  "Lectura y comprensión": "Lectura y comprensión",
-  "Escritura": "Escritura",
-  "Ciencias naturales": "Ciencias naturales",
-  "Inglés": "Inglés"
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!formData.aceptaTerminos) {
-    alert("Debes aceptar los términos y condiciones antes de continuar.");
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  const mappedAreas = formData.areasAyuda
-    .filter(area => AREAS_APOYO_MAP.hasOwnProperty(area))
-    .map(area => AREAS_APOYO_MAP[area]);
-
-  const adaptedData = {
-    ...formData,
-    edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
-    aceptaTerminos: Boolean(formData.aceptaTerminos),
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
-    areasAyuda: mappedAreas
-  };
-
-  try {
-    const response = await fetch("/api/registro/refuerzo-escolar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(adaptedData),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) throw new Error(result.error || "Error al registrar");
-
-    alert("Formulario enviado exitosamente.");
-    onClose?.();
-  } catch (error) {
-    alert(error.message || "Error al enviar el formulario.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
-
 
   return (
     <motion.div
@@ -155,10 +107,20 @@ const handleSubmit = async (e) => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          handleSubmit(formData); // Llama al handleSubmit del hook, pasándole formData
+        }}
+        className="space-y-6">
         <FormSection
           title="Datos del Niño, Niña o Adolescente"
           color={program.color}>
+          {/* Aquí se asume que PersonalInfoFields maneja el cambio de formData correctamente internamente.
+              Si PersonalInfoFields necesita un onChange específico para sus campos, asegúrate de pasárselo.
+              Para este formulario, 'nombreCompleto', 'fechaNacimiento', 'comuna', 'estratoSocial', 'edad', 'grupoEtnico'
+              están en formData.
+          */}
           <PersonalInfoFields formData={formData} onChange={setFormData} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -262,7 +224,7 @@ const handleSubmit = async (e) => {
               onOtherValueChange={(value) =>
                 setFormData({ ...formData, otrasAreas: value })
               }
-              required
+              required // Puede que quieras que esto sea opcional si no se marcan áreas
             />
 
             <RadioOptions
@@ -377,7 +339,7 @@ const handleSubmit = async (e) => {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting viene del hook
           submitColor={program.color}
         />
       </form>

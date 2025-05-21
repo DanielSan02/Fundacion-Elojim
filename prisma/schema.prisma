@@ -1,6 +1,5 @@
-
 generator client {
-  provider = "prisma-client-js" 
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,7 +7,331 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== ENUMS ====================
+model Users {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(20)
+  lastName String @db.VarChar(20)
+  email    String @unique
+  password String @db.VarChar(100)
+  rolId    Int
+  posts    Post[]
+  role     Role   @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("users")
+}
+
+model Role {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(50)
+  users Users[]
+
+  @@map("roles")
+}
+
+model Post {
+  id       Int      @id @default(autoincrement())
+  title    String
+  content  String?
+  authorId Int
+  images   String[]
+  author   Users    @relation(fields: [authorId], references: [id])
+
+  @@map("posts")
+}
+
+model RegistroMujerVulnerable {
+  id                      Int            @id @default(autoincrement())
+  nombreCompleto          String         @db.VarChar(100)
+  tipoDocumento           TipoDocumento
+  numeroDocumento         String         @unique @db.VarChar(20)
+  fechaNacimiento         DateTime
+  comuna                  String         @db.VarChar(50)
+  estratoSocial           EstratoSocial
+  edad                    Int
+  grupoEtnico             GrupoEtnico
+  telefonoContacto        String         @db.VarChar(15)
+  correoElectronico       String?        @db.VarChar(100)
+  direccion               String         @db.VarChar(30)
+  esMadreCabeza           Boolean        @default(false)
+  numeroHijos             Int            @default(0)
+  conviveConOtrasPersonas Boolean        @default(false)
+  conQuienesConvive       String?        @db.VarChar(100)
+  nivelEducativo          NivelEducativo
+  tieneEmpleo             Boolean        @default(false)
+  actividadLaboral        String?        @db.VarChar(100)
+  fuenteIngresos          String?        @db.VarChar(100)
+  areasApoyo              AreaApoyo[]
+  otrasAreas              String?        @db.VarChar(100)
+  tieneApoyoGubernamental Boolean        @default(false)
+  tipoApoyoGubernamental  String?        @db.VarChar(100)
+  motivacion              String
+  tiempoSemanalDisponible String         @db.VarChar(50)
+  expectativas            String
+  aceptaTerminos          Boolean        @default(false)
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  @@map("registros_mujer_vulnerable")
+}
+
+model RegistroSemilleroInnovacion {
+  id                       Int             @id @default(autoincrement())
+  nombreCompleto           String          @db.VarChar(100)
+  tipoDocumento            TipoDocumento
+  numeroDocumento          String          @unique @db.VarChar(20)
+  fechaNacimiento          DateTime
+  comuna                   String          @db.VarChar(50)
+  estratoSocial            EstratoSocial
+  edad                     Int
+  grupoEtnico              GrupoEtnico
+  telefonoContacto         String          @db.VarChar(15)
+  correoElectronico        String?         @db.VarChar(100)
+  direccion                String          @db.VarChar(30)
+  tipoVinculacion          TipoVinculacion
+  nombreEntidadVinculacion String
+  nivelEducativo           NivelEducativo
+  participacionPrevia      Boolean         @default(false)
+  areasInteres             String[]
+  otrasAreas               String?
+  tieneProyecto            Boolean         @default(false)
+  descripcionProyecto      String?         @db.VarChar(100)
+  habilidades              String          @db.VarChar(100)
+  disponibilidad           String          @db.VarChar(100)
+  motivacion               String          @db.VarChar(100)
+  expectativas             String          @db.VarChar(100)
+  aceptaTerminos           Boolean
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+
+  @@map("registros_semillero_innovacion")
+}
+
+model RegistroTallerSteam {
+  id                   Int           @id @default(autoincrement())
+  nombreCompleto       String        @db.VarChar(100)
+  fechaNacimiento      DateTime
+  comuna               String        @db.VarChar(50)
+  estratoSocial        EstratoSocial
+  edad                 Int
+  grupoEtnico          GrupoEtnico
+  institucionEducativa String        @db.VarChar(100)
+  cursoGrado           String        @db.VarChar(50)
+  direccion            String        @db.VarChar(100)
+  nombreAcudiente      String        @db.VarChar(100)
+  relacionNino         String        @db.VarChar(50)
+  telefonoContacto     String        @db.VarChar(15)
+  correoElectronico    String?       @db.VarChar(100)
+  participacionPrevia  Boolean       @default(false)
+  actividadesInteres   String[]
+  otrasActividades     String?       @db.VarChar(100)
+  disponibilidad       String        @db.VarChar(100)
+  accesoComputadora    Boolean       @default(false)
+  accesoInternet       Boolean       @default(false)
+  motivacion           String
+  expectativa          String
+  aceptaTerminos       Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@map("registros_taller_steam")
+}
+
+model RegistroSeguridadAlimentaria {
+  id                     Int           @id @default(autoincrement())
+  nombreResponsable      String        @db.VarChar(100)
+  tipoDocumento          TipoDocumento
+  numeroDocumento        String        @db.VarChar(20)
+  fechaNacimiento        DateTime
+  telefono               String        @db.VarChar(15)
+  correoElectronico      String?       @db.VarChar(100)
+  direccion              String        @db.VarChar(100)
+  barrio                 String        @db.VarChar(100)
+  comuna                 String        @db.VarChar(50)
+  estratoSocial          EstratoSocial
+  grupoEtnico            GrupoEtnico
+  esAgricultor           Boolean       @default(false)
+  tieneTierras           Boolean       @default(false)
+  hectareas              Float?
+  pisoTermico            String?       @db.VarChar(50)
+  tieneCultivo           Boolean       @default(false)
+  tiposCultivo           String?       @db.VarChar(100)
+  participacionPrevia    Boolean       @default(false)
+  proyectosAnteriores    String?       @db.VarChar(100)
+  tieneRiego             Boolean       @default(false)
+  tieneHerramientas      Boolean       @default(false)
+  tiposHerramientas      String?       @db.VarChar(100)
+  tieneAsistenciaTecnica Boolean       @default(false)
+  motivacion             String
+  tiempoSemanal          String        @db.VarChar(100)
+  expectativas           String
+  aceptaTerminos         Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@map("registros_seguridad_alimentaria")
+}
+
+model RegistroRefuerzoEscolar {
+  id                     Int           @id @default(autoincrement())
+  nombreCompleto         String        @db.VarChar(100)
+  fechaNacimiento        DateTime
+  comuna                 String        @db.VarChar(50)
+  estratoSocial          EstratoSocial
+  edad                   Int
+  grupoEtnico            GrupoEtnico
+  institucionEducativa   String        @db.VarChar(100)
+  cursoGrado             String        @db.VarChar(50)
+  direccion              String        @db.VarChar(100)
+  nombreAcudiente        String        @db.VarChar(100)
+  relacionNino           String        @db.VarChar(50)
+  telefonoContacto       String        @db.VarChar(15)
+  correoElectronico      String?       @db.VarChar(100)
+  areasAyuda             String[]      @db.VarChar(50)
+  otrasAreas             String?       @db.VarChar(100)
+  refuerzoPrevio         Boolean       @default(false)
+  dificultadesAcademicas String
+  disponibilidad         String        @db.VarChar(100)
+  accesoMateriales       Boolean       @default(false)
+  apoyoHabitos           Boolean       @default(false)
+  motivacion             String
+  expectativas           String
+  aceptaTerminos         Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@map("registros_refuerzo_escolar")
+}
+
+model RegistroSoftwareFactory {
+  id                   Int           @id @default(autoincrement())
+  nombreCompleto       String        @db.VarChar(100)
+  tipoDocumento        TipoDocumento
+  numeroDocumento      String        @unique @db.VarChar(20)
+  fechaNacimiento      DateTime
+  telefonoContacto     String        @db.VarChar(15)
+  correoElectronico    String?       @db.VarChar(100)
+  direccion            String        @db.VarChar(100)
+  comuna               String        @db.VarChar(50)
+  estratoSocial        EstratoSocial
+  edad                 Int
+  grupoEtnico          GrupoEtnico
+  modalidadVinculacion String        @db.VarChar(50)
+  institucionEducativa String        @db.VarChar(100)
+  programaAcademico    String        @db.VarChar(100)
+  semestreNivel        String        @db.VarChar(50)
+  tiempoDisponible     String        @db.VarChar(100)
+  tecnologias          String[]
+  proyectosRealizados  String?
+  areasInteres         String[]
+  otrasAreas           String?       @db.VarChar(100)
+  experienciaAgile     String?
+  motivacion           String
+  aceptaTerminos       Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@map("registros_software_factory")
+}
+
+model RegistroVoluntariado {
+  id                  Int                @id @default(autoincrement())
+  nombreCompleto      String             @db.VarChar(100)
+  tipoDocumento       TipoDocumento
+  numeroDocumento     String             @unique @db.VarChar(20)
+  fechaNacimiento     DateTime
+  telefonoContacto    String             @db.VarChar(15)
+  correoElectronico   String?            @db.VarChar(100)
+  direccion           String             @db.VarChar(100)
+  comuna              String             @db.VarChar(50)
+  estratoSocial       EstratoSocial
+  edad                Int
+  grupoEtnico         GrupoEtnico
+  nivelEducativo      NivelEducativo
+  profesionOcupacion  String             @db.VarChar(20)
+  disponibilidadTipo  TipoDisponibilidad
+  diasEspecificos     String?
+  horasDisponibles    Int
+  areasInteres        String[]
+  otrasAreas          String?            @db.VarChar(100)
+  habilidades         String
+  fundacion           String             @db.VarChar(25)
+  funcion             String             @db.VarChar(25)
+  tiempo              String             @db.VarChar(25)
+  motivacion          String
+  referencia1Nombre   String?            @db.VarChar(25)
+  referencia1Telefono String?            @db.VarChar(25)
+  referencia2Nombre   String?            @db.VarChar(25)
+  referencia2Telefono String?            @db.VarChar(25)
+  aceptaTerminos      Boolean            @default(false)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@map("registros_voluntariado")
+}
+
+model RegistroCultural {
+  id                    Int                 @id @default(autoincrement())
+  nombreCompleto        String              @db.VarChar(100)
+  fechaNacimiento       DateTime
+  comuna                String              @db.VarChar(50)
+  estratoSocial         EstratoSocial
+  edad                  Int
+  grupoEtnico           GrupoEtnico
+  telefonoContacto      String              @db.VarChar(15)
+  correoElectronico     String?             @db.VarChar(100)
+  direccion             String              @db.VarChar(100)
+  documentoIdentidad    String              @unique @db.VarChar(20)
+  municipioDepartamento String              @db.VarChar(20)
+  nivelEducativo        NivelEducativo
+  ocupacion             String              @db.VarChar(20)
+  areaInteresPrincipal  AreaInteresCultural
+  otraAreaInteres       String?             @db.VarChar(100)
+  formacionPrevia       Boolean             @default(false)
+  detalleFormacion      String?             @db.VarChar(100)
+  perteneceGrupo        Boolean             @default(false)
+  detalleGrupo          String?             @db.VarChar(100)
+  diasDisponibles       String
+  motivacion            String
+  expectativas          String
+  aceptaTerminos        Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@map("registros_cultural")
+}
+
+model RegistroEconomiaPlateada {
+  id                  Int           @id @default(autoincrement())
+  nombreCompleto      String        @db.VarChar(100)
+  fechaNacimiento     DateTime
+  comuna              String        @db.VarChar(50)
+  estratoSocial       EstratoSocial
+  edad                Int
+  grupoEtnico         GrupoEtnico
+  telefonoContacto    String        @db.VarChar(15)
+  correoElectronico   String?       @db.VarChar(100)
+  direccion           String        @db.VarChar(100)
+  tipoDocumento       TipoDocumento
+  numeroDocumento     String        @unique @db.VarChar(20)
+  genero              Genero
+  esPensionado        Boolean       @default(false)
+  actividadEconomica  String?       @db.VarChar(100)
+  trabajoAnterior     Boolean       @default(false)
+  sectorTrabajo       String?       @db.VarChar(100)
+  ingresosAdicionales Boolean       @default(false)
+  fuenteIngresos      String?       @db.VarChar(100)
+  areasInteres        String[]
+  otrasAreas          String?       @db.VarChar(100)
+  habilidades         String
+  tiempoSemanal       String        @db.VarChar(100)
+  motivacion          String
+  expectativas        String
+  aceptaTerminos      Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@map("registros_economia_plateada")
+}
 
 enum TipoVinculacion {
   INSTITUCION_EDUCATIVA
@@ -62,7 +385,6 @@ enum AreaApoyo {
   OTRAS
 }
 
-
 enum TipoDisponibilidad {
   TIEMPO_COMPLETO
   TIEMPO_PARCIAL
@@ -70,322 +392,6 @@ enum TipoDisponibilidad {
   DIAS_ESPECIFICOS
 }
 
-
-// ==================== MODELOS ====================
-
-model Users {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(20)
-  lastName String  @db.VarChar(20)
-  email    String  @unique
-  password String  @db.VarChar(100)  // Aumenté a 100 caracteres para seguridad
-  posts    Post[]
-  rolId    Int
-  role     Role    @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@map("users")
-}
-
-model Role {
-  id      Int     @id @default(autoincrement())
-  name    String  @db.VarChar(50)
-  users   Users[]
-
-  @@map("roles")
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  authorId  Int
-  author    Users     @relation(fields: [authorId], references: [id])
-  images    String[]
-
-  @@map("posts")
-}
-
-
-model RegistroMujerVulnerable {
-  id                     Int       @id @default(autoincrement())
-  
-  // ===== Datos Personales =====
-  nombreCompleto         String    @db.VarChar(100)
-  tipoDocumento          TipoDocumento
-  numeroDocumento        String    @db.VarChar(20) @unique
-  fechaNacimiento        DateTime
-  comuna                 String    @db.VarChar(50)
-  estratoSocial          EstratoSocial
-  edad                   Int
-  grupoEtnico            GrupoEtnico
-  telefonoContacto       String    @db.VarChar(15)
-  correoElectronico      String?   @db.VarChar(100)
-  direccion              String    @db.VarChar(100)
-
-  // ===== Situación Socioeconómica =====
-  esMadreCabeza          Boolean   @default(false)
-  numeroHijos            Int       @default(0)
-  conviveConOtrasPersonas Boolean  @default(false)
-  conQuienesConvive      String?   @db.VarChar(100)
-  nivelEducativo         NivelEducativo
-  tieneEmpleo            Boolean   @default(false)
-  actividadLaboral       String?   @db.VarChar(100)
-  fuenteIngresos         String?   @db.VarChar(100)
-
-  // ===== Intereses y Necesidades =====
-  areasApoyo             AreaApoyo[] 
-  otrasAreas             String?   @db.VarChar(100)
-  tieneApoyoGubernamental Boolean  @default(false)
-  tipoApoyoGubernamental String?   @db.VarChar(100)
-
-  // ===== Motivación y Disponibilidad =====
-  motivacion             String    @db.Text
-  tiempoSemanalDisponible String   @db.VarChar(50) // Ej: "5 horas semanales"
-  expectativas           String    @db.Text
-
-  // ===== Auditoría =====
-  aceptaTerminos         Boolean   @default(false)
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt()
-
-  @@map("registros_mujer_vulnerable")
-}
-
-
-model RegistroSemilleroInnovacion {
-  
-  id                     Int       @id @default(autoincrement())
-
-  // ===== Datos Personales =====
-  nombreCompleto         String    @db.VarChar(100)
-  tipoDocumento          TipoDocumento
-  numeroDocumento        String    @db.VarChar(20) @unique
-  fechaNacimiento        DateTime
-  comuna                 String    @db.VarChar(50)
-  estratoSocial          EstratoSocial
-  edad                   Int
-  grupoEtnico            GrupoEtnico
-  telefonoContacto       String    @db.VarChar(15)
-  correoElectronico      String?   @db.VarChar(100)
-  direccion              String    @db.VarChar(100)
-
-  // ===== Información de Vinculación =====
-  tipoVinculacion          TipoVinculacion
-  nombreEntidadVinculacion String
-  nivelEducativo           NivelEducativo
-
-  
-  // ===== Participación e intereses =====
-
-  participacionPrevia Boolean     @default(false)
-
-  areasInteres        String[]
-  otrasAreas          String?
-  tieneProyecto       Boolean     @default(false)
-  descripcionProyecto String?     @db.VarChar(100)
-
-  habilidades         String      @db.VarChar(100)
-  disponibilidad      String      @db.VarChar(100)
-  motivacion          String      @db.VarChar(100)
-  expectativas        String      @db.VarChar(100)
-
-  // ===== Auditoría =====
-  aceptaTerminos      Boolean
-  createdAt           DateTime @default(now())
-  updatedAt              DateTime  @updatedAt()
-
-  @@map("registros_semillero_innovacion")
-}
-
-
-model RegistroTallerSteam {
-  id                     Int       @id @default(autoincrement())
-
-  // ===== Datos del Niño/a =====
-  nombreCompleto         String    @db.VarChar(100)
-  fechaNacimiento        DateTime
-  comuna                 String    @db.VarChar(50)
-  estratoSocial          EstratoSocial
-  edad                   Int
-  grupoEtnico            GrupoEtnico
-  institucionEducativa   String    @db.VarChar(100)
-  cursoGrado             String    @db.VarChar(50)
-  direccion              String    @db.VarChar(100)
-
-  // ===== Datos del Acudiente =====
-  nombreAcudiente        String    @db.VarChar(100)
-  relacionNino           String    @db.VarChar(50)
-  telefonoContacto       String    @db.VarChar(15)
-  correoElectronico      String?   @db.VarChar(100)
-
-  // ===== Intereses y Conocimientos =====
-  participacionPrevia    Boolean   @default(false)
-  actividadesInteres     String[]
-  otrasActividades       String?  @db.VarChar(100)
-
-  // ===== Disponibilidad y Acceso =====
-  disponibilidad         String    @db.VarChar(100)
-  accesoComputadora      Boolean   @default(false)
-  accesoInternet         Boolean   @default(false)
-
-  // ===== Motivación =====
-  motivacion             String    @db.Text
-  expectativa            String    @db.Text
-
-  // ===== Autorización =====
-  aceptaTerminos         Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt()
-
-  @@map("registros_taller_steam")
-}
-
-model RegistroRefuerzoEscolar {
-  id                   Int       @id @default(autoincrement())
-
-  // ===== Datos del Niño/a =====
-  nombreCompleto       String    @db.VarChar(100)
-  fechaNacimiento      DateTime
-  comuna               String    @db.VarChar(50)
-  estratoSocial        EstratoSocial
-  edad                 Int
-  grupoEtnico          GrupoEtnico
-  institucionEducativa String    @db.VarChar(100)
-  cursoGrado           String    @db.VarChar(50)
-  direccion            String    @db.VarChar(100)
-
-  // ===== Datos del Acudiente =====
-  nombreAcudiente      String    @db.VarChar(100)
-  relacionNino         String    @db.VarChar(50)
-  telefonoContacto     String    @db.VarChar(15)
-  correoElectronico    String?   @db.VarChar(100)
-
-  // ===== Información Académica =====
-  areasAyuda           String[]  @db.VarChar(50) // arreglo de strings
-  otrasAreas           String?   @db.VarChar(100)
-  refuerzoPrevio       Boolean   @default(false)
-  dificultadesAcademicas String @db.Text
-
-  // ===== Disponibilidad y Recursos =====
-  disponibilidad       String    @db.VarChar(100)
-  accesoMateriales     Boolean   @default(false)
-  apoyoHabitos         Boolean   @default(false)
-
-  // ===== Motivación y Expectativas =====
-  motivacion           String    @db.Text
-  expectativas         String    @db.Text
-
-  // ===== Autorización =====
-  aceptaTerminos       Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt()
-
-  @@map("registros_refuerzo_escolar")
-}
-
-
-model RegistroSoftwareFactory {
-  id                   Int       @id @default(autoincrement())
-
-  // ===== Datos Personales =====
-  nombreCompleto       String    @db.VarChar(100)
-  tipoDocumento        TipoDocumento
-  numeroDocumento      String    @db.VarChar(20) @unique
-  fechaNacimiento      DateTime
-  telefonoContacto     String    @db.VarChar(15)
-  correoElectronico    String?   @db.VarChar(100)
-  direccion            String    @db.VarChar(100)
-  comuna               String    @db.VarChar(50)
-  estratoSocial        EstratoSocial
-  edad                 Int
-  grupoEtnico          GrupoEtnico
-
-  // ===== Información de Vinculación =====
-  modalidadVinculacion String    @db.VarChar(50) // Ej: "pasantia"
-  institucionEducativa String    @db.VarChar(100)
-  programaAcademico    String    @db.VarChar(100)
-  semestreNivel        String    @db.VarChar(50)
-  tiempoDisponible     String    @db.VarChar(100)
-
-  // ===== Experiencia y Habilidades =====
-  tecnologias          String[]  // Ej: "Desarrollo web", "Bases de datos", etc.
-  proyectosRealizados  String?   @db.Text
-
-  // ===== Motivación e Intereses =====
-  areasInteres         String[]
-  otrasAreas           String?   @db.VarChar(100)
-  experienciaAgile     String?   @db.Text
-  motivacion           String    @db.Text
-
-  // ===== Autorización =====
-  aceptaTerminos       Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt()
-
-  @@map("registros_software_factory")
-}
-
-
-
-model RegistroVoluntariado {
-  id                   Int       @id @default(autoincrement())
-
-  // ===== Datos Personales =====
-  nombreCompleto       String    @db.VarChar(100)
-  tipoDocumento        TipoDocumento
-  numeroDocumento      String    @db.VarChar(20) @unique
-  fechaNacimiento      DateTime
-  telefonoContacto     String    @db.VarChar(15)
-  correoElectronico    String?   @db.VarChar(100)
-  direccion            String    @db.VarChar(100)
-  comuna               String    @db.VarChar(50)
-  estratoSocial        EstratoSocial
-  edad                 Int
-  grupoEtnico          GrupoEtnico
-  nivelEducativo       NivelEducativo
-  profesionOcupacion   String    @db.VarChar(20)
-
-  // ===== Información Disponibilidad =====
-
-  disponibilidadTipo     TipoDisponibilidad
-  diasEspecificos        String?
-  horasDisponibles       Int
-
-
-  // ===== Intereses y Habilidades =====
-  areasInteres         String[]
-  otrasAreas           String?   @db.VarChar(100)
-  habilidades          String    @db.Text
-
-  // ===== Experiencia previa =====
-  fundacion            String    @db.VarChar(25)
-  funcion              String    @db.VarChar(25)
-  tiempo               String    @db.VarChar(25)
-  motivacion           String    @db.Text
-
-
-  // ===== Referencias Personales =====
-
-  referencia1Nombre    String?   @db.VarChar(25)
-  referencia1Telefono  String?   @db.VarChar(25)
-  referencia2Nombre    String?   @db.VarChar(25)
-  referencia2Telefono  String?   @db.VarChar(25)
-
-  // ===== Autorización =====
-  aceptaTerminos       Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt()
-
-  @@map("registros_voluntariado")
-}
 
 
 enum AreaInteresCultural {
@@ -397,111 +403,8 @@ enum AreaInteresCultural {
   Otro
 }
 
-model RegistroCultural {
-  id                   Int       @id @default(autoincrement())
-
-  // ===== Datos Personales =====
-  nombreCompleto        String           @db.VarChar(100)
-  fechaNacimiento       DateTime
-  comuna                String           @db.VarChar(50)
-  estratoSocial         EstratoSocial
-  edad                  Int
-  grupoEtnico           GrupoEtnico
-  telefonoContacto      String           @db.VarChar(15)
-  correoElectronico     String?          @db.VarChar(100)
-  direccion             String           @db.VarChar(100)
-  documentoIdentidad    String           @db.VarChar(20) @unique
-  municipioDepartamento String           @db.VarChar(20)
-
-  // ===== Datos Socioeconomicos ======
-
-  nivelEducativo        NivelEducativo
-  ocupacion             String           @db.VarChar(20)
-
-  // ====== Areas Intereses =====     
-
-  areaInteresPrincipal AreaInteresCultural
-  otraAreaInteres      String?   @db.VarChar(100)
-
-  // ======== Experiencias =========  
-
-  formacionPrevia      Boolean   @default(false)
-  detalleFormacion     String?   @db.VarChar(100)    
-  perteneceGrupo       Boolean   @default(false)
-  detalleGrupo         String?   @db.VarChar(100)
-
-
-  // ========== Disponibilidad ==========
-
-  diasDisponibles      String    @db.Text
-  motivacion           String    @db.Text
-  expectativas         String    @db.Text
-
-
-  // ===== Autorización =====
-
-  aceptaTerminos       Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt()
-
-  @@map("registros_cultural")
-}
-
 
 enum Genero {
   FEMENINO
   MASCULINO
-}
-
-model RegistroEconomiaPlateada {
-  id                   Int       @id @default(autoincrement())
-
-  // ===== Datos Personales =====
-  nombreCompleto        String           @db.VarChar(100)
-  fechaNacimiento       DateTime
-  comuna                String           @db.VarChar(50)
-  estratoSocial         EstratoSocial
-  edad                  Int
-  grupoEtnico           GrupoEtnico
-  telefonoContacto      String           @db.VarChar(15)
-  correoElectronico     String?          @db.VarChar(100)
-  direccion             String           @db.VarChar(100)
-  tipoDocumento         TipoDocumento
-  numeroDocumento       String           @db.VarChar(20) @unique
-  genero                Genero
-
-  // ===== Situacion Economica =====
-
-  esPensionado          Boolean          @default(false)
-  actividadEconomica    String?          @db.VarChar(100)
-  trabajoAnterior       Boolean          @default(false)
-  sectorTrabajo         String?          @db.VarChar(100)
-  ingresosAdicionales   Boolean          @default(false)
-  fuenteIngresos        String?          @db.VarChar(100)   
-  
-
-  // ====== Intereses y Habilidades =====     
-
-  areasInteres          String[]
-  otrasAreas            String?          @db.VarChar(100)
-  habilidades           String           @db.Text
-
-  // ========== Disponibilidad ==========
-
-  tiempoSemanal        String            @db.VarChar(100)
-  motivacion           String            @db.Text
-  expectativas         String            @db.Text
-
-
-  // ===== Autorización =====
-
-  aceptaTerminos       Boolean   @default(false)
-
-  // ===== Auditoría =====
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt()
-
-  @@map("registros_economia_plateada")
 }
