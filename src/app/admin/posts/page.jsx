@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
+import ProtectedAdmin from "@/components/ProtectedAdmin";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -66,12 +67,13 @@ export default function PostsPage() {
   }
 
   return (
+    <ProtectedAdmin>
     <ContentLayout title="All Posts">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
+              <Link href="/">Inicio</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -118,5 +120,6 @@ export default function PostsPage() {
         </table>
       </div>
     </ContentLayout>
+    </ProtectedAdmin>
   );
 }

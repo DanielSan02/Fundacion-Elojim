@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ProtectedAdmin from "@/components/ProtectedAdmin";
 
 export default function EventosEconomiaPlateadaPage() {
   const programId = "economia-plateada";
@@ -82,6 +83,7 @@ export default function EventosEconomiaPlateadaPage() {
   }
 
   return (
+    <ProtectedAdmin>
     <ContentLayout title="Eventos - Programa Economía Plateada">
       <Breadcrumb>
         <BreadcrumbList>
@@ -308,5 +310,6 @@ export default function EventosEconomiaPlateadaPage() {
         )}
       </div>
     </ContentLayout>
+    </ProtectedAdmin>
   );
 }

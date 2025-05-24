@@ -77,7 +77,8 @@ export default function RegisterNewsPage() {
         try {
             const res = await fetch("/api/news", {
                 method: "POST",
-                body: data
+                body: data,
+                credentials: "include"
             })
 
             if (res.ok) {

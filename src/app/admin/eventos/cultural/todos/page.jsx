@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ProtectedAdmin from "@/components/ProtectedAdmin";
 
 export default function EventosCulturalPage() {
   const programId = "cultural";
@@ -82,6 +83,7 @@ export default function EventosCulturalPage() {
   }
 
   return (
+    <ProtectedAdmin>
     <ContentLayout title="Eventos - Programa Cultural">
       <Breadcrumb>
         <BreadcrumbList>
@@ -308,5 +310,6 @@ export default function EventosCulturalPage() {
         )}
       </div>
     </ContentLayout>
+    </ProtectedAdmin>
   );
 }

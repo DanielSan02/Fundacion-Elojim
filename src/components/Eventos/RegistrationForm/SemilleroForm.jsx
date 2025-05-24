@@ -109,6 +109,7 @@ export default function SemilleroForm({ program, onClose }) {
     "Medio ambiente y sostenibilidad",
     "Transformación digital",
     "Desarrollo de productos o servicios",
+    "Otras",
   ];
 
   return (
@@ -131,8 +132,18 @@ export default function SemilleroForm({ program, onClose }) {
       {/* Actualiza el onSubmit para usar el handleSubmit del hook */}
       <form
         onSubmit={(e) => {
-          e.preventDefault(); // Previene la recarga de la página
-          handleSubmit(formData); // Pasa solo formData al hook
+          e.preventDefault();
+
+          // Añadir "Otras" a areasInteres si el usuario escribió algo en otrasAreas
+          const nuevasAreasInteres = [...formData.areasInteres];
+          if (formData.otrasAreas?.trim()) {
+            nuevasAreasInteres.push("Otras");
+          }
+
+          handleSubmit({
+            ...formData,
+            areasInteres: nuevasAreasInteres,
+          });
         }}
         className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>

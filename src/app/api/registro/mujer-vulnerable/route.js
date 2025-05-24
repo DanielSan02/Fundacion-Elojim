@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
+
 
 import {
   EstratoSocial,
@@ -8,9 +11,6 @@ import {
   TipoDocumento,
   AreaApoyo,
 } from '@prisma/client';
-
-console.log("EstratoSocial enum:", EstratoSocial);
-console.log("GrupoEtnico enum:", GrupoEtnico);
 
 const ESTRATOS = Object.values(EstratoSocial);
 const GRUPOS_ETNICOS = Object.values(GrupoEtnico);
@@ -94,12 +94,25 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
-    const data = await request.json();
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ message: "No autenticado" }, { status: 401 });
+    }
 
+    const usuario = await prisma.users.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!usuario) {
+      return NextResponse.json({ message: "Usuario no encontrado" }, { status: 404 });
+    }
+
+    const data = await request.json();
     validarDatos(data);
 
     const nuevoRegistro = await prisma.registroMujerVulnerable.create({
       data: {
+        userId: usuario.id,
         nombreCompleto: data.nombreCompleto,
         tipoDocumento: data.tipoDocumento,
         numeroDocumento: data.numeroDocumento,
@@ -130,7 +143,6 @@ export async function POST(request) {
         tiempoSemanalDisponible: data.tiempoSemanalDisponible,
         expectativas: data.expectativas,
         aceptaTerminos: Boolean(data.aceptaTerminos),
-
       },
     });
 
@@ -162,7 +174,6 @@ export async function GET() {
     return new Response("Error al obtener registros", { status: 500 });
   }
 }
-
 
 export async function DELETE(req) {
   try {

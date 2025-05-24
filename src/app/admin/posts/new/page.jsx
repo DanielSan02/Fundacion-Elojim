@@ -3,6 +3,7 @@ import Link from "next/link";
 import PlaceholderContent from "@/components/demo/placeholder-content";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import RegisterNewsPage from "@/app/registerNews/page"; 
+import ProtectedAdmin from "@/components/ProtectedAdmin";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,12 +15,13 @@ import {
 
 export default function NewPostPage() {
   return (
+    <ProtectedAdmin>
     <ContentLayout title="New Post">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
+              <Link href="/">Inicio</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -36,12 +38,13 @@ export default function NewPostPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>New</BreadcrumbPage>
+            <BreadcrumbPage>Nueva Noticia</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       {/* <PlaceholderContent /> */}
       <RegisterNewsPage />
     </ContentLayout>
+    </ProtectedAdmin>
   );
 }

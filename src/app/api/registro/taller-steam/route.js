@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico } from "@prisma/client";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getServerSession } from "next-auth";
 
 const ESTRATOS_VALIDOS = Object.values(EstratoSocial);
 const GRUPOS_ETNICOS_VALIDOS = Object.values(GrupoEtnico);
@@ -74,6 +76,13 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
+
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
     const data = await request.json();
 
     validarDatos(data);
@@ -83,6 +92,9 @@ export async function POST(request) {
         ...data,
         fechaNacimiento: new Date(data.fechaNacimiento),
         actividadesInteres: data.actividadesInteres || [],
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 

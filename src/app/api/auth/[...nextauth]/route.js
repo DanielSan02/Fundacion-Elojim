@@ -49,7 +49,7 @@ export const authOptions = {
         async session({ session, token }) {
             session.user = {
                 ...session.user,
-                id: token.sub,
+                id: token.id,
                 rolId: token.rolId, 
                 lastname: token.lastname,
                 document: token.email
@@ -62,7 +62,7 @@ export const authOptions = {
                 token.rolId = user.rolId; 
                 token.lastname = user.lastname;
                 token.email = user.email;
-                token.sub = user.id;
+                token.id = user.id;
             }
             return token;
         },

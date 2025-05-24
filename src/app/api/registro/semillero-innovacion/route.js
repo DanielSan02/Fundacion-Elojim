@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getServerSession } from "next-auth";
 
 
 import {
@@ -11,13 +13,13 @@ import {
 } from "@prisma/client";
 
 const areasInteresValidas = [
-    "Emprendimiento social",
-    "Tecnología e innovación",
-    "Medio ambiente y sostenibilidad",
-    "Transformación digital",
-    "Desarrollo de productos o servicios",
-    "Otras"
-  ];
+  "EMPRENDIMIENTO_SOCIAL",
+  "TECNOLOGIA_E_INNOVACION",
+  "MEDIO_AMBIENTE_Y_SOSTENIBILIDAD",
+  "TRANSFORMACION_DIGITAL",
+  "DESARROLLO_DE_PRODUCTOS_O_SERVICIOS",
+  "OTRAS"
+];
 
 const ESTRATOS = Object.values(EstratoSocial);
 const GRUPOS_ETNICOS = Object.values(GrupoEtnico);
@@ -107,15 +109,23 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
-    const data = await request.json();
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
 
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
+    const data = await request.json();
     validarDatos(data);
 
     const nuevoRegistro = await prisma.registroSemilleroInnovacion.create({
       data: {
         ...data,
         fechaNacimiento: new Date(data.fechaNacimiento),
-        areasInteres: data.areasInteres || [],
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 

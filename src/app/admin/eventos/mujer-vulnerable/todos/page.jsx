@@ -11,12 +11,16 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ProtectedAdmin from "@/components/ProtectedAdmin";
+import ParticipantesModal from "@/components/admin-panel/ParticipantesModal";
+
 
 export default function EventosMujerVulnerablePage() {
   const programId = "mujer-vulnerable";
 
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [eventoEnEdicion, setEventoEnEdicion] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -25,6 +29,7 @@ export default function EventosMujerVulnerablePage() {
     location: "",
     duration: "",
     capacity: "",
+    registered: "",
   });
 
   const [busqueda, setBusqueda] = useState("");
@@ -82,6 +87,7 @@ export default function EventosMujerVulnerablePage() {
   }
 
   return (
+    <ProtectedAdmin>
     <ContentLayout title="Eventos - Mujer Vulnerable">
       <Breadcrumb>
         <BreadcrumbList>
@@ -124,6 +130,7 @@ export default function EventosMujerVulnerablePage() {
               <th className="py-2 px-4 border border-gray-300 text-left">Ubicación</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Duración</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Capacidad</th>
+              <th className="py-2 px-4 border border-gray-300 text-left">Participantes</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Acciones</th>
             </tr>
           </thead>
@@ -152,6 +159,18 @@ export default function EventosMujerVulnerablePage() {
                   <td className="py-2 px-4 border border-gray-300">{ev.location}</td>
                   <td className="py-2 px-4 border border-gray-300">{ev.duration}</td>
                   <td className="py-2 px-4 border border-gray-300">{ev.capacity}</td>
+                  <td className="py-2 px-4 border border-gray-300">
+                    {ev.registered}
+                    <div>
+                      <button
+                        onClick={() => setEventoSeleccionado(ev.id)}
+                        className="text-blue-600 text-xs hover:underline mt-1"
+                      >
+                        Ver participantes
+                      </button>
+                    </div>
+                  </td>
+
                   <td className="py-2 px-4 border border-gray-300 space-x-2">
                     <button
                       onClick={() => {
@@ -205,7 +224,8 @@ export default function EventosMujerVulnerablePage() {
         date: formData.date,
         location: formData.location,
         duration: formData.duration,
-        capacity: Number(formData.capacity) // Asegúrate de que sea número
+        capacity: Number(formData.capacity), // Asegúrate de que sea número
+        registered: Number(formData.capacity)
       };
 
       const res = await fetch(`/api/eventos/${programId}`, {
@@ -272,6 +292,13 @@ export default function EventosMujerVulnerablePage() {
           onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
           className="w-full px-3 py-2 border rounded"
         />
+        <input
+          type="number"
+          placeholder="Participantes"
+          value={formData.registered}
+          onChange={(e) => setFormData({ ...formData, registered: e.target.value })}
+          className="w-full px-3 py-2 border rounded"
+        />
         <div className="flex justify-end gap-4">
           <button
             type="button"
@@ -294,5 +321,11 @@ export default function EventosMujerVulnerablePage() {
 
       </div>
     </ContentLayout>
+    <ParticipantesModal
+          eventoId={eventoSeleccionado}
+          open={!!eventoSeleccionado}
+          onClose={() => setEventoSeleccionado(null)}
+        />
+    </ProtectedAdmin>
   );
 }

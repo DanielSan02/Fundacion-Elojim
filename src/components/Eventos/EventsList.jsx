@@ -58,22 +58,57 @@ export default function EventsList({ program }) {
     (a, b) => new Date(a.date) - new Date(b.date)
   );
 
-  const handleRegister = (eventId) => {
-    setRegistering(eventId);
+  const handleRegister = async (eventId) => {
+  setRegistering(eventId);
 
-    // Simulación de registro - AQUI ES DONDE TAMBIEN DEBERIAS LLAMAR AL BACKEND
-    // para notificar que un usuario se ha inscrito en un evento
-    // (si quieres que el contador de 'registered' en el backend se actualice)
-    setTimeout(() => {
-      registerEvent(eventId); // Esto registra localmente en tu ProgramContext
-      setRegistering(null);
+  try {
+    const res = await fetch("/api/inscripciones-evento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventoId: eventId,
+        programId: program.id,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      registerEvent(eventId); // actualiza el contexto local
       toast({
         title: "¡Registro exitoso!",
         description: "Te has registrado correctamente en este evento.",
         variant: "default",
       });
-    }, 1000); // Esto sigue siendo una simulación, considera cambiarlo por una llamada real
-  };
+
+      // Opcional: Actualiza estado local de `apiEvents` para incrementar el contador visualmente
+      setApiEvents((prev) =>
+        prev.map((ev) =>
+          ev.id === eventId
+            ? { ...ev, registered: ev.registered + 1 }
+            : ev
+        )
+      );
+    } else {
+      toast({
+        title: "Error al registrarse",
+        description: data.message || "No se pudo completar la inscripción.",
+        variant: "destructive",
+      });
+    }
+  } catch (error) {
+    toast({
+      title: "Error inesperado",
+      description: error.message,
+      variant: "destructive",
+    });
+  } finally {
+    setRegistering(null);
+  }
+};
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

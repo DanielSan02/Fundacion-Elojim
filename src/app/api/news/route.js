@@ -11,6 +11,8 @@ export async function POST(req) {
   try {
     // 🔐 Obtener token JWT desde la cookie
     const token = await getToken({ req });
+    console.log("TOKEN RECIBIDO:", token);
+
 
     if (!token || !token.sub) {
       return new Response("No autorizado", { status: 401 });

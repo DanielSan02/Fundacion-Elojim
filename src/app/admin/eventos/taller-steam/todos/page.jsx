@@ -11,12 +11,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ParticipantesModal from "@/components/admin-panel/ParticipantesModal";
 
 export default function EventosTallerSteamPage() {
   const programId = "taller-steam";
 
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [eventoEnEdicion, setEventoEnEdicion] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -25,6 +27,7 @@ export default function EventosTallerSteamPage() {
     location: "",
     duration: "",
     capacity: "",
+    registered: "",
   });
 
   const [busqueda, setBusqueda] = useState("");
@@ -124,13 +127,14 @@ export default function EventosTallerSteamPage() {
               <th className="py-2 px-4 border border-gray-300 text-left">Ubicación</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Duración</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Capacidad</th>
+              <th className="py-2 px-4 border border-gray-300 text-left">Participantes</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {eventosFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-4 text-gray-500">
+                <td colSpan={8} className="text-center py-4 text-gray-500">
                   No hay eventos que coincidan con los filtros.
                 </td>
               </tr>
@@ -152,6 +156,17 @@ export default function EventosTallerSteamPage() {
                   <td className="py-2 px-4 border border-gray-300">{ev.location}</td>
                   <td className="py-2 px-4 border border-gray-300">{ev.duration}</td>
                   <td className="py-2 px-4 border border-gray-300">{ev.capacity}</td>
+                  <td className="py-2 px-4 border border-gray-300">
+                    {ev.registered || 0}
+                    <div>
+                      <button
+                        onClick={() => setEventoSeleccionado(ev.id)}
+                        className="text-blue-600 text-xs hover:underline mt-1"
+                      >
+                        Ver participantes
+                      </button>
+                    </div>
+                  </td>
                   <td className="py-2 px-4 border border-gray-300 space-x-2">
                     <button
                       onClick={() => {
@@ -163,6 +178,7 @@ export default function EventosTallerSteamPage() {
                           location: ev.location || "",
                           duration: ev.duration || "",
                           capacity: ev.capacity?.toString() || "",
+                          registered: ev.registered?.toString() || "0",
                         });
                       }}
                       className="text-blue-600 hover:underline"
@@ -205,6 +221,7 @@ export default function EventosTallerSteamPage() {
                       location: formData.location,
                       duration: formData.duration,
                       capacity: Number(formData.capacity),
+                      registered: Number(formData.registered),
                     };
 
                     const res = await fetch(`/api/eventos/${programId}`, {
@@ -219,11 +236,7 @@ export default function EventosTallerSteamPage() {
                       alert("Evento actualizado correctamente");
                     } else {
                       const errorData = await res.json();
-                      alert(
-                        `Error al actualizar: ${
-                          errorData.message || "Error desconocido"
-                        }`
-                      );
+                      alert(`Error al actualizar: ${errorData.message || "Error desconocido"}`);
                     }
                   } catch (err) {
                     console.error("Error al actualizar", err);
@@ -287,6 +300,15 @@ export default function EventosTallerSteamPage() {
                   }
                   className="w-full px-3 py-2 border rounded"
                 />
+                <input
+                  type="number"
+                  placeholder="Participantes"
+                  value={formData.registered}
+                  onChange={(e) =>
+                    setFormData({ ...formData, registered: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border rounded"
+                />
                 <div className="flex justify-end gap-4">
                   <button
                     type="button"
@@ -307,6 +329,12 @@ export default function EventosTallerSteamPage() {
           </div>
         )}
       </div>
+
+      <ParticipantesModal
+        eventoId={eventoSeleccionado}
+        open={!!eventoSeleccionado}
+        onClose={() => setEventoSeleccionado(null)}
+      />
     </ContentLayout>
   );
 }
