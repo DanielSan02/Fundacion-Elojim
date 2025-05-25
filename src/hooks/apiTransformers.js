@@ -147,6 +147,7 @@ export function transformMujerVulnerableDataForApi(formData) {
 }
 
 // *** NUEVA FUNCIÓN PARA SEMILLERO DE INNOVACIÓN ***
+
 export function transformSemilleroDataForApi(formData) {
   const AREAS_INTERES_MAP = {
     "Emprendimiento social": "EMPRENDIMIENTO_SOCIAL",
@@ -154,55 +155,49 @@ export function transformSemilleroDataForApi(formData) {
     "Medio ambiente y sostenibilidad": "MEDIO_AMBIENTE_Y_SOSTENIBILIDAD",
     "Transformación digital": "TRANSFORMACION_DIGITAL",
     "Desarrollo de productos o servicios": "DESARROLLO_DE_PRODUCTOS_O_SERVICIOS",
+    "Otras": "OTRAS", // si fue seleccionada
   };
-
 
   const TIPO_VINCULACION_MAP_BACKEND = {
     "institucion": "INSTITUCION_EDUCATIVA",
-    "comunidad": "COMUNIDAD"
+    "comunidad": "COMUNIDAD",
   };
 
   const mappedAreas = (Array.isArray(formData.areasInteres) ? formData.areasInteres : [])
-    .map(area => AREAS_INTERES_MAP[area] || area); // Mapea a valores de backend, si no encuentra, deja el original (para "Otras")
-
-  // Incluye "Otras" si existe y no está vacío
-  if (formData.otrasAreas && formData.otrasAreas.trim() !== "") {
-    mappedAreas.push(formData.otrasAreas.trim());
-  }
+    .filter((area) => AREAS_INTERES_MAP[area]) // solo si está en el mapa
+    .map((area) => AREAS_INTERES_MAP[area]);
 
   return {
     nombreCompleto: formData.nombreCompleto,
     tipoDocumento: formData.tipoDocumento,
     numeroDocumento: formData.numeroDocumento,
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(), // Formato ISO
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
     telefonoContacto: formData.telefonoContacto,
-    correoElectronico: formData.correoElectronico || null, // Puede ser nulo
+    correoElectronico: formData.correoElectronico || null,
     direccion: formData.direccion,
     comuna: formData.comuna,
     estratoSocial: formData.estratoSocial,
     edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
     grupoEtnico: formData.grupoEtnico,
 
-    tipoVinculacion: TIPO_VINCULACION_MAP_BACKEND[formData.tipoVinculacion], // Mapea al valor del backend
+    tipoVinculacion: TIPO_VINCULACION_MAP_BACKEND[formData.tipoVinculacion],
     nombreEntidadVinculacion: formData.nombreEntidadVinculacion,
-    nivelEducativo: formData.nivelEducativo, // Mapea al valor del backend
+    nivelEducativo: formData.nivelEducativo,
 
-    participacionPrevia: formData.participacionPrevia, // Ya es booleano
-    areasInteres: mappedAreas, // Ya transformadas
-    otrasAreas: formData.otrasAreas || null, // Puede ser nulo
-    tieneProyecto: formData.tieneProyecto, // Ya es booleano
-    // Si tieneProyecto es false, enviar descripcionProyecto como null o vacío
+    participacionPrevia: formData.participacionPrevia,
+    areasInteres: mappedAreas, // ← limpio, sin texto suelto
+    otrasAreas: formData.otrasAreas?.trim() || null, // ← va como string separado
+    tieneProyecto: formData.tieneProyecto,
     descripcionProyecto: formData.tieneProyecto ? formData.descripcionProyecto : null,
 
     habilidades: formData.habilidades,
     disponibilidad: formData.disponibilidad,
-
     motivacion: formData.motivacion,
     expectativas: formData.expectativas,
-
     aceptaTerminos: Boolean(formData.aceptaTerminos),
   };
 }
+
 
 export function transformSteamDataForAp(formData) {
   
@@ -289,22 +284,30 @@ export function transformSeguridadAlimentariaDataForApi(formData) {
 }
 
 export function transformRefuerzoEscolarDataForApi(formData) {
-  // Las áreas de ayuda no necesitan un mapeo complejo si coinciden directamente con el backend,
-  // pero la lógica es la misma que ya tenías en el formulario.
-  const mappedAreas = Array.isArray(formData.areasAyuda) ? formData.areasAyuda : [];
-  
-  // Si 'otrasAreas' tiene contenido, agrégalo a las áreas de ayuda.
-  // Tu backend ya tiene la validación para AREAS_AYUDA_VALIDAS.
-  // Si necesitas que 'otrasAreas' se envíe como un campo separado en el backend,
-  // ajusta la lógica aquí y en tu esquema de Prisma.
-  if (formData.otrasAreas && formData.otrasAreas.trim() !== "") {
-    mappedAreas.push(formData.otrasAreas.trim());
-  }
+  // Lista de áreas válidas reconocidas por el backend
+  const AREAS_AYUDA_VALIDAS = [
+    "MATEMATICAS",
+    "LECTURA",
+    "ESCRITURA",
+    "CIENCIAS",
+    "TECNOLOGIA",
+    "OTRAS"
+  ];
+
+  // Filtra áreas válidas desde el frontend (convertidas a mayúscula por seguridad)
+  const mappedAreas = Array.isArray(formData.areasAyuda)
+    ? formData.areasAyuda.filter((area) =>
+        AREAS_AYUDA_VALIDAS.includes(area.toUpperCase())
+      )
+    : [];
+
+  // Si hay texto en otrasAreas, se envía por separado (NO se mete en el array)
+  const otrasAreas = formData.otrasAreas?.trim() || null;
 
   return {
-    // Datos del Niño/a (según el esquema de tu backend)
+    // Datos del Niño/a
     nombreCompleto: formData.nombreCompleto,
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(), // Formato ISO para el backend
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
     comuna: formData.comuna,
     estratoSocial: formData.estratoSocial,
     edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
@@ -317,57 +320,79 @@ export function transformRefuerzoEscolarDataForApi(formData) {
     nombreAcudiente: formData.nombreAcudiente,
     relacionNino: formData.relacionNino,
     telefonoContacto: formData.telefonoContacto,
-    correoElectronico: formData.correoElectronico || null, // Puede ser nulo si no es requerido
+    correoElectronico: formData.correoElectronico || null,
 
     // Información Académica
-    areasAyuda: mappedAreas, // Array de áreas transformadas
-    otrasAreas: formData.otrasAreas || null, // Se envía el texto libre de 'otrasAreas' como un campo separado
-    refuerzoPrevio: Boolean(formData.refuerzoPrevio), // Convertir a booleano
+    areasAyuda: mappedAreas,
+    otrasAreas: otrasAreas,
+    refuerzoPrevio: Boolean(formData.refuerzoPrevio),
     dificultadesAcademicas: formData.dificultadesAcademicas,
 
     // Disponibilidad y Recursos
     disponibilidad: formData.disponibilidad,
-    accesoMateriales: Boolean(formData.accesoMateriales), // Convertir a booleano
-    apoyoHabitos: Boolean(formData.apoyoHabitos), // Convertir a booleano
+    accesoMateriales: Boolean(formData.accesoMateriales),
+    apoyoHabitos: Boolean(formData.apoyoHabitos),
 
     // Motivación
     motivacion: formData.motivacion,
     expectativas: formData.expectativas,
 
     // Autorización
-    aceptaTerminos: Boolean(formData.aceptaTerminos), // Convertir a booleano
+    aceptaTerminos: Boolean(formData.aceptaTerminos),
   };
 }
 
-export function transformSoftwareFactoryDataForApi(formData) {
-  // Asegúrate de que las listas de tecnologías y áreas de interés sean arrays
-  const mappedTecnologias = Array.isArray(formData.tecnologias) ? formData.tecnologias : [];
-  const mappedAreasInteres = Array.isArray(formData.areasInteres) ? formData.areasInteres : [];
 
-  // Agrega el valor de "otrasAreas" a la lista de tecnologías si existe
-  if (formData.otrasAreas && formData.otrasAreas.trim() !== "") {
-    mappedTecnologias.push(formData.otrasAreas.trim());
-  }
-  // Agrega el valor de "otrasAreasInteres" a la lista de áreas de interés si existe
-  if (formData.otrasAreasInteres && formData.otrasAreasInteres.trim() !== "") {
-    mappedAreasInteres.push(formData.otrasAreasInteres.trim());
-  }
+export function transformSoftwareFactoryDataForApi(formData) {
+  const TECNOLOGIAS_VALIDAS = [
+    "Desarrollo web (HTML, CSS, JavaScript)",
+    "Backend (Python, Java, Node.js, etc.)",
+    "Bases de datos (MySQL, PostgreSQL, MongoDB, etc.)",
+    "Desarrollo móvil (Android, iOS, Flutter, React Native)",
+    "Inteligencia Artificial / Machine Learning",
+    "Ciberseguridad",
+    "Otras",
+  ];
+
+  const AREAS_INTERES_VALIDAS = [
+    "Desarrollo de Aplicaciones",
+    "Inteligencia Artificial y Aprendizaje Automático",
+    "Bases de Datos y Big Data",
+    "Ciberseguridad",
+    "Computación en la Nube y DevOps",
+    "Internet de las Cosas (IoT)",
+    "Realidad Virtual y Aumentada",
+    "Blockchain y Criptomonedas",
+    "Ingeniería de Software y Metodologías de Desarrollo",
+    "Software para Educación e Inclusión",
+    "Otras",
+  ];
+
+  // Filtrar tecnologías seleccionadas
+  const tecnologiasFiltradas = Array.isArray(formData.tecnologias)
+    ? formData.tecnologias.filter((t) => TECNOLOGIAS_VALIDAS.includes(t))
+    : [];
+
+  // Filtrar áreas de interés seleccionadas
+  const areasInteresFiltradas = Array.isArray(formData.areasInteres)
+    ? formData.areasInteres.filter((a) => AREAS_INTERES_VALIDAS.includes(a))
+    : [];
 
   return {
     // Datos Personales
     nombreCompleto: formData.nombreCompleto,
     tipoDocumento: formData.tipoDocumento,
     numeroDocumento: formData.numeroDocumento,
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(), // Formato ISO
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
     telefonoContacto: formData.telefonoContacto,
-    correoElectronico: formData.correoElectronico || null, // Opcional
+    correoElectronico: formData.correoElectronico || null,
     direccion: formData.direccion,
     comuna: formData.comuna,
     estratoSocial: formData.estratoSocial,
     edad: isNaN(Number(formData.edad)) ? 0 : parseInt(formData.edad, 10),
     grupoEtnico: formData.grupoEtnico,
 
-    // Información de Vinculación
+    // Información Académica
     modalidadVinculacion: formData.modalidadVinculacion,
     institucionEducativa: formData.institucionEducativa,
     programaAcademico: formData.programaAcademico,
@@ -375,17 +400,17 @@ export function transformSoftwareFactoryDataForApi(formData) {
     tiempoDisponible: formData.tiempoDisponible,
 
     // Experiencia y Habilidades
-    tecnologias: mappedTecnologias, // Array de tecnologías transformado
-    proyectosRealizados: formData.proyectosRealizados || null, // Opcional
+    tecnologias: tecnologiasFiltradas,
+    otrasAreas: formData.otrasAreas?.trim() || null,
+    proyectosRealizados: formData.proyectosRealizados || null,
 
     // Motivación e Intereses
-    areasInteres: mappedAreasInteres, // Array de áreas de interés transformado
-    // otrasAreas: formData.otrasAreas || null, // Se envía el texto libre si necesitas un campo separado
-    // otrasAreasInteres: formData.otrasAreasInteres || null, // Se envía el texto libre si necesitas un campo separado
-    experienciaAgile: formData.experienciaAgile || null, // Opcional
+    areasInteres: areasInteresFiltradas,
+    otrasAreasInteres: formData.otrasAreasInteres?.trim() || null,
+    experienciaAgile: formData.experienciaAgile || null,
     motivacion: formData.motivacion,
 
     // Autorización
-    aceptaTerminos: Boolean(formData.aceptaTerminos), // Convertir a booleano
+    aceptaTerminos: Boolean(formData.aceptaTerminos),
   };
 }

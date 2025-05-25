@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico, TipoDocumento } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 const CAMPOS_OBLIGATORIOS = [
   "nombreResponsable", // Ahora se espera este nombre
@@ -78,14 +80,23 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
-    const data = await request.json();
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
 
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
+    const data = await request.json();
     validarDatos(data);
 
     const nuevoRegistro = await prisma.registroSeguridadAlimentaria.create({
       data: {
         ...data,
         fechaNacimiento: new Date(data.fechaNacimiento),
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 

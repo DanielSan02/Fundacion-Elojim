@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { getServerSession } from "next-auth";
 
-
 import {
   EstratoSocial,
   GrupoEtnico,
@@ -92,6 +91,11 @@ function validarDatos(data) {
     throw new Error("El campo 'areasInteres' debe ser una lista.");
   }
 
+  // LOG para depuración
+  if (process.env.NODE_ENV === "development") {
+    console.log("Backend recibió areasInteres:", data.areasInteres);
+  }
+
   const areasInvalidas = data.areasInteres.filter(
     (area) => !areasInteresValidas.includes(area)
   );
@@ -142,7 +146,6 @@ export async function POST(request) {
   }
 }
 
-
 export async function GET() {
   try {
     const registros = await prisma.registroSemilleroInnovacion.findMany({
@@ -158,7 +161,6 @@ export async function GET() {
     return new Response("Error al obtener registros", { status: 500 });
   }
 }
-
 
 export async function DELETE(req) {
   try {
@@ -182,7 +184,6 @@ export async function DELETE(req) {
     return new Response("Error interno al eliminar registro", { status: 500 });
   }
 }
-
 
 export const config = {
   api: {

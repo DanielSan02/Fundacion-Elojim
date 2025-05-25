@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
+
 
 // Enums válidos
 const ESTRATOS_VALIDOS = Object.values(EstratoSocial);
@@ -14,6 +17,7 @@ const TECNOLOGIAS_VALIDAS = [
     "Desarrollo móvil (Android, iOS, Flutter, React Native)",
     "Inteligencia Artificial / Machine Learning",
     "Ciberseguridad",
+    "Otras",
   ];
 
 const AREAS_INTERES_VALIDAS = [
@@ -115,20 +119,34 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
-    const data = await request.json();
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
 
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
+    const data = await request.json();
     validarDatos(data);
+
+    // Eliminar campo no soportado por Prisma
+    const {
+      otrasAreasInteres, // ❌ no existe en el modelo
+      ...restData
+    } = data;
 
     const nuevoRegistro = await prisma.registroSoftwareFactory.create({
       data: {
-        ...data,
+        ...restData,
         fechaNacimiento: new Date(data.fechaNacimiento),
-        tecnologias: data.tecnologias || [],
-        areasInteres: data.areasInteres || [],
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 
     return NextResponse.json(nuevoRegistro, { status: 201 });
+
   } catch (error) {
     console.error("Error al registrar en Software Factory:", error);
     return NextResponse.json(

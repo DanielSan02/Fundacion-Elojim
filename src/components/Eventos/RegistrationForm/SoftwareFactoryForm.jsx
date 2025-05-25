@@ -135,8 +135,18 @@ export default function SoftwareFactoryForm({ program, onClose }) {
 
       <form
         onSubmit={(e) => {
-          e.preventDefault(); // Previene la recarga de la página
-          handleSubmit(formData); // Llama al handleSubmit del hook, pasándole formData
+          e.preventDefault();
+          const areasFinal = [...formData.areasInteres];
+          if (formData.otrasAreas && formData.otrasAreas.trim() !== "") {
+            areasFinal.push(formData.otrasAreas.trim());
+          }
+
+          const payload = {
+            ...formData,
+            areasInteres: areasFinal,
+          };
+
+          handleSubmit(payload);
         }}
         className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
@@ -322,9 +332,9 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               columns={2}
               showOtherOption={true} // Agregado showOtherOption para áreas de interés
               otherOptionLabel="Otras"
-              otherValue={formData.otrasAreasInteres} // Nuevo campo para "otras" áreas de interés
+              otherValue={formData.otrasAreas} // Nuevo campo para "otras" áreas de interés
               onOtherValueChange={(value) =>
-                setFormData({ ...formData, otrasAreasInteres: value })
+                setFormData({ ...formData, otrasAreas: value })
               }
               required // Considera si es realmente requerido o si pueden no tener ninguna
             />

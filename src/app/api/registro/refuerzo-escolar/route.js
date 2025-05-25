@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 const ESTRATOS = Object.values(EstratoSocial);
 const GRUPOS_ETNICOS_VALIDOS = Object.values(GrupoEtnico);
@@ -11,6 +13,7 @@ const AREAS_AYUDA_VALIDAS = [
   "Escritura",
   "Ciencias naturales",
   "Inglés",
+  "Otras",
 ];
 
 const CAMPOS_OBLIGATORIOS = [
@@ -73,6 +76,12 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
+    
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
     const data = await request.json();
 
     validarDatos(data);
@@ -82,6 +91,9 @@ export async function POST(request) {
         ...data,
         fechaNacimiento: new Date(data.fechaNacimiento),
         areasAyuda: data.areasAyuda || [],
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 

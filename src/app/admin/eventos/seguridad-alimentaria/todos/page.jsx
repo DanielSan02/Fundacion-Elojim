@@ -11,6 +11,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import ProtectedAdmin from "@/components/ProtectedAdmin";
+import ParticipantesModal from "@/components/admin-panel/ParticipantesModal";
+
 
 export default function EventosSeguridadAlimentariaPage() {
   const programId = "seguridad-alimentaria";
@@ -18,6 +21,7 @@ export default function EventosSeguridadAlimentariaPage() {
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [eventoEnEdicion, setEventoEnEdicion] = useState(null);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -82,6 +86,7 @@ export default function EventosSeguridadAlimentariaPage() {
   }
 
   return (
+    <ProtectedAdmin>
     <ContentLayout title="Eventos - Programa Seguridad Alimentaria">
       <Breadcrumb>
         <BreadcrumbList>
@@ -124,6 +129,7 @@ export default function EventosSeguridadAlimentariaPage() {
               <th className="py-2 px-4 border border-gray-300 text-left">Ubicación</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Duración</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Capacidad</th>
+              <th className="py-2 px-4 border border-gray-300 text-left">Participantes</th>
               <th className="py-2 px-4 border border-gray-300 text-left">Acciones</th>
             </tr>
           </thead>
@@ -152,6 +158,17 @@ export default function EventosSeguridadAlimentariaPage() {
                   <td className="py-2 px-4 border border-gray-300">{ev.location}</td>
                   <td className="py-2 px-4 border border-gray-300">{ev.duration}</td>
                   <td className="py-2 px-4 border border-gray-300">{ev.capacity}</td>
+                  <td className="py-2 px-4 border border-gray-300">
+                    {ev.registered}
+                    <div>
+                      <button
+                        onClick={() => setEventoSeleccionado(ev.id)}
+                        className="text-blue-600 text-xs hover:underline mt-1"
+                      >
+                        Ver participantes
+                      </button>
+                    </div>
+                  </td>
                   <td className="py-2 px-4 border border-gray-300 space-x-2">
                     <button
                       onClick={() => {
@@ -308,5 +325,11 @@ export default function EventosSeguridadAlimentariaPage() {
         )}
       </div>
     </ContentLayout>
+    <ParticipantesModal
+      eventoId={eventoSeleccionado}
+      open={!!eventoSeleccionado}
+      onClose={() => setEventoSeleccionado(null)}
+    />
+    </ProtectedAdmin>
   );
 }

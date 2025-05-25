@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 import {
   EstratoSocial,
@@ -122,15 +124,28 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
+
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
+
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
     const data = await request.json();
     
 
     validarDatos(data);
+
+    const {
+      otrasAreasInteres, // ❌ no existe en el modelo
+      ...restData
+    } = data;
     
 
     const nuevoRegistro = await prisma.registroVoluntariado.create({
       data: {
-        ...data,
+        ...restData,
         fechaNacimiento: new Date(data.fechaNacimiento),
         areasInteres: data.areasInteres || [],
         diasEspecificos: data.diasEspecificos || null,
@@ -139,6 +154,9 @@ export async function POST(request) {
         referencia1Telefono: data.referencia1Telefono || null,
         referencia2Nombre: data.referencia2Nombre || null,
         referencia2Telefono: data.referencia2Telefono || null,
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 
