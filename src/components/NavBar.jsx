@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -11,18 +11,60 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, User, LogOut } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isVoluntario, setIsVoluntario] = useState(false);
 
-  const navItems = [
-    { href: "#inicio", label: "Inicio" },
-    { href: "#nosotros", label: "Nosotros" },
-    { href: "#noticias", label: "Noticias" },
-    { href: "#contacto", label: "Contáctanos" },
-    { href: "/programas", label: "Programas" },
+  useEffect(() => {
+    
+    if (session && session.user) {
+      // Verifica si rolId existe, de lo contrario intenta obtenerlo a través de una API
+      if (session.user.rolId !== undefined) {
+        setIsAdmin(session.user.rolId === 2);
+        // setIsVoluntario(session.user.rolId === 2);
+      }
+    } else {
+      setIsAdmin(false);
+      setIsVoluntario(false);
+    }
+  }, [session]);
+
+  const getConditionalNavItems = () => {
+  let items = [
+    { href: "/", label: "Inicio" },
+    { href: "/#nosotros", label: "Nosotros" },
+    { href: "/news", label: "Noticias" },
+    { href: "/#contacto", label: "Contáctanos" },
   ];
+
+  // Solo mostrar "Programas" si el usuario está autenticado
+  if (status === "authenticated") {
+    items.push({ href: "/programas", label: "Programas" });
+  }
+
+  // Agregar enlace admin si corresponde
+  if (isAdmin) {
+    items.push({ href: "/admin", label: "Panel Administrativo" });
+  }
+
+  return items;
+};
+
+
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push("/");
+  };
+
+  // Lista de navegación final con elementos condicionales
+  const finalNavItems = getConditionalNavItems();
 
   return (
     <header className="fixed w-full z-50 bg-[#1B3C8C] bg-opacity-95 text-white">
@@ -38,8 +80,10 @@ const Navbar = () => {
             />
             <span className="text-2xl font-semibold">Fundación Elojim</span>
           </Link>
+          
+          {/* Navegación de escritorio */}
           <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => (
+            {finalNavItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
@@ -47,14 +91,28 @@ const Navbar = () => {
                 {item.label}
               </a>
             ))}
-            <Link href="/auth/login">
-              <Button
-                variant="outline"
-                className="text-[#3B82F6] border-white hover:bg-[#3B82F6] hover:text-white transition-colors">
-                Iniciar Sesión
-              </Button>
-            </Link>
+
+            {/* Opciones de autenticación */}
+            {status === "authenticated" ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm">Hola, {session.user.name}</span>
+                <Button 
+                  variant="ghost" 
+                  className="hover:text-[#3B82F6] transition-colors p-0"
+                  onClick={handleSignOut}>
+                  <LogOut className="h-5 w-5 mr-1" />
+                  <span>Salir</span>
+                </Button>
+              </div>
+            ) : (
+              <Link href="/auth/login" className="hover:text-[#3B82F6] transition-colors flex items-center">
+                <User className="h-5 w-5 mr-1" />
+                <span>Iniciar sesión</span>
+              </Link>
+            )}
           </nav>
+          
+          {/* Menú móvil */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" className="p-0">
@@ -66,7 +124,6 @@ const Navbar = () => {
             <SheetContent
               side="right"
               className="w-[300px] sm:w-[400px] bg-[#1B3C8C] text-white">
-              {/* 🔹 Agregar SheetTitle para accesibilidad */}
               <SheetHeader>
                 <SheetTitle className="text-white text-xl font-bold tracking-wide">
                   Menú
@@ -74,7 +131,7 @@ const Navbar = () => {
               </SheetHeader>
 
               <nav className="flex flex-col space-y-4 mt-6">
-                {navItems.map((item) => (
+                {finalNavItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -83,13 +140,35 @@ const Navbar = () => {
                     {item.label}
                   </Link>
                 ))}
-                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
-                  <Button
-                    variant="outline"
-                    className="text-[#3B82F6] border-white hover:bg-[#3B82F6] hover:text-white transition-colors">
-                    Iniciar Sesión
-                  </Button>
-                </Link>
+                
+                {/* Opciones de autenticación móvil */}
+                <div className="pt-4 border-t border-blue-700">
+                  {status === "authenticated" ? (
+                    <div className="space-y-4">
+                      <div className="text-sm text-blue-300">
+                        Sesión iniciada como <span className="font-semibold">{session.user.name}</span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-lg hover:text-[#3B82F6] transition-colors p-0"
+                        onClick={() => {
+                          handleSignOut();
+                          setIsOpen(false);
+                        }}>
+                        <LogOut className="h-5 w-5 mr-2" />
+                        <span>Cerrar sesión</span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/auth/login"
+                      className="flex items-center text-lg hover:text-[#3B82F6] transition-colors"
+                      onClick={() => setIsOpen(false)}>
+                      <User className="h-5 w-5 mr-2" />
+                      <span>Iniciar sesión</span>
+                    </Link>
+                  )}
+                </div>
               </nav>
             </SheetContent>
           </Sheet>

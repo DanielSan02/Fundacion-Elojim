@@ -1,7 +1,9 @@
 "use client";
+
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "@/components/providers/theme-provider"; // 🔥
 import { Toaster } from "@/components/ui/toaster";
 
 // Cargar las fuentes
@@ -21,12 +23,17 @@ const inter = Inter({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className="h-full bg-gray-100">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.className} h-full`}>
+    <html
+      lang="es"
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.className} h-full`}
+      suppressHydrationWarning
+    >
+      <body className="h-full bg-background text-foreground">
         <SessionProvider>
-          {children}
-          <Toaster />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+            <Toaster />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

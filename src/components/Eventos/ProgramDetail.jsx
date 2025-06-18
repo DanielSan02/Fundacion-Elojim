@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription, // Importa DialogDescription
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { usePrograms } from "@/context/ProgramContext";
@@ -50,6 +55,9 @@ export default function ProgramDetail({ program, isOpen, onClose }) {
 
           {/* Contenido con scroll */}
           <div className="p-6 overflow-y-auto flex-grow">
+            {/* **Añadimos el DialogDescription aquí** */}
+            <DialogDescription></DialogDescription>
+
             <AnimatePresence mode="wait">
               {registered && showEvents ? (
                 <EventsList key="events" program={program} />

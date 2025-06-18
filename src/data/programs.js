@@ -12,7 +12,7 @@ import {
 
 export const programs = [
   {
-    id: 1,
+    id: "mujer-vulnerable",
     title: "Programa Mujer Vulnerable",
     description:
       "Apoyo integral a mujeres en situación de vulnerabilidad a través de asistencia psicológica, legal y formación para el empleo.",
@@ -36,7 +36,7 @@ export const programs = [
     ],
   },
   {
-    id: 2,
+    id: "semillero-innovacion",
     title: "Semillero de Innovación y Emprendimiento",
     description:
       "Formación y acompañamiento para el desarrollo de proyectos innovadores con impacto social y económico.",
@@ -60,7 +60,7 @@ export const programs = [
     ],
   },
   {
-    id: 3,
+    id: "taller-steam",
     title: "Programa Taller STEAM+H",
     description:
       "Formación en ciencia, tecnología, ingeniería, arte, matemáticas y humanidades para niños, niñas y adolescentes.",
@@ -84,7 +84,7 @@ export const programs = [
     ],
   },
   {
-    id: 4,
+    id: "seguridad-alimentaria",
     title: "Programa de Seguridad Alimentaria",
     description:
       "Implementación de sistemas agrícolas sostenibles para mejorar la producción, distribución y acceso a alimentos nutritivos.",
@@ -108,7 +108,7 @@ export const programs = [
     ],
   },
   {
-    id: 6,
+    id: "refuerzo-escolar",
     title: "Programa de Jornadas de Refuerzo Escolar",
     description:
       "Apoyo académico para niños, niñas y adolescentes con dificultades en su proceso de aprendizaje escolar.",
@@ -132,7 +132,7 @@ export const programs = [
     ],
   },
   {
-    id: 7,
+    id: "software-factory",
     title: "Programa de Factoría de Software",
     description:
       "Formación en desarrollo de software y creación de soluciones tecnológicas para problemas comunitarios.",
@@ -156,7 +156,7 @@ export const programs = [
     ],
   },
   {
-    id: 8,
+    id: "voluntariado",
     title: "Programa de Voluntariado Social",
     description: "Oportunidades para contribuir con tiempo y talento en proyectos sociales de impacto comunitario.",
     color: "#FF5722", // Naranja
@@ -179,7 +179,7 @@ export const programs = [
     ],
   },
   {
-    id: 9,
+    id: "cultural",
     title: "Programa Cultural",
     description:
       "Formación en música, danza, manualidades y otras expresiones artísticas para el desarrollo cultural de la comunidad.",
@@ -203,7 +203,7 @@ export const programs = [
     ],
   },
   {
-    id: 10,
+    id: "economia-plateada",
     title: "Programa Economía Plateada",
     description: "Apoyo integral para adultos mayores en el desarrollo de proyectos productivos y bienestar.",
     color: "#607D8B", // Azul grisáceo

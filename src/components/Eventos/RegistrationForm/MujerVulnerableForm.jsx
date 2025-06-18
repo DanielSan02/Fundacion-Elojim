@@ -19,7 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
+import {
+  NIVELES_EDUCATIVOS,
+  TIPOS_DOCUMENTO,
+} from "../form-utils/formConstants";
 
 export default function MujerVulnerableForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -28,9 +31,6 @@ export default function MujerVulnerableForm({ program, onClose }) {
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -40,19 +40,19 @@ export default function MujerVulnerableForm({ program, onClose }) {
     direccion: "",
 
     // Situación Socioeconómica
-    esMadreCabeza: "no",
+    esMadreCabeza: false,
     numeroHijos: "",
-    conviveOtros: "no",
+    conviveConOtrasPersonas: false,
     conQuienesConvive: "",
     nivelEducativo: "",
-    tieneEmpleo: "no",
+    tieneEmpleo: false,
     actividadLaboral: "",
     fuenteIngresos: "",
 
     // Intereses y Necesidades
     areasApoyo: [],
     otrasAreas: "",
-    tieneApoyoGubernamental: "no",
+    tieneApoyoGubernamental: false,
     tipoApoyoGubernamental: "",
 
     // Motivación y Disponibilidad
@@ -65,9 +65,9 @@ export default function MujerVulnerableForm({ program, onClose }) {
   });
 
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "mujer-vulnerable",
     onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el Programa Mujer Vulnerable.`,
+    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
   });
 
   const handleChange = (e) => {
@@ -125,7 +125,12 @@ export default function MujerVulnerableForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // <-- ¡ESENCIAL! Previene la recarga de la página
+          handleSubmit(formData); // <-- SOLO pasar formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -139,13 +144,22 @@ export default function MujerVulnerableForm({ program, onClose }) {
               <Label htmlFor="tipoDocumento">
                 Tipo de documento<span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="tipoDocumento"
-                name="tipoDocumento"
+              <Select
                 value={formData.tipoDocumento}
-                onChange={handleChange}
-                required
-              />
+                onValueChange={(value) =>
+                  setFormData({ ...formData, tipoDocumento: value })
+                }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIPOS_DOCUMENTO.map((tipo) => (
+                    <SelectItem key={tipo.value} value={tipo.value}>
+                      {tipo.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="numeroDocumento">
@@ -191,13 +205,13 @@ export default function MujerVulnerableForm({ program, onClose }) {
 
             <RadioOptions
               label="¿Convive con otras personas?"
-              name="conviveOtros"
-              value={formData.conviveOtros}
+              name="conviveConOtrasPersonas"
+              value={formData.conviveConOtrasPersonas}
               onChange={handleRadioChange}
               required
             />
 
-            {formData.conviveOtros === "si" && (
+            {formData.conviveConOtrasPersonas === true && (
               <div className="space-y-2">
                 <Label htmlFor="conQuienesConvive">
                   Si la respuesta es sí, ¿con quiénes?
@@ -241,7 +255,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
               required
             />
 
-            {formData.tieneEmpleo === "si" ? (
+            {formData.tieneEmpleo === true ? (
               <div className="space-y-2">
                 <Label htmlFor="actividadLaboral">
                   Si la respuesta es sí, ¿en qué actividad laboral?
@@ -297,7 +311,7 @@ export default function MujerVulnerableForm({ program, onClose }) {
               required
             />
 
-            {formData.tieneApoyoGubernamental === "si" && (
+            {formData.tieneApoyoGubernamental === true && (
               <div className="space-y-2">
                 <Label htmlFor="tipoApoyoGubernamental">
                   Si la respuesta es sí, ¿cuál?

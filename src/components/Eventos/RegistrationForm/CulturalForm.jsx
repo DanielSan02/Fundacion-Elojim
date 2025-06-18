@@ -25,9 +25,6 @@ export default function CulturalForm({ program, onClose }) {
     // Datos Personales
     nombreCompleto: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -62,9 +59,9 @@ export default function CulturalForm({ program, onClose }) {
   });
 
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "cultural",
     onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en el Programa Cultural.`,
+    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
   });
 
   const handleChange = (e) => {
@@ -90,7 +87,7 @@ export default function CulturalForm({ program, onClose }) {
   };
 
   const areasInteres = [
-    "Música",
+    "Musica",
     "Danza",
     "Manualidades",
     "Maquillaje",
@@ -115,7 +112,12 @@ export default function CulturalForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // <-- ¡ESENCIAL! Previene la recarga de la página
+          handleSubmit(formData); // <-- SOLO pasar formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -235,7 +237,7 @@ export default function CulturalForm({ program, onClose }) {
               required
             />
 
-            {formData.formacionPrevia === "si" && (
+            {formData.formacionPrevia === true && (
               <div className="space-y-2">
                 <Label htmlFor="detalleFormacion">Especificar:</Label>
                 <Input
@@ -255,7 +257,7 @@ export default function CulturalForm({ program, onClose }) {
               required
             />
 
-            {formData.perteneceGrupo === "si" && (
+            {formData.perteneceGrupo === true && (
               <div className="space-y-2">
                 <Label htmlFor="detalleGrupo">Especificar:</Label>
                 <Input

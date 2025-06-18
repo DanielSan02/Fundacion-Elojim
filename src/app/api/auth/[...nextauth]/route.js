@@ -12,8 +12,6 @@ export const authOptions = {
                 password: {label: "Password", type: "password", placeholder: "*******"}
             }, 
             async authorize(credentials, req) {
-                // console.log(credentials)
-
                 const userFound = await db.users.findUnique({
                     where: {
                         email: credentials.email
@@ -26,6 +24,7 @@ export const authOptions = {
 
                 // Mensaje en consola para éxito de inicio de sesión
                 console.log(`Inicio de sesión exitoso para el usuario: ${userFound.name}`);
+                console.log("Datos del usuario:", userFound); // Añadido para depuración
 
                 //DATOS PARA LA CREACIÓN DE UN TOKEN EN EL FRONTEND
                 return {
@@ -33,7 +32,7 @@ export const authOptions = {
                     name: userFound.name,
                     lastname: userFound.lastname,
                     email: userFound.email,
-                    id_rol: userFound.id_rol
+                    rolId: userFound.rolId
                 }
             },
         }),
@@ -48,19 +47,26 @@ export const authOptions = {
     },
     callbacks: {
         async session({ session, token }) {
-            session.user.id_rol = token.id_rol; // Incluye el rol en la sesión
-            session.user.document = token.email; //incluir el email en la sesión
+            session.user = {
+                ...session.user,
+                id: token.id,
+                rolId: token.rolId, 
+                lastname: token.lastname,
+                document: token.email
+            };
             return session;
         },
         async jwt({ token, user }) {
             if (user) {
-            token.id_rol = user.id_rol; // Almacena el rol en el token
-            token.email = user.email //almacenar el document 
+                // Guarda todos los datos del usuario en el token
+                token.rolId = user.rolId; 
+                token.lastname = user.lastname;
+                token.email = user.email;
+                token.id = user.id;
             }
             return token;
         },
-    },
-
+    },   
 };
 
 const handler = NextAuth(authOptions);

@@ -19,7 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NIVELES_EDUCATIVOS } from "../form-utils/formConstants";
+
+import {
+  NIVELES_EDUCATIVOS,
+  TIPOS_DOCUMENTO,
+} from "../form-utils/formConstants";
 
 export default function VoluntariadoForm({ program, onClose }) {
   const [formData, setFormData] = useState({
@@ -27,11 +31,8 @@ export default function VoluntariadoForm({ program, onClose }) {
     nombreCompleto: "",
     documentoIdentidad: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     direccion: "",
-    telefono: "",
+    telefonoContacto: "",
     correoElectronico: "",
     comuna: "",
     estratoSocial: "",
@@ -73,7 +74,7 @@ export default function VoluntariadoForm({ program, onClose }) {
   });
 
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "voluntariado",
     onSuccess: onClose,
     successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
   });
@@ -153,7 +154,12 @@ export default function VoluntariadoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // <-- ¡ESENCIAL! Previene la recarga de la página
+          handleSubmit(formData); // <-- SOLO pasar formData al hook
+        }}
+        className="space-y-6">
         <FormSection title="Información Personal" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -164,25 +170,34 @@ export default function VoluntariadoForm({ program, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="documentoIdentidad">
-                Documento de identidad<span className="text-red-500">*</span>
+              <Label htmlFor="tipoDocumento">
+                Tipo de documento<span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="documentoIdentidad"
-                name="documentoIdentidad"
-                value={formData.documentoIdentidad}
-                onChange={handleChange}
-                required
-              />
+              <Select
+                value={formData.tipoDocumento || ""}
+                onValueChange={(value) =>
+                  handleSelectChange("tipoDocumento", value)
+                }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIPOS_DOCUMENTO.map((tipo) => (
+                    <SelectItem key={tipo.value} value={tipo.value}>
+                      {tipo.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefono">
-                Teléfono<span className="text-red-500">*</span>
+              <Label htmlFor="numeroDocumento">
+                Número de documento<span className="text-red-500">*</span>
               </Label>
               <Input
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
+                id="numeroDocumento"
+                name="numeroDocumento"
+                value={formData.numeroDocumento || ""}
                 onChange={handleChange}
                 required
               />
@@ -236,16 +251,16 @@ export default function VoluntariadoForm({ program, onClose }) {
               value={formData.disponibilidad}
               onChange={handleRadioChange}
               options={[
-                { value: "completo", label: "Tiempo completo" },
-                { value: "parcial", label: "Tiempo parcial" },
-                { value: "fines-semana", label: "Fines de semana" },
-                { value: "dias-especificos", label: "Días específicos" },
+                { value: "TIEMPO_COMPLETO", label: "Tiempo completo" },
+                { value: "TIEMPO_PARCIAL", label: "Tiempo parcial" },
+                { value: "FINES_DE_SEMANA", label: "Fines de semana" },
+                { value: "DIAS_ESPECIFICOS", label: "Días específicos" },
               ]}
               orientation="vertical"
               required
             />
 
-            {formData.disponibilidad === "dias-especificos" && (
+            {formData.disponibilidad === "DIAS_ESPECIFICOS" && (
               <div className="space-y-2">
                 <Label htmlFor="diasEspecificos">Especifique los días</Label>
                 <Input
@@ -253,7 +268,6 @@ export default function VoluntariadoForm({ program, onClose }) {
                   name="diasEspecificos"
                   value={formData.diasEspecificos}
                   onChange={handleChange}
-                  placeholder="Ej: Lunes y miércoles"
                 />
               </div>
             )}

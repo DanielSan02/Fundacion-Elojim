@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -28,9 +28,6 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     telefonoContacto: "",
     correoElectronico: "",
     direccion: "",
@@ -52,7 +49,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
 
     // Motivación e Intereses
     areasInteres: [],
-    otrasAreas: "",
+    otrasAreas: "", // Mantener para el campo "Otras" si aplica en CheckboxGroup
     experienciaAgile: "",
     motivacion: "",
 
@@ -60,10 +57,11 @@ export default function SoftwareFactoryForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
+  // Utiliza el hook useFormSubmit
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "software-factory", // <--- ¡Importante! Nuevo programId
     onSuccess: onClose,
-    successDescription: `Te has inscrito correctamente en la Factoría de Software.`,
+    successDescription: `Te has inscrito correctamente en la factoría de software.`,
   });
 
   const handleChange = (e) => {
@@ -135,7 +133,22 @@ export default function SoftwareFactoryForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const areasFinal = [...formData.areasInteres];
+          if (formData.otrasAreas && formData.otrasAreas.trim() !== "") {
+            areasFinal.push(formData.otrasAreas.trim());
+          }
+
+          const payload = {
+            ...formData,
+            areasInteres: areasFinal,
+          };
+
+          handleSubmit(payload);
+        }}
+        className="space-y-6">
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -269,7 +282,11 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               columns={2}
               showOtherOption={true}
               otherOptionLabel="Otras"
-              required
+              otherValue={formData.otrasAreas} // Reutilizamos otrasAreas del estado para esto
+              onOtherValueChange={(value) =>
+                setFormData({ ...formData, otrasAreas: value })
+              }
+              required // Considera si es realmente requerido o si pueden no tener ninguna
             />
 
             <div className="space-y-2">
@@ -313,7 +330,13 @@ export default function SoftwareFactoryForm({ program, onClose }) {
               selectedValues={formData.areasInteres}
               onChange={handleAreasInteresChange}
               columns={2}
-              required
+              showOtherOption={true} // Agregado showOtherOption para áreas de interés
+              otherOptionLabel="Otras"
+              otherValue={formData.otrasAreas} // Nuevo campo para "otras" áreas de interés
+              onOtherValueChange={(value) =>
+                setFormData({ ...formData, otrasAreas: value })
+              }
+              required // Considera si es realmente requerido o si pueden no tener ninguna
             />
 
             <div className="space-y-2">
@@ -347,7 +370,7 @@ export default function SoftwareFactoryForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting viene del hook
           submitColor={program.color}
         />
       </form>
