@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import ProtectedAdmin from "@/components/ProtectedAdmin";
+import { useToast } from "@/hooks/use-toast";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,6 +16,7 @@ import {
 
 export default function PostsPage() {
   const [posts, setPosts] = useState([]);
+  const { toast } = useToast(); 
   const [loading, setLoading] = useState(true);
 
   // Fetch posts from the API
@@ -48,7 +50,10 @@ export default function PostsPage() {
       if (res.ok) {
         // Remove the deleted post from the state to reflect the changes immediately
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-        alert("Post Eliminado correctamente");
+        toast({
+                title: "Post eliminado",
+                description: "El post ha sido eliminado correctamente.",
+              });
       } else {
         console.error("Error eliminando el post");
       }

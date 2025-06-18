@@ -11,12 +11,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 export default function MujerVulnerablePage() {
   const [registros, setRegistros] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const { toast } = useToast(); 
   const [busqueda, setBusqueda] = useState("");
+
   const [comuna, setComuna] = useState("");
   const [estrato, setEstrato] = useState("");
   const [grupoEtnico, setGrupoEtnico] = useState("");
@@ -43,27 +46,62 @@ export default function MujerVulnerablePage() {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmar = confirm("¿Estás seguro de que deseas eliminar este registro?");
-    if (!confirmar) return;
 
-    try {
-      const res = await fetch("/api/registro/mujer-vulnerable", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
+  const handleDelete = (id) => {
+    const toastId = toast({
+      title: "¿Estás seguro?",
+      description: "Esta acción eliminará el registro permanentemente.",
+      action: (
+        <div className="flex gap-2 mt-4">
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              toast.dismiss(toastId); // Cierra el toast de confirmación
+              try {
+                const res = await fetch("/api/registro/mujer-vulnerable", {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ id }),
+                });
 
-      if (res.ok) {
-        setRegistros((prev) => prev.filter((registro) => registro.id !== id));
-        alert("Registro eliminado correctamente");
-      } else {
-        alert("Error al eliminar el registro");
-      }
-    } catch (error) {
-      console.error("Error al eliminar el registro", error);
-    }
+                if (res.ok) {
+                  setRegistros((prev) => prev.filter((r) => r.id !== id));
+                  toast({
+                    title: "Registro eliminado",
+                    description: "El registro ha sido eliminado correctamente.",
+                  });
+                } else {
+                  toast({
+                    title: "Error al eliminar",
+                    description: "Hubo un problema al eliminar el registro.",
+                    variant: "destructive",
+                  });
+                }
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: "Error inesperado al eliminar el registro.",
+                  variant: "destructive",
+                });
+                console.error(error);
+              }
+            }}
+          >
+            Aceptar
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.dismiss(toastId)}
+          >
+            Cancelar
+          </Button>
+        </div>
+      ),
+    });
   };
+
 
   useEffect(() => {
     fetchRegistros();

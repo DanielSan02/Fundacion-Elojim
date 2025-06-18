@@ -39,7 +39,7 @@ export function transformVoluntariadoDataForApi(formData) {
 export function transformCulturalDataForApi(formData) {
   return {
     nombreCompleto: formData.nombreCompleto,
-    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(), // Asegúrate de que la fecha sea ISO string
+    fechaNacimiento: new Date(formData.fechaNacimiento).toISOString(),
     comuna: formData.comuna,
     estratoSocial: formData.estratoSocial,
     edad: parseInt(formData.edad, 10),
@@ -47,21 +47,26 @@ export function transformCulturalDataForApi(formData) {
     telefonoContacto: formData.telefonoContacto,
     direccion: formData.direccion,
     documentoIdentidad: formData.documentoIdentidad,
-    correoElectronico: formData.correoElectronico, // Agregado, si se usa
+    correoElectronico: formData.correoElectronico || null,
     municipioDepartamento: formData.municipioDepartamento,
     nivelEducativo: formData.nivelEducativo,
     ocupacion: formData.ocupacion,
-    areaInteresPrincipal: formData.areaInteres === 'Otro' ? formData.otraArea : formData.areaInteres,
-    formacionPrevia: formData.formacionPrevia === 'si',
+
+    // Parte importante:
+    areaInteresPrincipal: formData.areaInteres, // solo valor exacto del enum
+    otraAreaInteres: formData.areaInteres === "Otro" ? formData.otraArea : null,
+
+    formacionPrevia: formData.formacionPrevia === "si",
     detalleFormacion: formData.detalleFormacion || null,
-    perteneceGrupo: formData.perteneceGrupo === 'si',
+    perteneceGrupo: formData.perteneceGrupo === "si",
     detalleGrupo: formData.detalleGrupo || null,
     diasDisponibles: formData.diasDisponibles,
     motivacion: formData.motivacion,
     expectativas: formData.expectativas,
-    aceptaTerminos: formData.aceptaTerminos,
+    aceptaTerminos: Boolean(formData.aceptaTerminos),
   };
 }
+
 
 // Función para transformar los datos del formulario de Economía Plateada (ya existente)
 export function transformEconomiaPDataForApi(formData) {

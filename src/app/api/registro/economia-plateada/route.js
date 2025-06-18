@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { EstratoSocial, GrupoEtnico, TipoDocumento, Genero } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 // Enums válidos
 const ESTRATOS_VALIDOS = Object.values(EstratoSocial);
@@ -117,17 +119,29 @@ function validarDatos(data) {
 export async function POST(request) {
   
   try {
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
+
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
     const data = await request.json();
-    
-
     validarDatos(data);
-    
 
+     const {
+      otrasAreasInteres, // ❌ no existe en el modelo
+      ...restData
+    } = data;
+    
     const nuevoRegistro = await prisma.registroEconomiaPlateada.create({
       data: {
-        ...data,
+        ...restData,
         fechaNacimiento: new Date(data.fechaNacimiento),
         areasInteres: data.areasInteres || [],
+        usuario: {
+          connect: { id: userId },
+        },
       },
     });
 
