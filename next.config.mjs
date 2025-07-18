@@ -21,7 +21,6 @@ const nextConfig = {
   },
   // Opciones modernas recomendadas
   experimental: {
-    serverActions: true,
     optimizePackageImports: ['@components']
   }
 };
