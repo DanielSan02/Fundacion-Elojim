@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -18,9 +18,6 @@ export default function RefuerzoForm({ program, onClose }) {
     // Datos del Niño/a
     nombreCompleto: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -36,15 +33,15 @@ export default function RefuerzoForm({ program, onClose }) {
     correoElectronico: "",
 
     // Información Académica
-    areasApoyo: [],
+    areasAyuda: [],
     otrasAreas: "",
-    refuerzoPrevio: "no",
+    refuerzoPrevio: false, // Cambiado a booleano para consistencia con RadioOptions
     dificultadesAcademicas: "",
 
     // Disponibilidad y Recursos
     disponibilidad: "",
-    accesoMateriales: "no",
-    apoyoHabitos: "no",
+    accesoMateriales: false, // Cambiado a booleano
+    apoyoHabitos: false, // Cambiado a booleano
 
     // Motivación
     motivacion: "",
@@ -54,10 +51,11 @@ export default function RefuerzoForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
+  // Utiliza el hook useFormSubmit
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "refuerzo-escolar", // <--- ¡Importante! Nuevo programId
     onSuccess: onClose,
-    successDescription: `Has inscrito correctamente al niño/a en las Jornadas de Refuerzo.`,
+    successDescription: `Has inscrito correctamente al niño/a en las jornadas de refuerzo.`,
   });
 
   const handleChange = (e) => {
@@ -69,20 +67,21 @@ export default function RefuerzoForm({ program, onClose }) {
   };
 
   const handleRadioChange = (name, value) => {
+    // Asegurarse de que el valor sea un booleano si la opción de RadioOptions lo devuelve como string
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: typeof value === "string" ? value === "true" : value,
     });
   };
 
   const handleAreaChange = (newValues) => {
     setFormData({
       ...formData,
-      areasApoyo: newValues,
+      areasAyuda: newValues,
     });
   };
 
-  const areasApoyo = [
+  const areasAyuda = [
     "Matemáticas",
     "Lectura y comprensión",
     "Escritura",
@@ -108,10 +107,20 @@ export default function RefuerzoForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          handleSubmit(formData); // Llama al handleSubmit del hook, pasándole formData
+        }}
+        className="space-y-6">
         <FormSection
           title="Datos del Niño, Niña o Adolescente"
           color={program.color}>
+          {/* Aquí se asume que PersonalInfoFields maneja el cambio de formData correctamente internamente.
+              Si PersonalInfoFields necesita un onChange específico para sus campos, asegúrate de pasárselo.
+              Para este formulario, 'nombreCompleto', 'fechaNacimiento', 'comuna', 'estratoSocial', 'edad', 'grupoEtnico'
+              están en formData.
+          */}
           <PersonalInfoFields formData={formData} onChange={setFormData} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -205,8 +214,8 @@ export default function RefuerzoForm({ program, onClose }) {
           <div className="space-y-4">
             <CheckboxGroup
               label="¿En qué áreas necesita apoyo el niño/a? (Marcar las que apliquen):"
-              options={areasApoyo}
-              selectedValues={formData.areasApoyo}
+              options={areasAyuda}
+              selectedValues={formData.areasAyuda}
               onChange={handleAreaChange}
               columns={2}
               showOtherOption={true}
@@ -215,7 +224,7 @@ export default function RefuerzoForm({ program, onClose }) {
               onOtherValueChange={(value) =>
                 setFormData({ ...formData, otrasAreas: value })
               }
-              required
+              required // Puede que quieras que esto sea opcional si no se marcan áreas
             />
 
             <RadioOptions
@@ -330,7 +339,7 @@ export default function RefuerzoForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting viene del hook
           submitColor={program.color}
         />
       </form>

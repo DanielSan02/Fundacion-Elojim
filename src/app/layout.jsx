@@ -2,6 +2,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "@/components/providers/theme-provider"; // 🔥
 import { Toaster } from "@/components/ui/toaster";
 
 // Cargar las fuentes
@@ -15,8 +16,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.className} h-full`}>
         <SessionProvider>
-          {children}
-          <Toaster />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+            <Toaster />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

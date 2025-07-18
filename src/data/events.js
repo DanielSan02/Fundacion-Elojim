@@ -2,7 +2,7 @@ export const events = [
     // Eventos para Programa Mujer Vulnerable (id: 1)
     {
       id: 101,
-      programId: 1,
+      programId: "voluntariado",
       title: "Taller de Autoestima y Empoderamiento",
       description:
         "Sesiones prácticas para fortalecer la autoestima y desarrollar herramientas de empoderamiento personal.",

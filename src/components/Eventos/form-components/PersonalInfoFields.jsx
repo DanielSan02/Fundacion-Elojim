@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DateSelector } from "./DateSelector";
 
 /**
  * Componente reutilizable para campos de información personal básica
@@ -29,29 +28,35 @@ export function PersonalInfoFields({
   const handleChange = (e) => {
     const { name, value } = e.target;
     onChange({ ...formData, [name]: value });
+
+    if (name === "fechaNacimiento" && value) {
+      const birthDate = new Date(value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+
+      onChange({ ...formData, fechaNacimiento: value, edad: age.toString() });
+    }
   };
 
   const handleSelectChange = (field, value) => {
     onChange({ ...formData, [field]: value });
   };
 
-  const handleDateChange = (dateObj, isoDate) => {
-    onChange({
-      ...formData,
-      diaNacimiento: dateObj.day,
-      mesNacimiento: dateObj.month,
-      anoNacimiento: dateObj.year,
-      fechaNacimiento: isoDate,
-    });
-  };
-
-  const estratoOptions = ["1", "2", "3", "4", "5", "6"];
+  const estratoOptions = ["E1", "E2", "E3", "E4", "E5", "E6"];
   const gruposEtnicos = [
     "Ninguno",
     "Afrodescendiente",
-    "Indígena",
+    "Indigena",
     "Raizal",
-    "Rom/Gitano",
+    "Rom_Gitano",
     "Palenquero",
     "Otro",
   ];
@@ -72,17 +77,20 @@ export function PersonalInfoFields({
           />
         </div>
 
-        <DateSelector
-          label="Fecha de nacimiento"
-          value={{
-            day: formData.diaNacimiento || "",
-            month: formData.mesNacimiento || "",
-            year: formData.anoNacimiento || "",
-          }}
-          onChange={handleDateChange}
-          required
-          yearRange={100}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="fechaNacimiento">
+            Fecha de nacimiento<span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="fechaNacimiento"
+            name="fechaNacimiento"
+            type="date"
+            value={formData.fechaNacimiento || ""}
+            onChange={handleChange}
+            required
+            max={new Date().toISOString().split("T")[0]} // No permite fechas futuras
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -94,6 +102,7 @@ export function PersonalInfoFields({
             <Input
               id="comuna"
               name="comuna"
+              type="number"
               value={formData.comuna || ""}
               onChange={handleChange}
               required
@@ -183,13 +192,16 @@ export function PersonalInfoFields({
 
       {showEmail && (
         <div className="space-y-2">
-          <Label htmlFor="correoElectronico">Correo electrónico</Label>
+          <Label htmlFor="correoElectronico">
+            Correo electrónico<span className="text-red-500">*</span>
+          </Label>
           <Input
             id="correoElectronico"
             name="correoElectronico"
             type="email"
             value={formData.correoElectronico || ""}
             onChange={handleChange}
+            required
           />
         </div>
       )}

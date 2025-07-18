@@ -8,32 +8,475 @@ datasource db {
 }
 
 model Users {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(20)
-  lastName String  @db.VarChar(20)
-  email    String  @unique
-  password String  @db.VarChar(100)  // Aumenté a 100 caracteres para seguridad
-  posts    Post[]
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(20)
+  lastName String @db.VarChar(20)
+  email    String @unique
+  password String @db.VarChar(100)
   rolId    Int
-  role     Role    @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("users")  // Mapea a la tabla "users" en la DB
+  posts    Post[]
+  role     Role   @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  registrosMujerVulnerable      RegistroMujerVulnerable[]
+  registrosCultural             RegistroCultural[]
+  registrosVoluntariado         RegistroVoluntariado[]
+  registrosEconomiaPlateada     RegistroEconomiaPlateada[]
+  registrosSeguridadAlimentaria RegistroSeguridadAlimentaria[]
+  registrosRefuerzoEscolar      RegistroRefuerzoEscolar[]
+  registrosSoftwareFactory      RegistroSoftwareFactory[]
+  registrosTallerSteam          RegistroTallerSteam[]
+  registrosSemilleroInnovacion  RegistroSemilleroInnovacion[]
+
+  @@map("users")
 }
 
-model Role {
-  id      Int     @id @default(autoincrement())
-  name    String  @db.VarChar(50)
-  users   Users[]
 
-  @@map("roles")  // Mapea a la tabla "roles" en la DB
+model Role {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(50)
+  users Users[]
+
+  @@map("roles")
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  authorId  Int
-  author    Users     @relation(fields: [authorId], references: [id])
+  id       Int      @id @default(autoincrement())
+  title    String
+  content  String?
+  authorId Int
+  images   String[]
+  author   Users    @relation(fields: [authorId], references: [id])
 
-  @@map("posts")  // Mapea a la tabla "posts" en la DB
+  @@map("posts")
+}
+
+model RegistroMujerVulnerable {
+  id                      Int            @id @default(autoincrement())
+  userId                  Int
+  usuario                 Users  @relation(fields: [userId], references: [id])
+  nombreCompleto          String         @db.VarChar(100)
+  tipoDocumento           TipoDocumento
+  numeroDocumento         String         @unique @db.VarChar(20)
+  fechaNacimiento         DateTime
+  comuna                  String         @db.VarChar(50)
+  estratoSocial           EstratoSocial
+  edad                    Int
+  grupoEtnico             GrupoEtnico
+  telefonoContacto        String         @db.VarChar(15)
+  correoElectronico       String?        @db.VarChar(100)
+  direccion               String         @db.VarChar(30)
+  esMadreCabeza           Boolean        @default(false)
+  numeroHijos             Int            @default(0)
+  conviveConOtrasPersonas Boolean        @default(false)
+  conQuienesConvive       String?        @db.VarChar(100)
+  nivelEducativo          NivelEducativo
+  tieneEmpleo             Boolean        @default(false)
+  actividadLaboral        String?        @db.VarChar(100)
+  fuenteIngresos          String?        @db.VarChar(100)
+  areasApoyo              AreaApoyo[]
+  otrasAreas              String?        @db.VarChar(100)
+  tieneApoyoGubernamental Boolean        @default(false)
+  tipoApoyoGubernamental  String?        @db.VarChar(100)
+  motivacion              String
+  tiempoSemanalDisponible String         @db.VarChar(50)
+  expectativas            String
+  aceptaTerminos          Boolean        @default(false)
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  @@map("registros_mujer_vulnerable")
+}
+
+model RegistroSemilleroInnovacion {
+  id                       Int             @id @default(autoincrement())
+  userId                   Int
+  usuario                  Users  @relation(fields: [userId], references: [id])
+  nombreCompleto           String          @db.VarChar(100)
+  tipoDocumento            TipoDocumento
+  numeroDocumento          String          @unique @db.VarChar(20)
+  fechaNacimiento          DateTime
+  comuna                   String          @db.VarChar(50)
+  estratoSocial            EstratoSocial
+  edad                     Int
+  grupoEtnico              GrupoEtnico
+  telefonoContacto         String          @db.VarChar(15)
+  correoElectronico        String?         @db.VarChar(100)
+  direccion                String          @db.VarChar(30)
+  tipoVinculacion          TipoVinculacion
+  nombreEntidadVinculacion String
+  nivelEducativo           NivelEducativo
+  participacionPrevia      Boolean         @default(false)
+  areasInteres             String[]
+  otrasAreas               String?
+  tieneProyecto            Boolean         @default(false)
+  descripcionProyecto      String?         @db.VarChar(100)
+  habilidades              String          @db.VarChar(100)
+  disponibilidad           String          @db.VarChar(100)
+  motivacion               String          @db.VarChar(100)
+  expectativas             String          @db.VarChar(100)
+  aceptaTerminos           Boolean
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+
+  @@map("registros_semillero_innovacion")
+}
+
+model RegistroTallerSteam {
+  id                   Int           @id @default(autoincrement())
+  userId               Int
+  usuario              Users  @relation(fields: [userId], references: [id])
+  nombreCompleto       String        @db.VarChar(100)
+  fechaNacimiento      DateTime
+  comuna               String        @db.VarChar(50)
+  estratoSocial        EstratoSocial
+  edad                 Int
+  grupoEtnico          GrupoEtnico
+  institucionEducativa String        @db.VarChar(100)
+  cursoGrado           String        @db.VarChar(50)
+  direccion            String        @db.VarChar(100)
+  nombreAcudiente      String        @db.VarChar(100)
+  relacionNino         String        @db.VarChar(50)
+  telefonoContacto     String        @db.VarChar(15)
+  correoElectronico    String?       @db.VarChar(100)
+  participacionPrevia  Boolean       @default(false)
+  actividadesInteres   String[]
+  otrasActividades     String?       @db.VarChar(100)
+  disponibilidad       String        @db.VarChar(100)
+  accesoComputadora    Boolean       @default(false)
+  accesoInternet       Boolean       @default(false)
+  motivacion           String
+  expectativa          String
+  aceptaTerminos       Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@map("registros_taller_steam")
+}
+
+model RegistroSeguridadAlimentaria {
+  id                     Int           @id @default(autoincrement())
+  userId                 Int
+  usuario                Users  @relation(fields: [userId], references: [id])
+  nombreResponsable      String        @db.VarChar(100)
+  tipoDocumento          TipoDocumento
+  numeroDocumento        String        @db.VarChar(20)
+  fechaNacimiento        DateTime
+  telefono               String        @db.VarChar(15)
+  correoElectronico      String?       @db.VarChar(100)
+  direccion              String        @db.VarChar(100)
+  barrio                 String        @db.VarChar(100)
+  comuna                 String        @db.VarChar(50)
+  estratoSocial          EstratoSocial
+  grupoEtnico            GrupoEtnico
+  esAgricultor           Boolean       @default(false)
+  tieneTierras           Boolean       @default(false)
+  hectareas              Float?
+  pisoTermico            String?       @db.VarChar(50)
+  tieneCultivo           Boolean       @default(false)
+  tiposCultivo           String?       @db.VarChar(100)
+  participacionPrevia    Boolean       @default(false)
+  proyectosAnteriores    String?       @db.VarChar(100)
+  tieneRiego             Boolean       @default(false)
+  tieneHerramientas      Boolean       @default(false)
+  tiposHerramientas      String?       @db.VarChar(100)
+  tieneAsistenciaTecnica Boolean       @default(false)
+  motivacion             String
+  tiempoSemanal          String        @db.VarChar(100)
+  expectativas           String
+  aceptaTerminos         Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@map("registros_seguridad_alimentaria")
+}
+
+model RegistroRefuerzoEscolar {
+  id                     Int           @id @default(autoincrement())
+  userId                 Int
+  usuario                Users  @relation(fields: [userId], references: [id])
+  nombreCompleto         String        @db.VarChar(100)
+  fechaNacimiento        DateTime
+  comuna                 String        @db.VarChar(50)
+  estratoSocial          EstratoSocial
+  edad                   Int
+  grupoEtnico            GrupoEtnico
+  institucionEducativa   String        @db.VarChar(100)
+  cursoGrado             String        @db.VarChar(50)
+  direccion              String        @db.VarChar(100)
+  nombreAcudiente        String        @db.VarChar(100)
+  relacionNino           String        @db.VarChar(50)
+  telefonoContacto       String        @db.VarChar(15)
+  correoElectronico      String?       @db.VarChar(100)
+  areasAyuda             String[]      @db.VarChar(50)
+  otrasAreas             String?       @db.VarChar(100)
+  refuerzoPrevio         Boolean       @default(false)
+  dificultadesAcademicas String
+  disponibilidad         String        @db.VarChar(100)
+  accesoMateriales       Boolean       @default(false)
+  apoyoHabitos           Boolean       @default(false)
+  motivacion             String
+  expectativas           String
+  aceptaTerminos         Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  @@map("registros_refuerzo_escolar")
+}
+
+model RegistroSoftwareFactory {
+  id                   Int           @id @default(autoincrement())
+  userId               Int
+  usuario              Users  @relation(fields: [userId], references: [id])
+  nombreCompleto       String        @db.VarChar(100)
+  tipoDocumento        TipoDocumento
+  numeroDocumento      String        @unique @db.VarChar(20)
+  fechaNacimiento      DateTime
+  telefonoContacto     String        @db.VarChar(15)
+  correoElectronico    String?       @db.VarChar(100)
+  direccion            String        @db.VarChar(100)
+  comuna               String        @db.VarChar(50)
+  estratoSocial        EstratoSocial
+  edad                 Int
+  grupoEtnico          GrupoEtnico
+  modalidadVinculacion String        @db.VarChar(50)
+  institucionEducativa String        @db.VarChar(100)
+  programaAcademico    String        @db.VarChar(100)
+  semestreNivel        String        @db.VarChar(50)
+  tiempoDisponible     String        @db.VarChar(100)
+  tecnologias          String[]
+  proyectosRealizados  String?
+  areasInteres         String[]
+  otrasAreas           String?       @db.VarChar(100)
+  experienciaAgile     String?
+  motivacion           String
+  aceptaTerminos       Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@map("registros_software_factory")
+}
+
+model RegistroVoluntariado {
+  id                  Int                @id @default(autoincrement())
+  userId              Int
+  usuario             Users  @relation(fields: [userId], references: [id])
+  nombreCompleto      String             @db.VarChar(100)
+  tipoDocumento       TipoDocumento
+  numeroDocumento     String             @unique @db.VarChar(20)
+  fechaNacimiento     DateTime
+  telefonoContacto    String             @db.VarChar(15)
+  correoElectronico   String?            @db.VarChar(100)
+  direccion           String             @db.VarChar(100)
+  comuna              String             @db.VarChar(50)
+  estratoSocial       EstratoSocial
+  edad                Int
+  grupoEtnico         GrupoEtnico
+  nivelEducativo      NivelEducativo
+  profesionOcupacion  String             @db.VarChar(20)
+  disponibilidadTipo  TipoDisponibilidad
+  diasEspecificos     String?
+  horasDisponibles    Int
+  areasInteres        String[]
+  otrasAreas          String?            @db.VarChar(100)
+  habilidades         String
+  fundacion           String             @db.VarChar(25)
+  funcion             String             @db.VarChar(25)
+  tiempo              String             @db.VarChar(25)
+  motivacion          String
+  referencia1Nombre   String?            @db.VarChar(25)
+  referencia1Telefono String?            @db.VarChar(25)
+  referencia2Nombre   String?            @db.VarChar(25)
+  referencia2Telefono String?            @db.VarChar(25)
+  aceptaTerminos      Boolean            @default(false)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@map("registros_voluntariado")
+}
+
+model RegistroCultural {
+  id                    Int                 @id @default(autoincrement())
+  userId                Int
+  usuario               Users  @relation(fields: [userId], references: [id])
+  nombreCompleto        String              @db.VarChar(100)
+  fechaNacimiento       DateTime
+  comuna                String              @db.VarChar(50)
+  estratoSocial         EstratoSocial
+  edad                  Int
+  grupoEtnico           GrupoEtnico
+  telefonoContacto      String              @db.VarChar(15)
+  correoElectronico     String?             @db.VarChar(100)
+  direccion             String              @db.VarChar(100)
+  documentoIdentidad    String              @unique @db.VarChar(20)
+  municipioDepartamento String              @db.VarChar(20)
+  nivelEducativo        NivelEducativo
+  ocupacion             String              @db.VarChar(20)
+  areaInteresPrincipal  AreaInteresCultural
+  otraAreaInteres       String?             @db.VarChar(100)
+  formacionPrevia       Boolean             @default(false)
+  detalleFormacion      String?             @db.VarChar(100)
+  perteneceGrupo        Boolean             @default(false)
+  detalleGrupo          String?             @db.VarChar(100)
+  diasDisponibles       String
+  motivacion            String
+  expectativas          String
+  aceptaTerminos        Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@map("registros_cultural")
+}
+
+model RegistroEconomiaPlateada {
+  id                  Int           @id @default(autoincrement())
+  userId              Int
+  usuario             Users  @relation(fields: [userId], references: [id])
+  nombreCompleto      String        @db.VarChar(100)
+  fechaNacimiento     DateTime
+  comuna              String        @db.VarChar(50)
+  estratoSocial       EstratoSocial
+  edad                Int
+  grupoEtnico         GrupoEtnico
+  telefonoContacto    String        @db.VarChar(15)
+  correoElectronico   String?       @db.VarChar(100)
+  direccion           String        @db.VarChar(100)
+  tipoDocumento       TipoDocumento
+  numeroDocumento     String        @unique @db.VarChar(20)
+  genero              Genero
+  esPensionado        Boolean       @default(false)
+  actividadEconomica  String?       @db.VarChar(100)
+  trabajoAnterior     Boolean       @default(false)
+  sectorTrabajo       String?       @db.VarChar(100)
+  ingresosAdicionales Boolean       @default(false)
+  fuenteIngresos      String?       @db.VarChar(100)
+  areasInteres        String[]
+  otrasAreas          String?       @db.VarChar(100)
+  habilidades         String
+  tiempoSemanal       String        @db.VarChar(100)
+  motivacion          String
+  expectativas        String
+  aceptaTerminos      Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@map("registros_economia_plateada")
+}
+
+enum TipoVinculacion {
+  INSTITUCION_EDUCATIVA
+  COMUNIDAD
+}
+
+enum NivelEducativo {
+  Primaria
+  Secundaria
+  Tecnica_Tecnologica
+  Universitaria
+  Especializacion
+  Maestria
+  Doctorado
+  Ninguno
+}
+
+enum EstratoSocial {
+  E1
+  E2
+  E3
+  E4
+  E5
+  E6
+}
+
+enum GrupoEtnico {
+  Ninguno
+  Afrodescendiente
+  Indigena
+  Raizal
+  Rom_Gitano
+  Palenquero
+  Otro
+}
+
+enum TipoDocumento {
+  CC
+  TI
+  CE
+  Pasaporte
+}
+
+enum AreaApoyo {
+  CAPACITACION_Y_EMPLEO
+  EMPRENDIMIENTO
+  EDUCACION
+  SALUD_Y_BIENESTAR
+  APOYO_PSICOLOGICO_Y_SOCIAL
+  VIVIENDA_Y_SUBSIDIOS
+  OTRAS
+}
+
+enum TipoDisponibilidad {
+  TIEMPO_COMPLETO
+  TIEMPO_PARCIAL
+  FINES_DE_SEMANA
+  DIAS_ESPECIFICOS
+}
+
+
+
+enum AreaInteresCultural {
+  Musica
+  Danza
+  Manualidades
+  Maquillaje
+  Dibujo
+  Otro
+}
+
+
+enum Genero {
+  FEMENINO
+  MASCULINO
+}
+
+
+enum ProgramaId {
+  MUJER_VULNERABLE      @map("mujer-vulnerable")
+  SEMILLERO_INNOVACION  @map("semillero-innovacion")
+  SEGURIDAD_ALIMENTARIA @map("seguridad-alimentaria")
+  VOLUNTARIADO          @map("voluntariado")
+  ECONOMIA_PLATEADA     @map("economia-plateada")
+  CULTURAL              @map("cultural")
+  TALLER_STEAM          @map("taller-steam")
+  REFUERZO_ESCOLAR      @map("refuerzo-escolar")
+  SOFTWARE_FACTORY      @map("software-factory")
+}
+
+
+model Evento {
+  id          Int         @id @default(autoincrement())
+  programId   ProgramaId
+  title       String
+  description String
+  date        DateTime
+  location    String
+  duration    String
+  capacity    Int
+  registered  Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("eventos")
+}
+
+model InscripcionPorEvento {
+  id              Int      @id @default(autoincrement())
+  nombreCompleto  String
+  numeroDocumento String?
+  programId       String
+  eventoId        Int
+  createdAt       DateTime @default(now())
+
+  @@unique([numeroDocumento, eventoId]) // previene doble inscripción
+  @@map("inscripciones_por_evento")
 }

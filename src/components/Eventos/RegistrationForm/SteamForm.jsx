@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -18,9 +18,6 @@ export default function SteamForm({ program, onClose }) {
     // Datos del Niño/a
     nombreCompleto: "",
     fechaNacimiento: "",
-    diaNacimiento: "",
-    mesNacimiento: "",
-    anoNacimiento: "",
     comuna: "",
     estratoSocial: "",
     edad: "",
@@ -36,14 +33,14 @@ export default function SteamForm({ program, onClose }) {
     correoElectronico: "",
 
     // Intereses y Conocimientos
-    participacionPrevia: "no",
+    participacionPrevia: false, // ¡Cambiado a booleano!
     actividadesInteres: [],
     otrasActividades: "",
 
     // Disponibilidad y Acceso
     disponibilidad: "",
-    accesoComputadora: "no",
-    accesoInternet: "no",
+    accesoComputadora: false, // ¡Cambiado a booleano!
+    accesoInternet: false, // ¡Cambiado a booleano!
 
     // Motivación
     motivacion: "",
@@ -53,24 +50,35 @@ export default function SteamForm({ program, onClose }) {
     aceptaTerminos: false,
   });
 
+  // Usamos el hook useFormSubmit
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: program.id,
+    programId: "taller-steam", // Un ID único para este programa
     onSuccess: onClose,
-    successDescription: `Has inscrito correctamente al niño/a en el Taller STEAM+H.`,
+    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
+    // Aquí podrías añadir un validationFn si necesitas validaciones extra en el frontend
   });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target; // Ya no necesitas `type` ni `checked` aquí
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     });
   };
 
   const handleRadioChange = (name, value) => {
+    // Convertimos "si"/"no" a booleanos para los campos que lo necesiten
+    let storedValue = value;
+    if (
+      name === "participacionPrevia" ||
+      name === "accesoComputadora" ||
+      name === "accesoInternet"
+    ) {
+      storedValue = value === "si" || value === true; // Asegura que se guarde como booleano
+    }
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: storedValue,
     });
   };
 
@@ -107,7 +115,13 @@ export default function SteamForm({ program, onClose }) {
         </p>
       </div>
 
-      <form onSubmit={(e) => handleSubmit(e, formData)} className="space-y-6">
+      {/* Actualiza el onSubmit para usar el handleSubmit del hook */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault(); // Previene la recarga de la página
+          handleSubmit(formData); // Pasa solo formData al hook
+        }}
+        className="space-y-6">
         <FormSection
           title="Datos del Niño, Niña o Adolescente"
           color={program.color}>
@@ -133,6 +147,7 @@ export default function SteamForm({ program, onClose }) {
               <Input
                 id="cursoGrado"
                 name="cursoGrado"
+                type="number"
                 value={formData.cursoGrado}
                 onChange={handleChange}
                 required
@@ -179,6 +194,7 @@ export default function SteamForm({ program, onClose }) {
                 name="telefonoContacto"
                 value={formData.telefonoContacto}
                 onChange={handleChange}
+                type="number"
                 required
               />
             </div>
@@ -200,10 +216,11 @@ export default function SteamForm({ program, onClose }) {
 
         <FormSection title="Intereses y Conocimientos" color={program.color}>
           <div className="space-y-4">
+            {/* Asegúrate que RadioOptions tenga la lógica para manejar booleanos o cámbiale el 'value' aquí */}
             <RadioOptions
               label="¿Ha participado antes en programas STEAM o de pensamiento computacional?"
               name="participacionPrevia"
-              value={formData.participacionPrevia}
+              value={formData.participacionPrevia} // Pasa directamente el booleano
               onChange={handleRadioChange}
               required
             />
@@ -247,7 +264,7 @@ export default function SteamForm({ program, onClose }) {
             <RadioOptions
               label="¿Cuenta con acceso a computadora o Tablet en casa?"
               name="accesoComputadora"
-              value={formData.accesoComputadora}
+              value={formData.accesoComputadora} // Pasa directamente el booleano
               onChange={handleRadioChange}
               required
             />
@@ -255,7 +272,7 @@ export default function SteamForm({ program, onClose }) {
             <RadioOptions
               label="¿Cuenta con acceso a internet en casa?"
               name="accesoInternet"
-              value={formData.accesoInternet}
+              value={formData.accesoInternet} // Pasa directamente el booleano
               onChange={handleRadioChange}
               required
             />
@@ -311,7 +328,7 @@ export default function SteamForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting} // isSubmitting ahora viene del hook
           submitColor={program.color}
         />
       </form>
