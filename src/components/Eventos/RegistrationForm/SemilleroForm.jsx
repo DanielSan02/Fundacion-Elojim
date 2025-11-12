@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useFormSubmit } from "@/hooks/useFormSubmit"; // Importa el hook
+import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { FormSection } from "../form-components/FormSection";
 import { PersonalInfoFields } from "../form-components/PersonalInfoFields";
 import { RadioOptions } from "../form-components/RadioOptions";
@@ -26,7 +26,6 @@ import {
 
 export default function SemilleroForm({ program, onClose }) {
   const [formData, setFormData] = useState({
-    // Datos Personales
     nombreCompleto: "",
     tipoDocumento: "",
     numeroDocumento: "",
@@ -38,34 +37,23 @@ export default function SemilleroForm({ program, onClose }) {
     estratoSocial: "",
     edad: "",
     grupoEtnico: "",
-
-    // Información de Vinculación
-    tipoVinculacion: "institucion", // Este es un string, lo dejaremos así
+    tipoVinculacion: "institucion",
     nombreEntidadVinculacion: "",
     nivelEducativo: "",
-
-    // Intereses y Experiencia
-    participacionPrevia: false, // Cambiado de "no" a false (booleano)
+    participacionPrevia: false,
     areasInteres: [],
     otrasAreas: "",
-    tieneProyecto: false, // Cambiado de "no" a false (booleano)
+    tieneProyecto: false,
     descripcionProyecto: "",
-
-    // Habilidades y Disponibilidad
     habilidades: "",
     disponibilidad: "",
-
-    // Motivación
     motivacion: "",
     expectativas: "",
-
-    // Autorización
     aceptaTerminos: false,
   });
 
-  // Usamos el hook useFormSubmit
   const { isSubmitting, handleSubmit } = useFormSubmit({
-    programId: "semillero-innovacion", // Un ID único para este programa
+    programId: "semillero-innovacion",
     onSuccess: onClose,
     successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
   });
@@ -116,11 +104,13 @@ export default function SemilleroForm({ program, onClose }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="space-y-6">
+      className="space-y-6"
+    >
       <div>
         <h3
           className="text-2xl font-bold mb-2"
-          style={{ color: program.color }}>
+          style={{ color: program.color }}
+        >
           Formulario de Registro - Semillero de Innovación y Emprendimiento
         </h3>
         <p className="text-gray-600 mb-6">
@@ -128,13 +118,60 @@ export default function SemilleroForm({ program, onClose }) {
         </p>
       </div>
 
-      {/* Actualiza el onSubmit para usar el handleSubmit del hook */}
       <form
         onSubmit={(e) => {
-          e.preventDefault(); // Previene la recarga de la página
-          handleSubmit(formData); // Pasa solo formData al hook
+          e.preventDefault();
+
+          const AREAS_MAP = {
+            "Emprendimiento social": "EMPRENDIMIENTO_SOCIAL",
+            "Tecnología e innovación": "TECNOLOGIA_E_INNOVACION",
+            "Medio ambiente y sostenibilidad": "MEDIO_AMBIENTE_Y_SOSTENIBILIDAD",
+            "Transformación digital": "TRANSFORMACION_DIGITAL",
+            "Desarrollo de productos o servicios": "DESARROLLO_DE_PRODUCTOS_O_SERVICIOS",
+            "Otras": "OTRAS",
+          };
+
+          const OPCIONES_VALIDAS = Object.keys(AREAS_MAP);
+
+          // --- PARCHE DE SEGURIDAD MÁXIMA ---
+          // Elimina TODO lo que no esté en la lista
+          let nuevasAreasInteres = [];
+          for (let area of (formData.areasInteres || [])) {
+            if (OPCIONES_VALIDAS.includes(area)) {
+              nuevasAreasInteres.push(area);
+            }
+          }
+
+          // Si hay texto en otrasAreas, asegura que "Otras" está en el array
+          if (formData.otrasAreas?.trim()) {
+            if (!nuevasAreasInteres.includes("Otras")) {
+              nuevasAreasInteres.push("Otras");
+            }
+          } else {
+            nuevasAreasInteres = nuevasAreasInteres.filter((area) => area !== "Otras");
+          }
+
+          // FILTRO FINAL, solo por si acaso
+          nuevasAreasInteres = nuevasAreasInteres.filter((area) =>
+            OPCIONES_VALIDAS.includes(area)
+          );
+
+          const areasInteresMapped = nuevasAreasInteres.map((area) => AREAS_MAP[area]);
+
+          // LOG PARA DEBUG
+          console.log("DEBUG-selected:", formData.areasInteres);
+          console.log("DEBUG-filtradas:", nuevasAreasInteres);
+          console.log("DEBUG-mapeadas:", areasInteresMapped);
+          console.log("DEBUG-otrasAreas:", formData.otrasAreas);
+
+          handleSubmit({
+            ...formData,
+            areasInteres: areasInteresMapped,
+          });
         }}
-        className="space-y-6">
+
+        className="space-y-6"
+      >
         <FormSection title="Datos Personales" icon="📇" color={program.color}>
           <PersonalInfoFields
             formData={formData}
@@ -142,7 +179,6 @@ export default function SemilleroForm({ program, onClose }) {
             showContact={true}
             showEmail={true}
           />
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div className="space-y-2">
               <Label htmlFor="tipoDocumento">
@@ -152,7 +188,8 @@ export default function SemilleroForm({ program, onClose }) {
                 value={formData.tipoDocumento}
                 onValueChange={(value) =>
                   setFormData({ ...formData, tipoDocumento: value })
-                }>
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar" />
                 </SelectTrigger>
@@ -184,9 +221,9 @@ export default function SemilleroForm({ program, onClose }) {
         <FormSection
           title="Información de Vinculación"
           icon="🔗"
-          color={program.color}>
+          color={program.color}
+        >
           <div className="space-y-4">
-            {/* Si RadioOptions maneja solo strings 'si'/'no', este está bien */}
             <RadioOptions
               label="¿Cómo desea vincularse al semillero?"
               name="tipoVinculacion"
@@ -225,7 +262,8 @@ export default function SemilleroForm({ program, onClose }) {
                 value={formData.nivelEducativo}
                 onValueChange={(value) =>
                   handleSelectChange("nivelEducativo", value)
-                }>
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar" />
                 </SelectTrigger>
@@ -244,9 +282,9 @@ export default function SemilleroForm({ program, onClose }) {
         <FormSection
           title="Intereses y Experiencia"
           icon="💡"
-          color={program.color}>
+          color={program.color}
+        >
           <div className="space-y-4">
-            {/* Cambiar la condición a booleano */}
             <RadioOptions
               label="¿Ha participado anteriormente en iniciativas de innovación o emprendimiento?"
               name="participacionPrevia"
@@ -264,13 +302,13 @@ export default function SemilleroForm({ program, onClose }) {
               showOtherOption={true}
               otherOptionLabel="Otras"
               otherValue={formData.otrasAreas}
-              onOtherValueChange={(value) =>
-                setFormData({ ...formData, otrasAreas: value })
-              }
+              onOtherValueChange={(value) => {
+                console.log("onOtherValueChange:", value, "áreasInteres:", formData.areasInteres);
+                setFormData({ ...formData, otrasAreas: value });
+              }}
               required
             />
 
-            {/* Cambiar la condición a booleano */}
             <RadioOptions
               label="¿Tiene un proyecto en marcha o una idea de emprendimiento?"
               name="tieneProyecto"
@@ -279,7 +317,6 @@ export default function SemilleroForm({ program, onClose }) {
               required
             />
 
-            {/* Renderizado condicional con booleano */}
             {formData.tieneProyecto === true && (
               <div className="space-y-2">
                 <Label htmlFor="descripcionProyecto">
@@ -302,7 +339,8 @@ export default function SemilleroForm({ program, onClose }) {
         <FormSection
           title="Habilidades y Disponibilidad"
           icon="🛠️"
-          color={program.color}>
+          color={program.color}
+        >
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="habilidades">
@@ -375,7 +413,8 @@ export default function SemilleroForm({ program, onClose }) {
         <FormSection
           title="Autorización de Participación y Tratamiento de Datos"
           icon="✅"
-          color={program.color}>
+          color={program.color}
+        >
           <TermsCheckbox
             checked={formData.aceptaTerminos}
             onChange={(checked) =>
@@ -387,7 +426,7 @@ export default function SemilleroForm({ program, onClose }) {
 
         <FormButtons
           onCancel={onClose}
-          isSubmitting={isSubmitting} // isSubmitting ahora viene del hook
+          isSubmitting={isSubmitting}
           submitColor={program.color}
         />
       </form>

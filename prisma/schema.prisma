@@ -14,8 +14,25 @@ model Users {
   email    String @unique
   password String @db.VarChar(100)
   rolId    Int
-  posts    Post[]
-  role     Role   @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  resetToken        String?   @db.VarChar(255)
+  resetTokenExpires DateTime?
+
+  posts Post[]
+  role  Role   @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  registrosMujerVulnerable      RegistroMujerVulnerable[]
+  registrosCultural             RegistroCultural[]
+  registrosVoluntariado         RegistroVoluntariado[]
+  registrosEconomiaPlateada     RegistroEconomiaPlateada[]
+  registrosSeguridadAlimentaria RegistroSeguridadAlimentaria[]
+  registrosRefuerzoEscolar      RegistroRefuerzoEscolar[]
+  registrosSoftwareFactory      RegistroSoftwareFactory[]
+  registrosTallerSteam          RegistroTallerSteam[]
+  registrosSemilleroInnovacion  RegistroSemilleroInnovacion[]
+
+  // 🔹 Nueva relación con inscripciones de eventos
+  inscripciones InscripcionPorEvento[]
 
   @@map("users")
 }
@@ -35,12 +52,16 @@ model Post {
   authorId Int
   images   String[]
   author   Users    @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("posts")
 }
 
 model RegistroMujerVulnerable {
   id                      Int            @id @default(autoincrement())
+  userId                  Int
+  usuario                 Users          @relation(fields: [userId], references: [id])
   nombreCompleto          String         @db.VarChar(100)
   tipoDocumento           TipoDocumento
   numeroDocumento         String         @unique @db.VarChar(20)
@@ -51,7 +72,7 @@ model RegistroMujerVulnerable {
   grupoEtnico             GrupoEtnico
   telefonoContacto        String         @db.VarChar(15)
   correoElectronico       String?        @db.VarChar(100)
-  direccion               String         @db.VarChar(30)
+  direccion               String         @db.VarChar(70)
   esMadreCabeza           Boolean        @default(false)
   numeroHijos             Int            @default(0)
   conviveConOtrasPersonas Boolean        @default(false)
@@ -76,6 +97,8 @@ model RegistroMujerVulnerable {
 
 model RegistroSemilleroInnovacion {
   id                       Int             @id @default(autoincrement())
+  userId                   Int
+  usuario                  Users           @relation(fields: [userId], references: [id])
   nombreCompleto           String          @db.VarChar(100)
   tipoDocumento            TipoDocumento
   numeroDocumento          String          @unique @db.VarChar(20)
@@ -86,7 +109,7 @@ model RegistroSemilleroInnovacion {
   grupoEtnico              GrupoEtnico
   telefonoContacto         String          @db.VarChar(15)
   correoElectronico        String?         @db.VarChar(100)
-  direccion                String          @db.VarChar(30)
+  direccion                String          @db.VarChar(70)
   tipoVinculacion          TipoVinculacion
   nombreEntidadVinculacion String
   nivelEducativo           NivelEducativo
@@ -108,6 +131,8 @@ model RegistroSemilleroInnovacion {
 
 model RegistroTallerSteam {
   id                   Int           @id @default(autoincrement())
+  userId               Int
+  usuario              Users         @relation(fields: [userId], references: [id])
   nombreCompleto       String        @db.VarChar(100)
   fechaNacimiento      DateTime
   comuna               String        @db.VarChar(50)
@@ -116,7 +141,7 @@ model RegistroTallerSteam {
   grupoEtnico          GrupoEtnico
   institucionEducativa String        @db.VarChar(100)
   cursoGrado           String        @db.VarChar(50)
-  direccion            String        @db.VarChar(100)
+  direccion            String        @db.VarChar(70)
   nombreAcudiente      String        @db.VarChar(100)
   relacionNino         String        @db.VarChar(50)
   telefonoContacto     String        @db.VarChar(15)
@@ -138,13 +163,15 @@ model RegistroTallerSteam {
 
 model RegistroSeguridadAlimentaria {
   id                     Int           @id @default(autoincrement())
+  userId                 Int
+  usuario                Users         @relation(fields: [userId], references: [id])
   nombreResponsable      String        @db.VarChar(100)
   tipoDocumento          TipoDocumento
   numeroDocumento        String        @db.VarChar(20)
   fechaNacimiento        DateTime
   telefono               String        @db.VarChar(15)
   correoElectronico      String?       @db.VarChar(100)
-  direccion              String        @db.VarChar(100)
+  direccion              String        @db.VarChar(70)
   barrio                 String        @db.VarChar(100)
   comuna                 String        @db.VarChar(50)
   estratoSocial          EstratoSocial
@@ -173,6 +200,8 @@ model RegistroSeguridadAlimentaria {
 
 model RegistroRefuerzoEscolar {
   id                     Int           @id @default(autoincrement())
+  userId                 Int
+  usuario                Users         @relation(fields: [userId], references: [id])
   nombreCompleto         String        @db.VarChar(100)
   fechaNacimiento        DateTime
   comuna                 String        @db.VarChar(50)
@@ -181,7 +210,7 @@ model RegistroRefuerzoEscolar {
   grupoEtnico            GrupoEtnico
   institucionEducativa   String        @db.VarChar(100)
   cursoGrado             String        @db.VarChar(50)
-  direccion              String        @db.VarChar(100)
+  direccion              String        @db.VarChar(70)
   nombreAcudiente        String        @db.VarChar(100)
   relacionNino           String        @db.VarChar(50)
   telefonoContacto       String        @db.VarChar(15)
@@ -204,13 +233,15 @@ model RegistroRefuerzoEscolar {
 
 model RegistroSoftwareFactory {
   id                   Int           @id @default(autoincrement())
+  userId               Int
+  usuario              Users         @relation(fields: [userId], references: [id])
   nombreCompleto       String        @db.VarChar(100)
   tipoDocumento        TipoDocumento
   numeroDocumento      String        @unique @db.VarChar(20)
   fechaNacimiento      DateTime
   telefonoContacto     String        @db.VarChar(15)
   correoElectronico    String?       @db.VarChar(100)
-  direccion            String        @db.VarChar(100)
+  direccion            String        @db.VarChar(70)
   comuna               String        @db.VarChar(50)
   estratoSocial        EstratoSocial
   edad                 Int
@@ -235,13 +266,15 @@ model RegistroSoftwareFactory {
 
 model RegistroVoluntariado {
   id                  Int                @id @default(autoincrement())
+  userId              Int
+  usuario             Users              @relation(fields: [userId], references: [id])
   nombreCompleto      String             @db.VarChar(100)
   tipoDocumento       TipoDocumento
   numeroDocumento     String             @unique @db.VarChar(20)
   fechaNacimiento     DateTime
   telefonoContacto    String             @db.VarChar(15)
   correoElectronico   String?            @db.VarChar(100)
-  direccion           String             @db.VarChar(100)
+  direccion           String             @db.VarChar(70)
   comuna              String             @db.VarChar(50)
   estratoSocial       EstratoSocial
   edad                Int
@@ -271,6 +304,8 @@ model RegistroVoluntariado {
 
 model RegistroCultural {
   id                    Int                 @id @default(autoincrement())
+  userId                Int
+  usuario               Users               @relation(fields: [userId], references: [id])
   nombreCompleto        String              @db.VarChar(100)
   fechaNacimiento       DateTime
   comuna                String              @db.VarChar(50)
@@ -279,7 +314,7 @@ model RegistroCultural {
   grupoEtnico           GrupoEtnico
   telefonoContacto      String              @db.VarChar(15)
   correoElectronico     String?             @db.VarChar(100)
-  direccion             String              @db.VarChar(100)
+  direccion             String              @db.VarChar(70)
   documentoIdentidad    String              @unique @db.VarChar(20)
   municipioDepartamento String              @db.VarChar(20)
   nivelEducativo        NivelEducativo
@@ -302,6 +337,8 @@ model RegistroCultural {
 
 model RegistroEconomiaPlateada {
   id                  Int           @id @default(autoincrement())
+  userId              Int
+  usuario             Users         @relation(fields: [userId], references: [id])
   nombreCompleto      String        @db.VarChar(100)
   fechaNacimiento     DateTime
   comuna              String        @db.VarChar(50)
@@ -310,7 +347,7 @@ model RegistroEconomiaPlateada {
   grupoEtnico         GrupoEtnico
   telefonoContacto    String        @db.VarChar(15)
   correoElectronico   String?       @db.VarChar(100)
-  direccion           String        @db.VarChar(100)
+  direccion           String        @db.VarChar(70)
   tipoDocumento       TipoDocumento
   numeroDocumento     String        @unique @db.VarChar(20)
   genero              Genero
@@ -392,8 +429,6 @@ enum TipoDisponibilidad {
   DIAS_ESPECIFICOS
 }
 
-
-
 enum AreaInteresCultural {
   Musica
   Danza
@@ -403,12 +438,10 @@ enum AreaInteresCultural {
   Otro
 }
 
-
 enum Genero {
   FEMENINO
   MASCULINO
 }
-
 
 enum ProgramaId {
   MUJER_VULNERABLE      @map("mujer-vulnerable")
@@ -422,9 +455,8 @@ enum ProgramaId {
   SOFTWARE_FACTORY      @map("software-factory")
 }
 
-
 model Evento {
-  id          Int         @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   programId   ProgramaId
   title       String
   description String
@@ -432,9 +464,23 @@ model Evento {
   location    String
   duration    String
   capacity    Int
-  registered  Int         @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  registered  Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@map("eventos")
+}
+
+model InscripcionPorEvento {
+  id              Int      @id @default(autoincrement())
+  nombreCompleto  String
+  numeroDocumento String?
+  programId       String
+  eventoId        Int
+  userId          Int
+  usuario         Users    @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@unique([numeroDocumento, eventoId]) // previene doble inscripción
+  @@map("inscripciones_por_evento")
 }

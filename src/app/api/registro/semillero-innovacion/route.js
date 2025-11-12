@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getServerSession } from "next-auth";
+import { sendRegistroUpdate } from "../stream/route";
+import { sendEventoUpdate } from "@/app/api/inscripciones-evento/stream/route";
 
 import {
   EstratoSocial,
@@ -11,13 +14,13 @@ import {
 } from "@prisma/client";
 
 const areasInteresValidas = [
-    "Emprendimiento social",
-    "Tecnología e innovación",
-    "Medio ambiente y sostenibilidad",
-    "Transformación digital",
-    "Desarrollo de productos o servicios",
-    "Otras"
-  ];
+  "EMPRENDIMIENTO_SOCIAL",
+  "TECNOLOGIA_E_INNOVACION",
+  "MEDIO_AMBIENTE_Y_SOSTENIBILIDAD",
+  "TRANSFORMACION_DIGITAL",
+  "DESARROLLO_DE_PRODUCTOS_O_SERVICIOS",
+  "OTRAS"
+];
 
 const ESTRATOS = Object.values(EstratoSocial);
 const GRUPOS_ETNICOS = Object.values(GrupoEtnico);
@@ -90,6 +93,11 @@ function validarDatos(data) {
     throw new Error("El campo 'areasInteres' debe ser una lista.");
   }
 
+  // LOG para depuración
+  if (process.env.NODE_ENV === "development") {
+    console.log("Backend recibió areasInteres:", data.areasInteres);
+  }
+
   const areasInvalidas = data.areasInteres.filter(
     (area) => !areasInteresValidas.includes(area)
   );
@@ -107,16 +115,30 @@ function validarDatos(data) {
 
 export async function POST(request) {
   try {
-    const data = await request.json();
+    const session = await getServerSession(authOptions);
+    const userId = Number(session?.user?.id);
 
+    if (!userId) {
+      return NextResponse.json({ error: "Usuario no autenticado" }, { status: 401 });
+    }
+
+    const data = await request.json();
     validarDatos(data);
 
     const nuevoRegistro = await prisma.registroSemilleroInnovacion.create({
       data: {
         ...data,
         fechaNacimiento: new Date(data.fechaNacimiento),
-        areasInteres: data.areasInteres || [],
+        usuario: {
+          connect: { id: userId },
+        },
       },
+    });
+
+    sendRegistroUpdate({
+      action: "created",
+      programId: "semillero-innovacion",
+      userId: userId,
     });
 
     return NextResponse.json(nuevoRegistro, { status: 201 });
@@ -131,7 +153,6 @@ export async function POST(request) {
     );
   }
 }
-
 
 export async function GET() {
   try {
@@ -149,7 +170,6 @@ export async function GET() {
   }
 }
 
-
 export async function DELETE(req) {
   try {
     const { id } = await req.json();
@@ -162,9 +182,44 @@ export async function DELETE(req) {
       return new Response("Registro no encontrado", { status: 404 });
     }
 
-    await prisma.registroSemilleroInnovacion.delete({
-      where: { id },
+    // 🔹 Obtener las inscripciones que se van a eliminar (para actualizar contadores)
+    const inscripciones = await prisma.inscripcionPorEvento.findMany({
+      where: {
+        programId: "semillero-innovacion",
+        userId: registro.userId,
+      },
+      select: { id: true, eventoId: true },
     });
+
+    await prisma.$transaction([
+      prisma.inscripcionPorEvento.deleteMany({
+        where: { programId: "semillero-innovacion", userId: registro.userId },
+      }), 
+      prisma.registroSemilleroInnovacion.delete({ where: { id } }),
+       // 🔹 Decrementar contador "registered" en cada evento afectado
+      ...inscripciones.map((i) =>
+        prisma.evento.update({
+          where: { id: i.eventoId },
+          data: { registered: { decrement: 1 } },
+        })
+      ),
+    ]);
+
+    sendRegistroUpdate({
+      action: "deleted",
+      programId: "semillero-innovacion",
+      userId: registro.userId,
+    });
+
+    for (const insc of inscripciones) {
+      sendEventoUpdate({
+        action: "deleted",
+        eventoId: insc.eventoId,
+        programId: "semillero-innovacion",
+        inscripcionId: insc.id,
+        userId: registro.userId,
+      });
+    }
 
     return new Response("Registro eliminado exitosamente", { status: 200 });
   } catch (error) {
@@ -172,7 +227,6 @@ export async function DELETE(req) {
     return new Response("Error interno al eliminar registro", { status: 500 });
   }
 }
-
 
 export const config = {
   api: {

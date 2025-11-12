@@ -71,7 +71,7 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
   const { isSubmitting, handleSubmit } = useFormSubmit({
     programId: "seguridad-alimentaria", // Un ID único para este programa
     onSuccess: onClose,
-    successDescription: "Formulario enviado exitosamente.",
+    successDescription: `Te has inscrito correctamente como voluntario en ${program.title}.`,
     // Aquí puedes añadir un validationFn si necesitas validaciones extra en el frontend
   });
 
@@ -84,29 +84,11 @@ export default function SeguridadAlimentariaForm({ program, onClose }) {
   };
 
   const handleRadioChange = (name, value) => {
-    let storedValue = value;
-    if (
-      name === "esAgricultor" ||
-      name === "tieneTierras" ||
-      name === "tieneCultivo" ||
-      name === "participacionPrevia" ||
-      name === "tieneRiego" ||
-      name === "tieneHerramientas" ||
-      name === "tieneAsistenciaTecnica"
-    ) {
-      storedValue = value === "si"; // True si es "si", False si es "no"
-    }
-    setFormData((prevFormData) => {
-      const newFormData = {
-        ...prevFormData,
-        [name]: storedValue,
-      };
-      console.log(
-        `Campo: ${name}, Valor anterior: ${prevFormData[name]}, Nuevo valor: ${newFormData[name]}`
-      );
-      return newFormData;
-    });
-  };
+  setFormData({
+    ...formData,
+    [name]: value,
+  });
+};
 
   const handleSelectChange = (field, value) => {
     setFormData({
